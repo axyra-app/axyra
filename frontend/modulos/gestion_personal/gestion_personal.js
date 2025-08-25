@@ -103,12 +103,12 @@ class GestionPersonalManager {
             }
           }
         });
-        
+
         // Limpiar formato al enfocar
         campo.addEventListener('focus', (e) => {
           e.target.value = e.target.value.replace(/[^\d]/g, '');
         });
-        
+
         // Formatear al perder el foco
         campo.addEventListener('blur', (e) => {
           let valor = e.target.value.replace(/[^\d]/g, '');
@@ -1010,7 +1010,11 @@ function procesarGeneracionNomina() {
   const periodo = document.getElementById('periodoNomina').value;
   const fechaCorte = document.getElementById('fechaCorteNomina').value;
 
-  mostrarNotificacion(`Generando nómina para el período: ${periodo}, Fecha de corte: ${fechaCorte}`, 'info', 'Generación de Nómina');
+  mostrarNotificacion(
+    `Generando nómina para el período: ${periodo}, Fecha de corte: ${fechaCorte}`,
+    'info',
+    'Generación de Nómina'
+  );
   cerrarModalGenerarNomina();
 }
 
@@ -1049,7 +1053,11 @@ function generarReporteDepartamento() {
   const departamento = document.getElementById('reporteDepartamentoSelect').value;
   const periodo = document.getElementById('reporteDepartamentoPeriodo').value;
 
-  mostrarNotificacion(`Generando reporte de departamento ${departamento || 'todos'} (${periodo})`, 'info', 'Generación de Reporte');
+  mostrarNotificacion(
+    `Generando reporte de departamento ${departamento || 'todos'} (${periodo})`,
+    'info',
+    'Generación de Reporte'
+  );
   cerrarModalReporteDepartamento();
 }
 
@@ -1082,23 +1090,23 @@ function mostrarNotificacion(mensaje, tipo = 'info', titulo = 'AXYRA') {
     // Configurar contenido
     tituloElement.textContent = titulo;
     mensajeElement.textContent = mensaje;
-    
+
     // Configurar tipo y icono
     notificacion.className = `notificacion notificacion-${tipo}`;
-    
+
     // Configurar icono según el tipo
     const iconos = {
       success: 'fa-check-circle',
       error: 'fa-exclamation-circle',
       warning: 'fa-exclamation-triangle',
-      info: 'fa-info-circle'
+      info: 'fa-info-circle',
     };
-    
+
     iconoElement.className = `fas ${iconos[tipo] || iconos.info}`;
-    
+
     // Mostrar notificación
     notificacion.classList.add('mostrar');
-    
+
     // Ocultar automáticamente después de 5 segundos
     setTimeout(() => {
       cerrarNotificacion();
