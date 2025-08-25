@@ -792,6 +792,25 @@
 
     <!-- Scripts -->
     <!-- Firebase -->
+    <script>
+      // Configuración de Firebase
+      const firebaseConfig = {
+        apiKey: "AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+        authDomain: "axyra-app.firebaseapp.com",
+        projectId: "axyra-app",
+        storageBucket: "axyra-app.appspot.com",
+        messagingSenderId: "123456789012",
+        appId: "1:123456789012:web:abcdefghijklmnop"
+      };
+      
+      // Inicializar Firebase
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        console.log('🔥 Firebase inicializado correctamente');
+      } else {
+        console.warn('⚠️ Firebase no está disponible');
+      }
+    </script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
