@@ -1024,6 +1024,29 @@
       window.cerrarModalGestionUsuarios = cerrarModalGestionUsuarios;
       window.cerrarModalAreasTrabajo = cerrarModalAreasTrabajo;
       window.guardarAreasTrabajo = guardarAreasTrabajo;
+      window.createBackup = createBackup;
+      window.agregarNuevoUsuario = agregarNuevoUsuario;
+      window.editarRoles = editarRoles;
+      window.cambiarColorPrimario = cambiarColorPrimario;
+      window.cambiarColorSecundario = cambiarColorSecundario;
+      window.cambiarColorAcento = cambiarColorAcento;
+      window.setup2FA = setup2FA;
+      window.test2FA = test2FA;
+      window.resetSessionTimeout = resetSessionTimeout;
+      window.configureSessionTimeout = configureSessionTimeout;
+      window.testResponsive = testResponsive;
+      window.configureResponsive = configureResponsive;
+      window.configureBackup = configureBackup;
+      window.testNotifications = testNotifications;
+      window.configureNotifications = configureNotifications;
+      window.checkUpdates = checkUpdates;
+      window.configureUpdates = configureUpdates;
+      window.performBackup = performBackup;
+      window.saveCompanyConfig = saveCompanyConfig;
+      window.resetCompanyConfig = resetCompanyConfig;
+      window.mostrarModalConfiguracion = mostrarModalConfiguracion;
+      window.confirmarModalConfiguracion = confirmarModalConfiguracion;
+      window.cerrarModalConfiguracion = cerrarModalConfiguracion;
     </script>
 
     <style>
@@ -1605,15 +1628,24 @@
       // Función para configurar timeout de sesión
       function configureSessionTimeout() {
         try {
-          const timeout = prompt('Ingresa el nuevo timeout en minutos (15-120):', '30');
-          if (timeout && !isNaN(timeout) && timeout >= 15 && timeout <= 120) {
-            if (window.axyraSessionTimeout) {
-              window.axyraSessionTimeout.setTimeout(timeout * 60 * 1000);
-              mostrarNotificacion(`⏰ Timeout configurado a ${timeout} minutos`, 'success');
-            } else {
-              mostrarNotificacion('⏰ Sistema de timeout no disponible', 'warning');
+          mostrarModalConfiguracion(
+            '⏰ Configurar Timeout de Sesión',
+            'Ingresa el nuevo timeout en minutos (15-120):',
+            '30',
+            'number',
+            (valor) => {
+              if (valor && !isNaN(valor) && valor >= 15 && valor <= 120) {
+                if (window.axyraSessionTimeout) {
+                  window.axyraSessionTimeout.setTimeout(valor * 60 * 1000);
+                  mostrarNotificacion(`⏰ Timeout configurado a ${valor} minutos`, 'success');
+                } else {
+                  mostrarNotificacion('⏰ Sistema de timeout no disponible', 'warning');
+                }
+              } else {
+                mostrarNotificacion('❌ El valor debe estar entre 15 y 120 minutos', 'error');
+              }
             }
-          }
+          );
         } catch (error) {
           console.error('❌ Error configurando timeout:', error);
         }
@@ -1647,10 +1679,19 @@
       // Función para configurar backup
       function configureBackup() {
         try {
-          const frecuencia = prompt('Ingresa la frecuencia de respaldo (daily/weekly/monthly):', 'daily');
-          if (frecuencia && ['daily', 'weekly', 'monthly'].includes(frecuencia)) {
-            mostrarNotificacion(`💾 Frecuencia de backup configurada a: ${frecuencia}`, 'success');
-          }
+          mostrarModalConfiguracion(
+            '💾 Configurar Frecuencia de Backup',
+            'Selecciona la frecuencia de respaldo:',
+            'daily',
+            'select',
+            ['daily', 'weekly', 'monthly'],
+            ['Diario', 'Semanal', 'Mensual'],
+            (valor) => {
+              if (valor && ['daily', 'weekly', 'monthly'].includes(valor)) {
+                mostrarNotificacion(`💾 Frecuencia de backup configurada a: ${valor}`, 'success');
+              }
+            }
+          );
         } catch (error) {
           console.error('❌ Error configurando backup:', error);
         }
@@ -1668,10 +1709,19 @@
       // Función para configurar notificaciones
       function configureNotifications() {
         try {
-          const frecuencia = prompt('Ingresa la frecuencia de notificaciones en minutos (5-60):', '10');
-          if (frecuencia && !isNaN(frecuencia) && frecuencia >= 5 && frecuencia <= 60) {
-            mostrarNotificacion(`🔔 Frecuencia configurada a: cada ${frecuencia} minutos`, 'success');
-          }
+          mostrarModalConfiguracion(
+            '🔔 Configurar Frecuencia de Notificaciones',
+            'Ingresa la frecuencia en minutos (5-60):',
+            '10',
+            'number',
+            (valor) => {
+              if (valor && !isNaN(valor) && valor >= 5 && valor <= 60) {
+                mostrarNotificacion(`🔔 Frecuencia configurada a: cada ${valor} minutos`, 'success');
+              } else {
+                mostrarNotificacion('❌ El valor debe estar entre 5 y 60 minutos', 'error');
+              }
+            }
+          );
         } catch (error) {
           console.error('❌ Error configurando notificaciones:', error);
         }
@@ -1748,27 +1798,112 @@
         }
       }
 
-      // Agregar todas las funciones al scope global
-      window.createBackup = createBackup;
-      window.agregarNuevoUsuario = agregarNuevoUsuario;
-      window.editarRoles = editarRoles;
-      window.cambiarColorPrimario = cambiarColorPrimario;
-      window.cambiarColorSecundario = cambiarColorSecundario;
-      window.cambiarColorAcento = cambiarColorAcento;
-      window.setup2FA = setup2FA;
-      window.test2FA = test2FA;
-      window.resetSessionTimeout = resetSessionTimeout;
-      window.configureSessionTimeout = configureSessionTimeout;
-      window.testResponsive = testResponsive;
-      window.configureResponsive = configureResponsive;
-      window.configureBackup = configureBackup;
-      window.testNotifications = testNotifications;
-      window.configureNotifications = configureNotifications;
-      window.checkUpdates = checkUpdates;
-      window.configureUpdates = configureUpdates;
-      window.performBackup = performBackup;
-      window.saveCompanyConfig = saveCompanyConfig;
-      window.resetCompanyConfig = resetCompanyConfig;
+      // Función para mostrar modal de configuración profesional
+      function mostrarModalConfiguracion(titulo, mensaje, valorInicial, tipo, opciones, opcionesTexto, callback) {
+        try {
+          // Crear modal HTML
+          let inputHTML = '';
+          if (tipo === 'select') {
+            inputHTML = `
+              <select id="modalConfigInput" class="axyra-modal-input">
+                ${opciones.map((opcion, index) => 
+                  `<option value="${opcion}" ${opcion === valorInicial ? 'selected' : ''}>${opcionesTexto[index]}</option>`
+                ).join('')}
+              </select>
+            `;
+          } else {
+            inputHTML = `
+              <input type="${tipo}" id="modalConfigInput" class="axyra-modal-input" 
+                     value="${valorInicial}" min="${tipo === 'number' ? '1' : ''}" 
+                     max="${tipo === 'number' ? '999' : ''}" />
+            `;
+          }
+
+          const modalHTML = `
+            <div class="axyra-modal-overlay" id="modalConfiguracion">
+              <div class="axyra-modal-container">
+                <div class="axyra-modal-header">
+                  <h3>${titulo}</h3>
+                  <button class="axyra-modal-close" onclick="cerrarModalConfiguracion()">&times;</button>
+                </div>
+                <div class="axyra-modal-body">
+                  <p class="axyra-modal-mensaje">${mensaje}</p>
+                  <div class="axyra-modal-input-container">
+                    ${inputHTML}
+                  </div>
+                </div>
+                <div class="axyra-modal-footer">
+                  <button class="axyra-btn axyra-btn-success" onclick="confirmarModalConfiguracion()">
+                    <i class="fas fa-check"></i> Confirmar
+                  </button>
+                  <button class="axyra-btn axyra-btn-secondary" onclick="cerrarModalConfiguracion()">
+                    <i class="fas fa-times"></i> Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          // Remover modal anterior si existe
+          const modalAnterior = document.getElementById('modalConfiguracion');
+          if (modalAnterior) {
+            modalAnterior.remove();
+          }
+
+          // Agregar nuevo modal
+          document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+          // Guardar callback para uso posterior
+          window.modalConfigCallback = callback;
+
+          // Mostrar modal
+          const modal = document.getElementById('modalConfiguracion');
+          if (modal) {
+            modal.style.display = 'block';
+            
+            // Enfocar input
+            setTimeout(() => {
+              const input = document.getElementById('modalConfigInput');
+              if (input) {
+                input.focus();
+                input.select();
+              }
+            }, 100);
+          }
+        } catch (error) {
+          console.error('❌ Error mostrando modal de configuración:', error);
+          // Fallback a notificación
+          mostrarNotificacion('❌ Error mostrando modal: ' + error.message, 'error');
+        }
+      }
+
+      // Función para confirmar modal de configuración
+      function confirmarModalConfiguracion() {
+        try {
+          const input = document.getElementById('modalConfigInput');
+          if (input && window.modalConfigCallback) {
+            const valor = input.value;
+            window.modalConfigCallback(valor);
+            cerrarModalConfiguracion();
+          }
+        } catch (error) {
+          console.error('❌ Error confirmando modal:', error);
+        }
+      }
+
+      // Función para cerrar modal de configuración
+      function cerrarModalConfiguracion() {
+        try {
+          const modal = document.getElementById('modalConfiguracion');
+          if (modal) {
+            modal.remove();
+          }
+          // Limpiar callback
+          delete window.modalConfigCallback;
+        } catch (error) {
+          console.error('❌ Error cerrando modal:', error);
+        }
+      }
     </script>
   </body>
 </html>

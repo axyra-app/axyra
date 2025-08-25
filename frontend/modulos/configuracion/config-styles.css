@@ -411,6 +411,188 @@ input:checked + .axyra-slider:before {
     border-color: var(--axyra-primary);
 }
 
+/* ===== MODALES PROFESIONALES DE CONFIGURACIÓN ===== */
+
+.axyra-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 10000;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.axyra-modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+.axyra-modal-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.axyra-modal-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.axyra-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.axyra-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.axyra-modal-body {
+  padding: 25px;
+}
+
+.axyra-modal-mensaje {
+  margin: 0 0 20px 0;
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.axyra-modal-input-container {
+  margin-bottom: 20px;
+}
+
+.axyra-modal-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+}
+
+.axyra-modal-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background: white;
+}
+
+.axyra-modal-input[type="number"] {
+  text-align: center;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.axyra-modal-input[type="select"] {
+  cursor: pointer;
+}
+
+.axyra-modal-footer {
+  padding: 20px 25px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+/* Botones del modal */
+.axyra-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  min-width: 100px;
+  justify-content: center;
+}
+
+.axyra-btn-success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+}
+
+.axyra-btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+}
+
+.axyra-btn-secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: 2px solid #cbd5e0;
+}
+
+.axyra-btn-secondary:hover {
+  background: #cbd5e0;
+  border-color: #a0aec0;
+  transform: translateY(-1px);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .axyra-config-container {
@@ -449,6 +631,19 @@ input:checked + .axyra-slider:before {
     
     .axyra-form-actions {
         flex-direction: column;
+    }
+
+    .axyra-modal-container {
+      width: 95%;
+      margin: 20px;
+    }
+    
+    .axyra-modal-footer {
+      flex-direction: column;
+    }
+    
+    .axyra-btn {
+      width: 100%;
     }
 }
 
