@@ -1123,6 +1123,8 @@ function exportarInventarioExcel() {
 // Aplicar estilos al Excel
 function aplicarEstilosExcel(worksheetProductos, worksheetMovimientos) {
   try {
+    console.log('🎨 Aplicando estilos al Excel del inventario...');
+    
     // Verificar que los worksheets existan y tengan datos
     if (!worksheetProductos || !worksheetProductos['!ref']) {
       console.warn('⚠️ Worksheet de productos no tiene datos para estilos');
@@ -1203,6 +1205,7 @@ function aplicarEstilosExcel(worksheetProductos, worksheetMovimientos) {
       console.warn('⚠️ Error ajustando ancho de columnas:', error);
     }
     
+    console.log('✅ Estilos aplicados exitosamente al Excel del inventario');
   } catch (error) {
     console.error('❌ Error general aplicando estilos Excel:', error);
   }
