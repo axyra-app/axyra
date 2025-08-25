@@ -253,17 +253,40 @@ class GestionPersonalManager {
   }
 
   formatearSalario(input) {
-    let valor = input.value.replace(/[^\d]/g, '');
-
-    if (valor.length > 0) {
-      // Convertir a número y formatear con separadores de miles
-      const numero = parseInt(valor);
-      if (!isNaN(numero)) {
-        valor = numero.toLocaleString('es-CO');
+    try {
+      let valor = input.value || input;
+      if (typeof valor === 'string') {
+        // Remover todos los caracteres no numéricos excepto el punto decimal
+        valor = valor.replace(/[^\d.]/g, '');
+        
+        // Permitir solo un punto decimal
+        const partes = valor.split('.');
+        if (partes.length > 2) {
+          valor = partes[0] + '.' + partes.slice(1).join('');
+        }
+        
+        // Convertir a número y validar
+        const numero = parseFloat(valor);
+        if (isNaN(numero)) {
+          input.value = '';
+          return;
+        }
+        
+        // Solo formatear si es un número válido y mayor a 0
+        if (numero > 0) {
+          // Formatear con separadores de miles solo si el usuario lo solicita
+          // Por ahora, mantener el valor original sin formateo automático
+          input.value = numero.toString();
+        } else {
+          input.value = '';
+        }
+        
+        console.log('💰 Salario formateado:', { original: valor, procesado: numero });
       }
+    } catch (error) {
+      console.error('❌ Error en formatearSalario:', error);
+      input.value = '';
     }
-
-    input.value = valor;
   }
 
   limpiarFormatoSalario(input) {
@@ -571,38 +594,52 @@ class GestionPersonalManager {
 
   renderizarListaDepartamentos() {
     const container = document.getElementById('listaDepartamentos');
-    const mensajeNoData = document.getElementById('mensajeNoDepartamentos');
-
     if (!container) return;
 
     if (this.departamentos.length === 0) {
-      if (mensajeNoData) mensajeNoData.style.display = 'block';
-      container.innerHTML = '';
+      container.innerHTML = `
+        <div class="no-data">
+          <i class="fas fa-building"></i>
+          <p>No hay departamentos creados. Crea el primero para comenzar.</p>
+          <button class="btn btn-primary" onclick="mostrarModalDepartamento()">
+            <i class="fas fa-plus"></i> Crear Primer Departamento
+          </button>
+        </div>
+      `;
       return;
     }
 
-    if (mensajeNoData) mensajeNoData.style.display = 'none';
-
-    const html = this.departamentos
-      .map(
-        (departamento) => `
-      <div class="departamento-item">
-        <div class="departamento-header">
-          <div class="departamento-color" style="background-color: ${departamento.color}"></div>
-          <div class="departamento-nombre">${departamento.nombre}</div>
-                </div>
-        <div class="departamento-descripcion">${departamento.descripcion || 'Sin descripción'}</div>
-        <div class="departamento-actions">
-          <button class="btn btn-small btn-danger" onclick="eliminarDepartamento('${departamento.id}')">
-            <i class="fas fa-trash"></i> Eliminar
-          </button>
-                </div>
-                </div>
-    `
-      )
-      .join('');
-
+    let html = '<div class="departamentos-grid">';
+    
+    this.departamentos.forEach(departamento => {
+      html += `
+        <div class="departamento-item" data-id="${departamento.id}">
+          <div class="departamento-header">
+            <div class="departamento-color" style="background-color: ${departamento.color}">
+              <i class="fas fa-building"></i>
+            </div>
+            <div class="departamento-info">
+              <h4 class="departamento-nombre">${departamento.nombre}</h4>
+              <p class="departamento-descripcion">${departamento.descripcion || 'Sin descripción'}</p>
+            </div>
+          </div>
+          
+          <div class="departamento-actions">
+            <button class="btn btn-sm btn-primary" onclick="editarDepartamento('${departamento.id}')">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="eliminarDepartamento('${departamento.id}')">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
     container.innerHTML = html;
+    
+    console.log('✅ Lista de departamentos renderizada:', this.departamentos.length);
   }
 
   async agregarEmpleado(empleado) {
@@ -647,15 +684,17 @@ class GestionPersonalManager {
 
   async eliminarDepartamento(departamentoId) {
     try {
-      const departamento = gestionPersonal.departamentos.find(dep => dep.id === departamentoId);
+      const departamento = gestionPersonal.departamentos.find((dep) => dep.id === departamentoId);
       if (!departamento) {
         mostrarNotificacion('❌ Departamento no encontrado', 'error');
         return;
       }
 
       // Verificar si el departamento tiene empleados
-      const empleadosEnDepartamento = gestionPersonal.empleados.filter(emp => emp.departamento === departamento.nombre);
-      
+      const empleadosEnDepartamento = gestionPersonal.empleados.filter(
+        (emp) => emp.departamento === departamento.nombre
+      );
+
       // Mostrar modal de confirmación profesional
       const modal = document.createElement('div');
       modal.className = 'modal-overlay';
@@ -672,30 +711,40 @@ class GestionPersonalManager {
               <div class="departamento-datos-eliminacion">
                 <h4>${departamento.nombre}</h4>
                 <p><strong>Descripción:</strong> ${departamento.descripcion || 'Sin descripción'}</p>
-                <p><strong>Color:</strong> <span class="color-preview" style="background-color: ${departamento.color}"></span> ${departamento.color}</p>
+                <p><strong>Color:</strong> <span class="color-preview" style="background-color: ${
+                  departamento.color
+                }"></span> ${departamento.color}</p>
               </div>
             </div>
             
             <div class="advertencias-eliminacion">
-              <div class="advertencia-item ${empleadosEnDepartamento.length > 0 ? 'advertencia-critica' : 'advertencia-info'}">
+              <div class="advertencia-item ${
+                empleadosEnDepartamento.length > 0 ? 'advertencia-critica' : 'advertencia-info'
+              }">
                 <i class="fas ${empleadosEnDepartamento.length > 0 ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
                 <span>Empleados en el departamento: ${empleadosEnDepartamento.length}</span>
               </div>
             </div>
             
-            ${empleadosEnDepartamento.length > 0 ? `
+            ${
+              empleadosEnDepartamento.length > 0
+                ? `
               <div class="advertencia-critica-mensaje">
                 <i class="fas fa-exclamation-triangle"></i>
-                <strong>Advertencia Crítica:</strong> Este departamento tiene ${empleadosEnDepartamento.length} empleado(s) asignado(s).
+                <strong>Advertencia Crítica:</strong> Este departamento tiene ${
+                  empleadosEnDepartamento.length
+                } empleado(s) asignado(s).
                 <br><br>
                 <strong>Empleados afectados:</strong>
                 <ul class="empleados-afectados">
-                  ${empleadosEnDepartamento.map(emp => `<li>• ${emp.nombre} (${emp.cargo})</li>`).join('')}
+                  ${empleadosEnDepartamento.map((emp) => `<li>• ${emp.nombre} (${emp.cargo})</li>`).join('')}
                 </ul>
                 <br>
                 <strong>Acción:</strong> Los empleados serán movidos a "Sin Departamento" y deberás reasignarlos manualmente.
               </div>
-            ` : ''}
+            `
+                : ''
+            }
             
             <p class="advertencia-final">⚠️ Esta acción no se puede deshacer.</p>
           </div>
@@ -711,7 +760,7 @@ class GestionPersonalManager {
       `;
 
       document.body.appendChild(modal);
-      
+
       console.log('🗑️ Modal de confirmación para eliminar departamento mostrado');
     } catch (error) {
       console.error('❌ Error mostrando modal de confirmación para eliminar departamento:', error);
@@ -963,14 +1012,14 @@ class GestionPersonalManager {
     }
 
     let html = '<div class="horas-grid">';
-    
-    this.horas.forEach(hora => {
-      const empleado = this.empleados.find(emp => emp.id === hora.empleadoId);
+
+    this.horas.forEach((hora) => {
+      const empleado = this.empleados.find((emp) => emp.id === hora.empleadoId);
       const nombreEmpleado = empleado ? empleado.nombre : 'Empleado no encontrado';
       const departamento = empleado ? empleado.departamento : 'Sin departamento';
-      
+
       const totalHoras = this.calcularTotalHoras(hora.horaEntrada, hora.horaSalida);
-      
+
       html += `
         <div class="hora-card" data-id="${hora.id}">
           <div class="hora-header">
@@ -998,12 +1047,16 @@ class GestionPersonalManager {
                 <span>Salida: ${hora.horaSalida}</span>
               </div>
             </div>
-            ${hora.observaciones ? `
+            ${
+              hora.observaciones
+                ? `
               <div class="hora-observaciones">
                 <i class="fas fa-comment"></i>
                 <span>${hora.observaciones}</span>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
           
           <div class="hora-actions">
@@ -1017,10 +1070,10 @@ class GestionPersonalManager {
         </div>
       `;
     });
-    
+
     html += '</div>';
     contenedor.innerHTML = html;
-    
+
     console.log('✅ Lista de horas renderizada:', this.horas.length);
   }
 }
@@ -1356,15 +1409,15 @@ async function guardarDepartamento() {
 // Eliminar Departamento
 async function eliminarDepartamento(departamentoId) {
   try {
-    const departamento = gestionPersonal.departamentos.find(dep => dep.id === departamentoId);
+    const departamento = gestionPersonal.departamentos.find((dep) => dep.id === departamentoId);
     if (!departamento) {
       mostrarNotificacion('❌ Departamento no encontrado', 'error');
       return;
     }
 
     // Verificar si el departamento tiene empleados
-    const empleadosEnDepartamento = gestionPersonal.empleados.filter(emp => emp.departamento === departamento.nombre);
-    
+    const empleadosEnDepartamento = gestionPersonal.empleados.filter((emp) => emp.departamento === departamento.nombre);
+
     // Mostrar modal de confirmación profesional
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -1381,30 +1434,40 @@ async function eliminarDepartamento(departamentoId) {
             <div class="departamento-datos-eliminacion">
               <h4>${departamento.nombre}</h4>
               <p><strong>Descripción:</strong> ${departamento.descripcion || 'Sin descripción'}</p>
-              <p><strong>Color:</strong> <span class="color-preview" style="background-color: ${departamento.color}"></span> ${departamento.color}</p>
+              <p><strong>Color:</strong> <span class="color-preview" style="background-color: ${
+                departamento.color
+              }"></span> ${departamento.color}</p>
             </div>
           </div>
           
           <div class="advertencias-eliminacion">
-            <div class="advertencia-item ${empleadosEnDepartamento.length > 0 ? 'advertencia-critica' : 'advertencia-info'}">
+            <div class="advertencia-item ${
+              empleadosEnDepartamento.length > 0 ? 'advertencia-critica' : 'advertencia-info'
+            }">
               <i class="fas ${empleadosEnDepartamento.length > 0 ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
               <span>Empleados en el departamento: ${empleadosEnDepartamento.length}</span>
             </div>
           </div>
           
-          ${empleadosEnDepartamento.length > 0 ? `
+          ${
+            empleadosEnDepartamento.length > 0
+              ? `
             <div class="advertencia-critica-mensaje">
               <i class="fas fa-exclamation-triangle"></i>
-              <strong>Advertencia Crítica:</strong> Este departamento tiene ${empleadosEnDepartamento.length} empleado(s) asignado(s).
+              <strong>Advertencia Crítica:</strong> Este departamento tiene ${
+                empleadosEnDepartamento.length
+              } empleado(s) asignado(s).
               <br><br>
               <strong>Empleados afectados:</strong>
               <ul class="empleados-afectados">
-                ${empleadosEnDepartamento.map(emp => `<li>• ${emp.nombre} (${emp.cargo})</li>`).join('')}
+                ${empleadosEnDepartamento.map((emp) => `<li>• ${emp.nombre} (${emp.cargo})</li>`).join('')}
               </ul>
               <br>
               <strong>Acción:</strong> Los empleados serán movidos a "Sin Departamento" y deberás reasignarlos manualmente.
             </div>
-          ` : ''}
+          `
+              : ''
+          }
           
           <p class="advertencia-final">⚠️ Esta acción no se puede deshacer.</p>
         </div>
@@ -1420,7 +1483,7 @@ async function eliminarDepartamento(departamentoId) {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('🗑️ Modal de confirmación para eliminar departamento mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de confirmación para eliminar departamento:', error);
@@ -1431,32 +1494,36 @@ async function eliminarDepartamento(departamentoId) {
 // Función para confirmar eliminación de departamento
 function confirmarEliminarDepartamento(departamentoId) {
   try {
-    const departamento = gestionPersonal.departamentos.find(dep => dep.id === departamentoId);
+    const departamento = gestionPersonal.departamentos.find((dep) => dep.id === departamentoId);
     if (!departamento) {
       mostrarNotificacion('❌ Departamento no encontrado', 'error');
       return;
     }
 
     // Mover empleados a "Sin Departamento"
-    gestionPersonal.empleados.forEach(emp => {
+    gestionPersonal.empleados.forEach((emp) => {
       if (emp.departamento === departamento.nombre) {
         emp.departamento = 'Sin Departamento';
       }
     });
 
     // Eliminar departamento del sistema
-    gestionPersonal.departamentos = gestionPersonal.departamentos.filter(dep => dep.id !== departamentoId);
-    
+    gestionPersonal.departamentos = gestionPersonal.departamentos.filter((dep) => dep.id !== departamentoId);
+
     // Guardar datos
     gestionPersonal.guardarDatos();
-    
+
     // Actualizar interfaz
     gestionPersonal.renderizarListaDepartamentos();
     gestionPersonal.renderizarListaEmpleados();
     gestionPersonal.actualizarEstadisticas();
-    
-    mostrarNotificacion(`✅ Departamento ${departamento.nombre} eliminado correctamente`, 'success', 'Departamento Eliminado');
-    
+
+    mostrarNotificacion(
+      `✅ Departamento ${departamento.nombre} eliminado correctamente`,
+      'success',
+      'Departamento Eliminado'
+    );
+
     console.log('✅ Departamento eliminado:', departamento.nombre);
   } catch (error) {
     console.error('❌ Error confirmando eliminación de departamento:', error);
@@ -1493,9 +1560,183 @@ async function guardarHoras() {
 
 // Procesar Exportación
 function procesarExportacion() {
-  const periodo = document.getElementById('periodoExport').value;
-  mostrarNotificacion(`Exportando datos para el período: ${periodo}`, 'info', 'Exportación');
-  cerrarModalExportarExcel();
+  try {
+    const periodo = document.getElementById('periodoExport').value;
+    const incluirHorasOrdinarias = document.getElementById('horasOrdinarias').checked;
+    const incluirHorasExtras = document.getElementById('horasExtras').checked;
+    const incluirHorasNocturnas = document.getElementById('horasNocturnas').checked;
+    const incluirHorasDominicales = document.getElementById('horasDominicales').checked;
+
+    // Validar que al menos un tipo de hora esté seleccionado
+    if (!incluirHorasOrdinarias && !incluirHorasExtras && !incluirHorasNocturnas && !incluirHorasDominicales) {
+      mostrarNotificacion('❌ Selecciona al menos un tipo de hora para exportar', 'warning');
+      return;
+    }
+
+    // Filtrar horas según el período seleccionado
+    let horasFiltradas = gestionPersonal.horas;
+    
+    if (periodo === 'mes_actual') {
+      const ahora = new Date();
+      const mesActual = ahora.getMonth();
+      const añoActual = ahora.getFullYear();
+      
+      horasFiltradas = gestionPersonal.horas.filter(hora => {
+        const fechaHora = new Date(hora.fecha);
+        return fechaHora.getMonth() === mesActual && fechaHora.getFullYear() === añoActual;
+      });
+    } else if (periodo === 'mes_anterior') {
+      const ahora = new Date();
+      const mesAnterior = ahora.getMonth() === 0 ? 11 : ahora.getMonth() - 1;
+      const añoAnterior = ahora.getMonth() === 0 ? ahora.getFullYear() - 1 : ahora.getFullYear();
+      
+      horasFiltradas = gestionPersonal.horas.filter(hora => {
+        const fechaHora = new Date(hora.fecha);
+        return fechaHora.getMonth() === mesAnterior && fechaHora.getFullYear() === añoAnterior;
+      });
+    }
+
+    console.log('📊 Horas filtradas para exportación:', {
+      total: gestionPersonal.horas.length,
+      filtradas: horasFiltradas.length,
+      periodo: periodo
+    });
+
+    if (horasFiltradas.length === 0) {
+      mostrarNotificacion('❌ No hay horas para exportar en el período seleccionado', 'warning');
+      return;
+    }
+
+    // Crear y descargar el archivo Excel
+    generarExcelHoras(horasFiltradas, periodo);
+    
+    mostrarNotificacion(`✅ Exportando ${horasFiltradas.length} horas para el período: ${periodo}`, 'success', 'Exportación Exitosa');
+    cerrarModalExportarExcel();
+  } catch (error) {
+    console.error('❌ Error en exportación:', error);
+    mostrarNotificacion('❌ Error al exportar horas', 'error');
+  }
+}
+
+// Función para generar Excel con todas las horas
+function generarExcelHoras(horas, periodo) {
+  try {
+    // Crear workbook y worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet([]);
+    
+    // Crear encabezados
+    const headers = [
+      'Fecha',
+      'Empleado',
+      'Departamento',
+      'Hora Entrada',
+      'Hora Salida',
+      'Total Horas',
+      'Horas Ordinarias',
+      'Horas Extras',
+      'Horas Nocturnas',
+      'Horas Dominicales',
+      'Observaciones'
+    ];
+    
+    // Agregar encabezados
+    XLSX.utils.sheet_add_aoa(ws, [headers], { origin: 'A1' });
+    
+    // Agregar datos de horas
+    const datosHoras = horas.map(hora => {
+      const empleado = gestionPersonal.empleados.find(emp => emp.id === hora.empleadoId);
+      const totalHoras = gestionPersonal.calcularTotalHoras(hora.horaEntrada, hora.horaSalida);
+      
+      return [
+        new Date(hora.fecha).toLocaleDateString('es-CO'),
+        empleado ? empleado.nombre : 'Empleado no encontrado',
+        empleado ? empleado.departamento : 'Sin departamento',
+        hora.horaEntrada,
+        hora.horaSalida,
+        totalHoras.toFixed(2),
+        totalHoras > 8 ? 8 : totalHoras, // Horas ordinarias (máximo 8)
+        totalHoras > 8 ? totalHoras - 8 : 0, // Horas extras
+        0, // Horas nocturnas (se calcularían según horario)
+        0, // Horas dominicales (se calcularían según fecha)
+        hora.observaciones || ''
+      ];
+    });
+    
+    // Agregar datos al worksheet
+    XLSX.utils.sheet_add_aoa(ws, datosHoras, { origin: 'A2' });
+    
+    // Aplicar estilos
+    aplicarEstilosExcelHoras(ws, horas.length);
+    
+    // Agregar worksheet al workbook
+    XLSX.utils.book_append_sheet(wb, ws, `Horas_${periodo}`);
+    
+    // Generar nombre del archivo
+    const fecha = new Date().toISOString().split('T')[0];
+    const nombreArchivo = `Horas_${periodo}_${fecha}.xlsx`;
+    
+    // Descargar archivo
+    XLSX.writeFile(wb, nombreArchivo);
+    
+    console.log('📊 Excel generado exitosamente:', nombreArchivo);
+  } catch (error) {
+    console.error('❌ Error generando Excel:', error);
+    mostrarNotificacion('❌ Error generando archivo Excel', 'error');
+  }
+}
+
+// Función para aplicar estilos al Excel de horas
+function aplicarEstilosExcelHoras(ws, totalHoras) {
+  try {
+    // Definir rangos
+    const range = XLSX.utils.decode_range(ws['!ref']);
+    
+    // Aplicar estilos a encabezados
+    for (let col = range.s.c; col <= range.e.c; col++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
+      if (!ws[cellAddress]) continue;
+      
+      ws[cellAddress].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '2E86AB' } },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        border: {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' }
+        }
+      };
+    }
+    
+    // Aplicar estilos a datos
+    for (let row = 1; row <= totalHoras; row++) {
+      for (let col = range.s.c; col <= range.e.c; col++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
+        if (!ws[cellAddress]) continue;
+        
+        ws[cellAddress].s = {
+          font: { color: { rgb: '2C3E50' } },
+          alignment: { horizontal: 'center', vertical: 'center' },
+          border: {
+            top: { style: 'thin', color: { rgb: 'BDC3C7' } },
+            bottom: { style: 'thin', color: { rgb: 'BDC3C7' } },
+            left: { style: 'thin', color: { rgb: 'BDC3C7' } },
+            right: { style: 'thin', color: { rgb: 'BDC3C7' } }
+          }
+        };
+      }
+    }
+    
+    // Ajustar ancho de columnas
+    const columnWidths = [12, 20, 15, 12, 12, 12, 15, 15, 15, 15, 25];
+    ws['!cols'] = columnWidths.map(width => ({ width }));
+    
+    console.log('🎨 Estilos aplicados al Excel de horas');
+  } catch (error) {
+    console.error('❌ Error aplicando estilos al Excel:', error);
+  }
 }
 
 // Generar Reporte de Horas
@@ -2962,16 +3203,16 @@ function verEmpleado(empleadoId) {
 // Función para eliminar empleado
 function eliminarEmpleado(empleadoId) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
     }
 
     // Verificar si el empleado tiene horas registradas
-    const horasEmpleado = gestionPersonal.horas.filter(h => h.empleadoId === empleadoId);
-    const nominasEmpleado = gestionPersonal.nominas.filter(n => n.empleadoId === empleadoId);
-    
+    const horasEmpleado = gestionPersonal.horas.filter((h) => h.empleadoId === empleadoId);
+    const nominasEmpleado = gestionPersonal.nominas.filter((n) => n.empleadoId === empleadoId);
+
     // Mostrar modal de confirmación profesional
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -3004,13 +3245,17 @@ function eliminarEmpleado(empleadoId) {
             </div>
           </div>
           
-          ${horasEmpleado.length > 0 || nominasEmpleado.length > 0 ? `
+          ${
+            horasEmpleado.length > 0 || nominasEmpleado.length > 0
+              ? `
             <div class="advertencia-critica-mensaje">
               <i class="fas fa-exclamation-triangle"></i>
               <strong>Advertencia:</strong> Este empleado tiene datos asociados. 
               La eliminación también eliminará todas las horas y nóminas relacionadas.
             </div>
-          ` : ''}
+          `
+              : ''
+          }
           
           <p class="advertencia-final">⚠️ Esta acción no se puede deshacer.</p>
         </div>
@@ -3026,7 +3271,7 @@ function eliminarEmpleado(empleadoId) {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('🗑️ Modal de confirmación para eliminar empleado mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de confirmación para eliminar empleado:', error);
@@ -3037,30 +3282,30 @@ function eliminarEmpleado(empleadoId) {
 // Función para confirmar eliminación de empleado
 function confirmarEliminarEmpleado(empleadoId) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
     }
 
     // Eliminar empleado del sistema
-    gestionPersonal.empleados = gestionPersonal.empleados.filter(emp => emp.id !== empleadoId);
-    
+    gestionPersonal.empleados = gestionPersonal.empleados.filter((emp) => emp.id !== empleadoId);
+
     // Eliminar horas asociadas
-    gestionPersonal.horas = gestionPersonal.horas.filter(h => h.empleadoId !== empleadoId);
-    
+    gestionPersonal.horas = gestionPersonal.horas.filter((h) => h.empleadoId !== empleadoId);
+
     // Eliminar nóminas asociadas
-    gestionPersonal.nominas = gestionPersonal.nominas.filter(n => n.empleadoId !== empleadoId);
-    
+    gestionPersonal.nominas = gestionPersonal.nominas.filter((n) => n.empleadoId !== empleadoId);
+
     // Guardar datos
     gestionPersonal.guardarDatos();
-    
+
     // Actualizar interfaz
     gestionPersonal.renderizarListaEmpleados();
     gestionPersonal.actualizarEstadisticas();
-    
+
     mostrarNotificacion(`✅ Empleado ${empleado.nombre} eliminado correctamente`, 'success', 'Empleado Eliminado');
-    
+
     console.log('✅ Empleado eliminado:', empleado.nombre);
   } catch (error) {
     console.error('❌ Error confirmando eliminación de empleado:', error);
@@ -3178,6 +3423,10 @@ window.confirmarEliminarEmpleado = confirmarEliminarEmpleado;
 window.confirmarEliminarDepartamento = confirmarEliminarDepartamento;
 window.editarHora = editarHora;
 window.actualizarHora = actualizarHora;
+window.editarDepartamento = editarDepartamento;
+window.actualizarDepartamento = actualizarDepartamento;
+window.generarExcelHoras = generarExcelHoras;
+window.aplicarEstilosExcelHoras = aplicarEstilosExcelHoras;
 
 // Modal de Configuración de Nómina
 function mostrarModalConfiguracionNomina() {
@@ -3559,7 +3808,7 @@ function generarProyecciones() {
 // Función para eliminar hora
 function eliminarHora(horaId) {
   try {
-    const hora = gestionPersonal.horas.find(h => h.id === horaId);
+    const hora = gestionPersonal.horas.find((h) => h.id === horaId);
     if (!hora) {
       mostrarNotificacion('❌ Hora no encontrada', 'error');
       return;
@@ -3595,7 +3844,7 @@ function eliminarHora(horaId) {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('🗑️ Modal de confirmación para eliminar hora mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de confirmación para eliminar hora:', error);
@@ -3607,17 +3856,17 @@ function eliminarHora(horaId) {
 function confirmarEliminarHora(horaId) {
   try {
     // Eliminar hora del sistema
-    gestionPersonal.horas = gestionPersonal.horas.filter(h => h.id !== horaId);
-    
+    gestionPersonal.horas = gestionPersonal.horas.filter((h) => h.id !== horaId);
+
     // Guardar datos
     gestionPersonal.guardarDatos();
-    
+
     // Actualizar interfaz
     gestionPersonal.renderizarListaHoras();
     gestionPersonal.actualizarEstadisticas();
-    
+
     mostrarNotificacion('✅ Hora eliminada correctamente', 'success', 'Hora Eliminada');
-    
+
     console.log('✅ Hora eliminada:', horaId);
   } catch (error) {
     console.error('❌ Error confirmando eliminación de hora:', error);
@@ -3628,7 +3877,7 @@ function confirmarEliminarHora(horaId) {
 // Función para editar hora
 function editarHora(horaId) {
   try {
-    const hora = gestionPersonal.horas.find(h => h.id === horaId);
+    const hora = gestionPersonal.horas.find((h) => h.id === horaId);
     if (!hora) {
       mostrarNotificacion('❌ Hora no encontrada', 'error');
       return;
@@ -3648,7 +3897,7 @@ function editarHora(horaId) {
 
     // Mostrar modal
     mostrarModalRegistroHoras();
-    
+
     console.log('✏️ Editando hora:', horaId);
   } catch (error) {
     console.error('❌ Error editando hora:', error);
@@ -3667,7 +3916,7 @@ function actualizarHora(horaId) {
       horaEntrada: document.getElementById('horaEntrada').value,
       horaSalida: document.getElementById('horaSalida').value,
       observaciones: document.getElementById('observacionesHoras').value,
-      fechaActualizacion: new Date().toISOString()
+      fechaActualizacion: new Date().toISOString(),
     };
 
     // Validar datos
@@ -3677,7 +3926,7 @@ function actualizarHora(horaId) {
     }
 
     // Actualizar hora en el sistema
-    const index = gestionPersonal.horas.findIndex(h => h.id === horaId);
+    const index = gestionPersonal.horas.findIndex((h) => h.id === horaId);
     if (index !== -1) {
       gestionPersonal.horas[index] = { ...gestionPersonal.horas[index], ...hora };
     }
@@ -3690,13 +3939,94 @@ function actualizarHora(horaId) {
     gestionPersonal.actualizarEstadisticas();
 
     mostrarNotificacion('✅ Hora actualizada correctamente', 'success', 'Hora Actualizada');
-    
+
     // Cerrar modal
     cerrarModalRegistroHoras();
-    
+
     console.log('✅ Hora actualizada:', horaId);
   } catch (error) {
     console.error('❌ Error actualizando hora:', error);
     mostrarNotificacion('❌ Error actualizando hora', 'error');
+  }
+}
+
+// Función para editar departamento
+function editarDepartamento(departamentoId) {
+  try {
+    const departamento = gestionPersonal.departamentos.find(dep => dep.id === departamentoId);
+    if (!departamento) {
+      mostrarNotificacion('❌ Departamento no encontrado', 'error');
+      return;
+    }
+
+    // Llenar el formulario con los datos del departamento
+    document.getElementById('nombreDepartamento').value = departamento.nombre || '';
+    document.getElementById('descripcionDepartamento').value = departamento.descripcion || '';
+    
+    // Cambiar texto del botón
+    const btnGuardar = document.getElementById('btnGuardarDepartamento');
+    btnGuardar.textContent = 'Actualizar Departamento';
+    btnGuardar.onclick = () => actualizarDepartamento(departamentoId);
+
+    // Mostrar modal
+    mostrarModalDepartamento();
+    
+    console.log('✏️ Editando departamento:', departamentoId);
+  } catch (error) {
+    console.error('❌ Error editando departamento:', error);
+    mostrarNotificacion('❌ Error editando departamento', 'error');
+  }
+}
+
+// Función para actualizar departamento
+function actualizarDepartamento(departamentoId) {
+  try {
+    // Obtener datos del formulario
+    const departamento = {
+      id: departamentoId,
+      nombre: document.getElementById('nombreDepartamento').value.trim(),
+      descripcion: document.getElementById('descripcionDepartamento').value.trim(),
+      color: document.getElementById('colorDepartamento').value || '#3498db',
+      fechaActualizacion: new Date().toISOString()
+    };
+
+    // Validar datos
+    if (!departamento.nombre) {
+      mostrarNotificacion('❌ Por favor ingresa el nombre del departamento', 'error');
+      return;
+    }
+
+    // Verificar si el nombre ya existe (excluyendo el departamento actual)
+    const nombreExistente = gestionPersonal.departamentos.find(
+      dep => dep.nombre === departamento.nombre && dep.id !== departamentoId
+    );
+    if (nombreExistente) {
+      mostrarNotificacion('❌ Ya existe un departamento con este nombre', 'error');
+      return;
+    }
+
+    // Actualizar departamento en el sistema
+    const index = gestionPersonal.departamentos.findIndex(dep => dep.id === departamentoId);
+    if (index !== -1) {
+      gestionPersonal.departamentos[index] = { ...gestionPersonal.departamentos[index], ...departamento };
+    }
+
+    // Guardar datos
+    gestionPersonal.guardarDatos();
+
+    // Actualizar interfaz
+    gestionPersonal.renderizarListaDepartamentos();
+    gestionPersonal.llenarSelectorDepartamentos();
+    gestionPersonal.actualizarEstadisticas();
+
+    mostrarNotificacion('✅ Departamento actualizado correctamente', 'success', 'Departamento Actualizado');
+    
+    // Cerrar modal
+    cerrarModalDepartamento();
+    
+    console.log('✅ Departamento actualizado:', departamentoId);
+  } catch (error) {
+    console.error('❌ Error actualizando departamento:', error);
+    mostrarNotificacion('❌ Error actualizando departamento', 'error');
   }
 }
