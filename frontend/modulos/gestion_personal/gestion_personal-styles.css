@@ -1256,3 +1256,194 @@ input[pattern='[0-9]*']:invalid:not(:placeholder-shown) {
     font-size: 13px;
   }
 }
+
+/* ===== TARJETAS DE EMPLEADOS ===== */
+
+.empleados-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.empleado-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-left: 4px solid #3498db;
+  transition: all 0.3s ease;
+}
+
+.empleado-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.empleado-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.empleado-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.empleado-info {
+  flex: 1;
+}
+
+.empleado-nombre {
+  margin: 0 0 5px 0;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.empleado-cargo {
+  margin: 0 0 3px 0;
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.empleado-cedula {
+  color: #7f8c8d;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.empleado-estado {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.empleado-estado.activo {
+  background: #e8f5e8;
+  color: #27ae60;
+}
+
+.empleado-estado.inactivo {
+  background: #f8d7da;
+  color: #dc3545;
+}
+
+.empleado-estado i {
+  font-size: 0.6rem;
+}
+
+.empleado-details {
+  margin-bottom: 20px;
+}
+
+.empleado-details > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.empleado-details i {
+  color: #3498db;
+  width: 16px;
+  text-align: center;
+}
+
+.empleado-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+/* ===== INFORMACIÓN DETALLADA DEL EMPLEADO ===== */
+
+.empleado-info-detallada {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-section {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #3498db;
+}
+
+.info-section h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 500;
+  color: #34495e;
+}
+
+.info-value {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.info-value.activo {
+  color: #27ae60;
+}
+
+.info-value.inactivo {
+  color: #dc3545;
+}
+
+/* ===== ESTADO SIN DATOS ===== */
+
+.no-data {
+  text-align: center;
+  padding: 40px 20px;
+  color: #7f8c8d;
+}
+
+.no-data i {
+  font-size: 3rem;
+  margin-bottom: 15px;
+  color: #bdc3c7;
+}
+
+.no-data p {
+  margin: 0;
+  font-size: 1.1rem;
+}

@@ -720,14 +720,51 @@ class GestionPersonalManager {
   }
 
   calcularTotalPagos() {
-    return this.empleados.reduce((total, emp) => {
-      if (emp.tipoSalario === 'fijo') {
-        return total + (emp.salarioFijo || 0) + (emp.bonificaciones || 0);
-      } else if (emp.tipoSalario === 'por_horas') {
-        return total + (emp.salarioReferencia || 0);
+    // Calcular total de pagos basado en las nóminas generadas (netos)
+    if (this.nominas.length === 0) {
+      return 0;
+    }
+    
+    // Sumar todos los netos de las nóminas
+    const totalNeto = this.nominas.reduce((total, nomina) => {
+      // Si la nómina tiene un campo neto, usarlo; si no, calcularlo
+      if (nomina.neto && typeof nomina.neto === 'number') {
+        return total + nomina.neto;
+      } else if (nomina.salarioNeto && typeof nomina.salarioNeto === 'number') {
+        return total + nomina.salarioNeto;
+      } else if (nomina.totalNeto && typeof nomina.totalNeto === 'number') {
+        return total + nomina.totalNeto;
+      } else {
+        // Si no hay campo neto, calcular basado en el salario del empleado
+        const empleado = this.empleados.find(emp => emp.id === nomina.empleadoId);
+        if (empleado) {
+          if (empleado.tipoSalario === 'fijo') {
+            return total + (empleado.salarioFijo || 0) + (empleado.bonificaciones || 0);
+          } else if (empleado.tipoSalario === 'por_horas') {
+            // Para empleados por horas, calcular basado en horas trabajadas
+            const horasEmpleado = this.horas.filter(h => h.empleadoId === empleado.id);
+            const totalHoras = horasEmpleado.reduce((sum, h) => {
+              return sum + this.calcularTotalHoras(h.horaEntrada, h.horaSalida);
+            }, 0);
+            const salarioPorHora = (empleado.salarioReferencia || 0) / 240; // 240 horas mensuales
+            return total + (totalHoras * salarioPorHora);
+          }
+        }
+        return total;
       }
-      return total;
     }, 0);
+    
+    console.log('💰 Total de pagos calculado:', {
+      nominas: this.nominas.length,
+      totalNeto: totalNeto,
+      nominasDetalle: this.nominas.map(n => ({
+        id: n.id,
+        empleadoId: n.empleadoId,
+        neto: n.neto || n.salarioNeto || n.totalNeto || 'No definido'
+      }))
+    });
+    
+    return totalNeto;
   }
 
   calcularPromedioHoras() {
@@ -762,6 +799,87 @@ class GestionPersonalManager {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(valor);
+  }
+
+  renderizarListaEmpleados() {
+    const contenedor = document.getElementById('listaEmpleados');
+    if (!contenedor) {
+      console.warn('⚠️ Contenedor de lista de empleados no encontrado');
+      return;
+    }
+
+    if (this.empleados.length === 0) {
+      contenedor.innerHTML = `
+        <div class="no-data">
+          <i class="fas fa-users"></i>
+          <p>No hay empleados registrados. Agrega el primero para comenzar.</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '<div class="empleados-grid">';
+    
+    this.empleados.forEach(empleado => {
+      const departamento = this.departamentos.find(dep => dep.id === empleado.departamento);
+      const nombreDepartamento = departamento ? departamento.nombre : 'Sin departamento';
+      
+      html += `
+        <div class="empleado-card" data-id="${empleado.id}">
+          <div class="empleado-header">
+            <div class="empleado-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <div class="empleado-info">
+              <h4 class="empleado-nombre">${empleado.nombre}</h4>
+              <p class="empleado-cargo">${empleado.cargo}</p>
+              <span class="empleado-cedula">C.C. ${empleado.cedula}</span>
+            </div>
+            <div class="empleado-estado ${empleado.estado === 'activo' ? 'activo' : 'inactivo'}">
+              <i class="fas fa-circle"></i>
+              ${empleado.estado === 'activo' ? 'Activo' : 'Inactivo'}
+            </div>
+          </div>
+          
+          <div class="empleado-details">
+            <div class="empleado-departamento">
+              <i class="fas fa-building"></i>
+              <span>${nombreDepartamento}</span>
+            </div>
+            <div class="empleado-salario">
+              <i class="fas fa-dollar-sign"></i>
+              <span>
+                ${empleado.tipoSalario === 'fijo' 
+                  ? `$${(empleado.salarioFijo || 0).toLocaleString('es-CO')} COP`
+                  : `$${(empleado.salarioReferencia || 0).toLocaleString('es-CO')} COP por hora`
+                }
+              </span>
+            </div>
+            <div class="empleado-fecha">
+              <i class="fas fa-calendar"></i>
+              <span>Contratado: ${new Date(empleado.fechaContratacion).toLocaleDateString('es-CO')}</span>
+            </div>
+          </div>
+          
+          <div class="empleado-actions">
+            <button class="btn btn-sm btn-primary" onclick="editarEmpleado('${empleado.id}')">
+              <i class="fas fa-edit"></i> Editar
+            </button>
+            <button class="btn btn-sm btn-info" onclick="verEmpleado('${empleado.id}')">
+              <i class="fas fa-eye"></i> Ver
+            </button>
+            <button class="btn btn-sm btn-danger" onclick="eliminarEmpleado('${empleado.id}')">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </div>
+        </div>
+      `;
+    });
+    
+    html += '</div>';
+    contenedor.innerHTML = html;
+    
+    console.log('✅ Lista de empleados renderizada:', this.empleados.length);
   }
 }
 
@@ -819,14 +937,14 @@ function mostrarModalEmpleado() {
   const modal = document.getElementById('modalEmpleado');
   if (modal) {
     document.getElementById('formEmpleado').reset();
-    
+
     // Inicializar tipo de salario por defecto
     const tipoSalarioSelect = document.getElementById('tipoSalarioEmpleado');
     if (tipoSalarioSelect) {
       tipoSalarioSelect.value = 'fijo';
       cambiarTipoSalario(); // Aplicar la lógica de mostrar/ocultar campos
     }
-    
+
     modal.style.display = 'block';
   }
 }
@@ -1222,12 +1340,174 @@ function procesarExportacionEmpleados() {
 
 // Cargar Datos de Ejemplo
 function cargarDatosEjemplo() {
-  if (typeof cargarDatosEjemplo === 'function') {
-    cargarDatosEjemplo();
-    mostrarNotificacion('Datos de ejemplo cargados correctamente', 'success', 'Éxito');
-    location.reload();
-  } else {
-    mostrarNotificacion('Función de datos de ejemplo no disponible', 'warning', 'Atención');
+  try {
+    // Datos de ejemplo para departamentos
+    const departamentosEjemplo = [
+      {
+        id: 'dept_001',
+        nombre: 'Administración',
+        descripcion: 'Departamento de administración y gestión general',
+        color: '#3498db',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'dept_002',
+        nombre: 'Ventas',
+        descripcion: 'Departamento de ventas y atención al cliente',
+        color: '#e74c3c',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'dept_003',
+        nombre: 'Operaciones',
+        descripcion: 'Departamento de operaciones y logística',
+        color: '#f39c12',
+        fechaCreacion: new Date().toISOString()
+      }
+    ];
+
+    // Datos de ejemplo para empleados
+    const empleadosEjemplo = [
+      {
+        id: 'emp_001',
+        nombre: 'Ana María González',
+        cedula: '12345678',
+        cargo: 'Gerente Administrativa',
+        departamento: 'dept_001',
+        tipoSalario: 'fijo',
+        salarioFijo: 2500000,
+        bonificaciones: 200000,
+        tipoContrato: 'indefinido',
+        fechaContratacion: '2024-01-15',
+        estado: 'activo',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'emp_002',
+        nombre: 'Carlos Rodríguez',
+        cedula: '87654321',
+        cargo: 'Vendedor Senior',
+        departamento: 'dept_002',
+        tipoSalario: 'fijo',
+        salarioFijo: 1800000,
+        bonificaciones: 150000,
+        tipoContrato: 'indefinido',
+        fechaContratacion: '2024-02-01',
+        estado: 'activo',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'emp_003',
+        nombre: 'María López',
+        cedula: '11223344',
+        cargo: 'Operadora',
+        departamento: 'dept_003',
+        tipoSalario: 'por_horas',
+        salarioReferencia: 8000,
+        tipoContrato: 'término fijo',
+        fechaContratacion: '2024-03-01',
+        estado: 'activo',
+        fechaCreacion: new Date().toISOString()
+      }
+    ];
+
+    // Datos de ejemplo para horas
+    const horasEjemplo = [
+      {
+        id: 'hora_001',
+        empleadoId: 'emp_001',
+        fecha: '2024-08-25',
+        horaEntrada: '08:00',
+        horaSalida: '17:00',
+        observaciones: 'Jornada completa',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'hora_002',
+        empleadoId: 'emp_002',
+        fecha: '2024-08-25',
+        horaEntrada: '09:00',
+        horaSalida: '18:00',
+        observaciones: 'Jornada completa',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'hora_003',
+        empleadoId: 'emp_003',
+        fecha: '2024-08-25',
+        horaEntrada: '07:00',
+        horaSalida: '15:00',
+        observaciones: 'Jornada de 8 horas',
+        fechaCreacion: new Date().toISOString()
+      }
+    ];
+
+    // Datos de ejemplo para nóminas
+    const nominasEjemplo = [
+      {
+        id: 'nom_001',
+        empleadoId: 'emp_001',
+        periodo: 'agosto_2024',
+        fechaGeneracion: '2024-08-25',
+        salarioBase: 2500000,
+        bonificaciones: 200000,
+        deducciones: 150000,
+        neto: 2550000,
+        estado: 'generada',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'nom_002',
+        empleadoId: 'emp_002',
+        periodo: 'agosto_2024',
+        fechaGeneracion: '2024-08-25',
+        salarioBase: 1800000,
+        bonificaciones: 150000,
+        deducciones: 120000,
+        neto: 1830000,
+        estado: 'generada',
+        fechaCreacion: new Date().toISOString()
+      },
+      {
+        id: 'nom_003',
+        empleadoId: 'emp_003',
+        periodo: 'agosto_2024',
+        fechaGeneracion: '2024-08-25',
+        horasTrabajadas: 8,
+        salarioPorHora: 8000,
+        totalBruto: 64000,
+        deducciones: 5000,
+        neto: 59000,
+        estado: 'generada',
+        fechaCreacion: new Date().toISOString()
+      }
+    ];
+
+    // Cargar datos en el sistema
+    gestionPersonal.departamentos = departamentosEjemplo;
+    gestionPersonal.empleados = empleadosEjemplo;
+    gestionPersonal.horas = horasEjemplo;
+    gestionPersonal.nominas = nominasEjemplo;
+
+    // Guardar en localStorage
+    gestionPersonal.guardarDatos();
+
+    // Actualizar interfaz
+    gestionPersonal.renderizarListaEmpleados();
+    gestionPersonal.renderizarListaDepartamentos();
+    gestionPersonal.actualizarEstadisticas();
+
+    mostrarNotificacion('✅ Datos de ejemplo cargados correctamente', 'success', 'Datos Cargados');
+    
+    console.log('📊 Datos de ejemplo cargados:', {
+      departamentos: departamentosEjemplo.length,
+      empleados: empleadosEjemplo.length,
+      horas: horasEjemplo.length,
+      nominas: nominasEjemplo.length
+    });
+  } catch (error) {
+    console.error('❌ Error cargando datos de ejemplo:', error);
+    mostrarNotificacion('❌ Error cargando datos de ejemplo', 'error');
   }
 }
 
@@ -1277,7 +1557,7 @@ function cerrarNotificacion() {
 
 // Días festivos de Colombia (2024-2025)
 const DIAS_FESTIVOS_COLOMBIA = {
-  '2024': [
+  2024: [
     '2024-01-01', // Año Nuevo
     '2024-01-08', // Día de los Reyes Magos
     '2024-03-24', // Domingo de Ramos
@@ -1297,9 +1577,9 @@ const DIAS_FESTIVOS_COLOMBIA = {
     '2024-11-04', // Todos los Santos
     '2024-11-11', // Independencia de Cartagena
     '2024-12-08', // Día de la Inmaculada Concepción
-    '2024-12-25'  // Navidad
+    '2024-12-25', // Navidad
   ],
-  '2025': [
+  2025: [
     '2025-01-01', // Año Nuevo
     '2025-01-06', // Día de los Reyes Magos
     '2025-04-13', // Domingo de Ramos
@@ -1318,19 +1598,19 @@ const DIAS_FESTIVOS_COLOMBIA = {
     '2025-11-03', // Todos los Santos
     '2025-11-10', // Independencia de Cartagena
     '2025-12-08', // Día de la Inmaculada Concepción
-    '2025-12-25'  // Navidad
-  ]
+    '2025-12-25', // Navidad
+  ],
 };
 
 // Función para verificar si una fecha es festiva
 function esDiaFestivo(fecha) {
   const año = fecha.getFullYear().toString();
   const fechaStr = fecha.toISOString().split('T')[0];
-  
+
   if (DIAS_FESTIVOS_COLOMBIA[año]) {
     return DIAS_FESTIVOS_COLOMBIA[año].includes(fechaStr);
   }
-  
+
   return false;
 }
 
@@ -1345,27 +1625,27 @@ function calcularHorasTrabajadas(horaEntrada, horaSalida, fecha) {
     // Convertir strings de hora a objetos Date
     const [horaEnt, minEnt] = horaEntrada.split(':').map(Number);
     const [horaSal, minSal] = horaSalida.split(':').map(Number);
-    
+
     // Crear objetos Date para la fecha específica
     const entrada = new Date(fecha);
     entrada.setHours(horaEnt, minEnt, 0, 0);
-    
+
     const salida = new Date(fecha);
     salida.setHours(horaSal, minSal, 0, 0);
-    
+
     // Si la salida es antes que la entrada, asumir que es del día siguiente
     if (salida < entrada) {
       salida.setDate(salida.getDate() + 1);
     }
-    
+
     // Calcular diferencia en milisegundos y convertir a horas
     const diferenciaMs = salida - entrada;
     const horasTrabajadas = diferenciaMs / (1000 * 60 * 60);
-    
+
     // Verificar si es día festivo o domingo
     const esFestivo = esDiaFestivo(new Date(fecha));
     const esDomingo = esDomingo(new Date(fecha));
-    
+
     return {
       horasTotal: horasTrabajadas,
       horasOrdinarias: esFestivo || esDomingo ? 0 : Math.min(horasTrabajadas, 8),
@@ -1374,7 +1654,7 @@ function calcularHorasTrabajadas(horaEntrada, horaSalida, fecha) {
       horasDominicales: esDomingo ? horasTrabajadas : 0,
       horasFestivas: esFestivo ? horasTrabajadas : 0,
       esDiaFestivo: esFestivo,
-      esDomingo: esDomingo
+      esDomingo: esDomingo,
     };
   } catch (error) {
     console.error('❌ Error calculando horas:', error);
@@ -1385,22 +1665,22 @@ function calcularHorasTrabajadas(horaEntrada, horaSalida, fecha) {
 // Función para calcular horas nocturnas (10 PM - 6 AM)
 function calcularHorasNocturnas(entrada, salida) {
   const horaInicioNocturna = 22; // 10 PM
-  const horaFinNocturna = 6;     // 6 AM
-  
+  const horaFinNocturna = 6; // 6 AM
+
   let horasNocturnas = 0;
   const fechaActual = new Date(entrada);
-  
+
   while (fechaActual < salida) {
     const hora = fechaActual.getHours();
-    
+
     // Verificar si es hora nocturna
     if (hora >= horaInicioNocturna || hora < horaFinNocturna) {
-      horasNocturnas += 1/60; // Incrementar por minuto
+      horasNocturnas += 1 / 60; // Incrementar por minuto
     }
-    
+
     fechaActual.setMinutes(fechaActual.getMinutes() + 1);
   }
-  
+
   return Math.round(horasNocturnas * 100) / 100; // Redondear a 2 decimales
 }
 
@@ -1408,45 +1688,45 @@ function calcularHorasNocturnas(entrada, salida) {
 function calcularSalarioPorHoras(horasCalculadas, salarioBaseMensual) {
   try {
     const salarioHoraOrdinaria = salarioBaseMensual / 240; // 240 horas mensuales estándar
-    
+
     // Recargos según ley colombiana
-    const recargoExtras = 1.25;        // 25% extra por horas extras
-    const recargoNocturnas = 1.35;     // 35% extra por horas nocturnas
-    const recargoDominicales = 1.75;   // 75% extra por horas dominicales
-    const recargoFestivas = 1.75;      // 75% extra por horas festivas
-    
+    const recargoExtras = 1.25; // 25% extra por horas extras
+    const recargoNocturnas = 1.35; // 35% extra por horas nocturnas
+    const recargoDominicales = 1.75; // 75% extra por horas dominicales
+    const recargoFestivas = 1.75; // 75% extra por horas festivas
+
     const calculo = {
       horasOrdinarias: {
         cantidad: horasCalculadas.horasOrdinarias,
         valorHora: salarioHoraOrdinaria,
-        subtotal: horasCalculadas.horasOrdinarias * salarioHoraOrdinaria
+        subtotal: horasCalculadas.horasOrdinarias * salarioHoraOrdinaria,
       },
       horasExtras: {
         cantidad: horasCalculadas.horasExtras,
         valorHora: salarioHoraOrdinaria * recargoExtras,
-        subtotal: horasCalculadas.horasExtras * salarioHoraOrdinaria * recargoExtras
+        subtotal: horasCalculadas.horasExtras * salarioHoraOrdinaria * recargoExtras,
       },
       horasNocturnas: {
         cantidad: horasCalculadas.horasNocturnas,
         valorHora: salarioHoraOrdinaria * recargoNocturnas,
-        subtotal: horasCalculadas.horasNocturnas * salarioHoraOrdinaria * recargoNocturnas
+        subtotal: horasCalculadas.horasNocturnas * salarioHoraOrdinaria * recargoNocturnas,
       },
       horasDominicales: {
         cantidad: horasCalculadas.horasDominicales,
         valorHora: salarioHoraOrdinaria * recargoDominicales,
-        subtotal: horasCalculadas.horasDominicales * salarioHoraOrdinaria * recargoDominicales
+        subtotal: horasCalculadas.horasDominicales * salarioHoraOrdinaria * recargoDominicales,
       },
       horasFestivas: {
         cantidad: horasCalculadas.horasFestivas,
         valorHora: salarioHoraOrdinaria * recargoFestivas,
-        subtotal: horasCalculadas.horasFestivas * salarioHoraOrdinaria * recargoFestivas
-      }
+        subtotal: horasCalculadas.horasFestivas * salarioHoraOrdinaria * recargoFestivas,
+      },
     };
-    
+
     // Calcular totales
     calculo.totalHoras = Object.values(calculo).reduce((sum, tipo) => sum + tipo.cantidad, 0);
     calculo.totalSalario = Object.values(calculo).reduce((sum, tipo) => sum + tipo.subtotal, 0);
-    
+
     return calculo;
   } catch (error) {
     console.error('❌ Error calculando salario por horas:', error);
@@ -1457,24 +1737,25 @@ function calcularSalarioPorHoras(horasCalculadas, salarioBaseMensual) {
 // Función para mostrar resumen de horas con calendario colombiano
 function mostrarResumenHorasColombiano(empleadoId, fechaInicio, fechaFin) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
     }
-    
+
     // Filtrar horas del período
-    const horasPeriodo = gestionPersonal.horas.filter(hora => 
-      hora.empleadoId === empleadoId &&
-      new Date(hora.fecha) >= new Date(fechaInicio) &&
-      new Date(hora.fecha) <= new Date(fechaFin)
+    const horasPeriodo = gestionPersonal.horas.filter(
+      (hora) =>
+        hora.empleadoId === empleadoId &&
+        new Date(hora.fecha) >= new Date(fechaInicio) &&
+        new Date(hora.fecha) <= new Date(fechaFin)
     );
-    
+
     if (horasPeriodo.length === 0) {
       mostrarNotificacion('ℹ️ No hay horas registradas para este período', 'info');
       return;
     }
-    
+
     // Calcular resumen
     let resumen = {
       totalDias: 0,
@@ -1486,13 +1767,13 @@ function mostrarResumenHorasColombiano(empleadoId, fechaInicio, fechaFin) {
       horasFestivas: 0,
       diasLaborales: 0,
       diasFestivos: 0,
-      domingos: 0
+      domingos: 0,
     };
-    
-    horasPeriodo.forEach(hora => {
+
+    horasPeriodo.forEach((hora) => {
       const fecha = new Date(hora.fecha);
       const calculo = calcularHorasTrabajadas(hora.horaEntrada, hora.horaSalida, fecha);
-      
+
       if (calculo) {
         resumen.totalDias++;
         resumen.totalHoras += calculo.horasTotal;
@@ -1501,22 +1782,21 @@ function mostrarResumenHorasColombiano(empleadoId, fechaInicio, fechaFin) {
         resumen.horasNocturnas += calculo.horasNocturnas;
         resumen.horasDominicales += calculo.horasDominicales;
         resumen.horasFestivas += calculo.horasFestivas;
-        
+
         if (calculo.esDiaFestivo) resumen.diasFestivos++;
         if (calculo.esDomingo) resumen.domingos++;
         if (!calculo.esDiaFestivo && !calculo.esDomingo) resumen.diasLaborales++;
       }
     });
-    
+
     // Calcular salario si es por horas
     let calculoSalario = null;
     if (empleado.tipoSalario === 'por_horas' && empleado.salarioReferencia) {
       calculoSalario = calcularSalarioPorHoras(resumen, empleado.salarioReferencia);
     }
-    
+
     // Mostrar resumen en el modal
     mostrarResumenHorasEnModal(resumen, calculoSalario, empleado);
-    
   } catch (error) {
     console.error('❌ Error mostrando resumen de horas:', error);
     mostrarNotificacion('❌ Error mostrando resumen de horas', 'error');
@@ -1527,10 +1807,10 @@ function mostrarResumenHorasColombiano(empleadoId, fechaInicio, fechaFin) {
 function mostrarResumenHorasEnModal(resumen, calculoSalario, empleado) {
   const modal = document.getElementById('modalCalculoHoras');
   if (!modal) return;
-  
+
   const resumenContainer = document.getElementById('resumenHoras');
   if (!resumenContainer) return;
-  
+
   let html = `
     <div class="resumen-horas-detallado">
       <h5><i class="fas fa-user"></i> ${empleado.nombre}</h5>
@@ -1580,7 +1860,7 @@ function mostrarResumenHorasEnModal(resumen, calculoSalario, empleado) {
         </div>
       </div>
   `;
-  
+
   if (calculoSalario) {
     html += `
       <div class="resumen-salario">
@@ -1606,11 +1886,241 @@ function mostrarResumenHorasEnModal(resumen, calculoSalario, empleado) {
       </div>
     `;
   }
-  
+
   html += '</div>';
-  
+
   resumenContainer.innerHTML = html;
   modal.style.display = 'block';
+}
+
+// Función para editar empleado
+function editarEmpleado(empleadoId) {
+  try {
+    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    if (!empleado) {
+      mostrarNotificacion('❌ Empleado no encontrado', 'error');
+      return;
+    }
+
+    // Llenar el formulario con los datos del empleado
+    document.getElementById('nombreEmpleado').value = empleado.nombre || '';
+    document.getElementById('cedulaEmpleado').value = empleado.cedula || '';
+    document.getElementById('cargoEmpleado').value = empleado.cargo || '';
+    document.getElementById('departamentoEmpleado').value = empleado.departamento || '';
+    document.getElementById('tipoSalarioEmpleado').value = empleado.tipoSalario || 'fijo';
+    document.getElementById('tipoContratoEmpleado').value = empleado.tipoContrato || '';
+    document.getElementById('fechaContratacionEmpleado').value = empleado.fechaContratacion || '';
+    document.getElementById('estadoEmpleado').value = empleado.estado || 'activo';
+
+    // Configurar campos de salario según el tipo
+    if (empleado.tipoSalario === 'fijo') {
+      document.getElementById('salarioFijoEmpleado').value = empleado.salarioFijo || '';
+      document.getElementById('bonificacionesEmpleado').value = empleado.bonificaciones || '';
+    } else if (empleado.tipoSalario === 'por_horas') {
+      document.getElementById('salarioReferenciaEmpleado').value = empleado.salarioReferencia || '';
+    }
+
+    // Aplicar cambios de visualización
+    cambiarTipoSalario();
+
+    // Cambiar texto del botón
+    const btnGuardar = document.getElementById('btnGuardarEmpleado');
+    btnGuardar.textContent = 'Actualizar Empleado';
+    btnGuardar.onclick = () => actualizarEmpleado(empleadoId);
+
+    // Mostrar modal
+    mostrarModalEmpleado();
+    
+    console.log('✏️ Editando empleado:', empleado.nombre);
+  } catch (error) {
+    console.error('❌ Error editando empleado:', error);
+    mostrarNotificacion('❌ Error editando empleado', 'error');
+  }
+}
+
+// Función para ver empleado
+function verEmpleado(empleadoId) {
+  try {
+    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    if (!empleado) {
+      mostrarNotificacion('❌ Empleado no encontrado', 'error');
+      return;
+    }
+
+    const departamento = gestionPersonal.departamentos.find(dep => dep.id === empleado.departamento);
+    const nombreDepartamento = departamento ? departamento.nombre : 'Sin departamento';
+
+    // Crear modal de visualización
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container">
+        <div class="modal-header">
+          <h3><i class="fas fa-user"></i> Información del Empleado</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="empleado-info-detallada">
+            <div class="info-section">
+              <h4>Información Personal</h4>
+              <div class="info-row">
+                <span class="info-label">Nombre:</span>
+                <span class="info-value">${empleado.nombre}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Cédula:</span>
+                <span class="info-value">${empleado.cedula}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Cargo:</span>
+                <span class="info-value">${empleado.cargo}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Departamento:</span>
+                <span class="info-value">${nombreDepartamento}</span>
+              </div>
+            </div>
+            
+            <div class="info-section">
+              <h4>Información Laboral</h4>
+              <div class="info-row">
+                <span class="info-label">Tipo de Salario:</span>
+                <span class="info-value">${empleado.tipoSalario === 'fijo' ? 'Salario Fijo' : 'Por Horas'}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Tipo de Contrato:</span>
+                <span class="info-value">${empleado.tipoContrato}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Fecha de Contratación:</span>
+                <span class="info-value">${new Date(empleado.fechaContratacion).toLocaleDateString('es-CO')}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Estado:</span>
+                <span class="info-value ${empleado.estado === 'activo' ? 'activo' : 'inactivo'}">${empleado.estado}</span>
+              </div>
+            </div>
+            
+            <div class="info-section">
+              <h4>Información Salarial</h4>
+              ${empleado.tipoSalario === 'fijo' ? `
+                <div class="info-row">
+                  <span class="info-label">Salario Base:</span>
+                  <span class="info-value">$${(empleado.salarioFijo || 0).toLocaleString('es-CO')} COP</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-label">Bonificaciones:</span>
+                  <span class="info-value">$${(empleado.bonificaciones || 0).toLocaleString('es-CO')} COP</span>
+                </div>
+              ` : `
+                <div class="info-row">
+                  <span class="info-label">Salario por Hora:</span>
+                  <span class="info-value">$${(empleado.salarioReferencia || 0).toLocaleString('es-CO')} COP</span>
+                </div>
+              `}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" onclick="editarEmpleado('${empleado.id}'); this.closest('.modal-overlay').remove();">
+            <i class="fas fa-edit"></i> Editar
+          </button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    
+    console.log('👁️ Visualizando empleado:', empleado.nombre);
+  } catch (error) {
+    console.error('❌ Error visualizando empleado:', error);
+    mostrarNotificacion('❌ Error visualizando empleado', 'error');
+  }
+}
+
+// Función para eliminar empleado
+function eliminarEmpleado(empleadoId) {
+  try {
+    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    if (!empleado) {
+      mostrarNotificacion('❌ Empleado no encontrado', 'error');
+      return;
+    }
+
+    // Verificar si el empleado tiene horas registradas
+    const horasEmpleado = gestionPersonal.horas.filter(h => h.empleadoId === empleadoId);
+    if (horasEmpleado.length > 0) {
+      mostrarNotificacion('⚠️ No se puede eliminar el empleado porque tiene horas registradas', 'warning');
+      return;
+    }
+
+    // Confirmar eliminación
+    if (confirm(`¿Estás seguro de que quieres eliminar a ${empleado.nombre}?`)) {
+      gestionPersonal.eliminarEmpleado(empleadoId);
+      mostrarNotificacion(`✅ Empleado ${empleado.nombre} eliminado correctamente`, 'success');
+      
+      // Actualizar interfaz
+      gestionPersonal.renderizarListaEmpleados();
+      gestionPersonal.actualizarEstadisticas();
+    }
+    
+    console.log('🗑️ Eliminando empleado:', empleado.nombre);
+  } catch (error) {
+    console.error('❌ Error eliminando empleado:', error);
+    mostrarNotificacion('❌ Error eliminando empleado', 'error');
+  }
+}
+
+// Función para actualizar empleado
+function actualizarEmpleado(empleadoId) {
+  try {
+    // Obtener datos del formulario
+    const empleado = {
+      id: empleadoId,
+      nombre: document.getElementById('nombreEmpleado').value,
+      cedula: document.getElementById('cedulaEmpleado').value,
+      cargo: document.getElementById('cargoEmpleado').value,
+      departamento: document.getElementById('departamentoEmpleado').value,
+      tipoSalario: document.getElementById('tipoSalarioEmpleado').value,
+      tipoContrato: document.getElementById('tipoContratoEmpleado').value,
+      fechaContratacion: document.getElementById('fechaContratacionEmpleado').value,
+      estado: document.getElementById('estadoEmpleado').value,
+    };
+
+    // Agregar campos de salario según el tipo
+    if (empleado.tipoSalario === 'fijo') {
+      empleado.salarioFijo = parseFloat(document.getElementById('salarioFijoEmpleado').value) || 0;
+      empleado.bonificaciones = parseFloat(document.getElementById('bonificacionesEmpleado').value) || 0;
+      empleado.salarioReferencia = 0;
+    } else if (empleado.tipoSalario === 'por_horas') {
+      empleado.salarioReferencia = parseFloat(document.getElementById('salarioReferenciaEmpleado').value) || 0;
+      empleado.salarioFijo = 0;
+      empleado.bonificaciones = 0;
+    }
+
+    // Validar datos
+    if (!empleado.nombre || !empleado.cedula || !empleado.cargo || !empleado.departamento) {
+      mostrarNotificacion('❌ Por favor completa todos los campos obligatorios', 'error');
+      return;
+    }
+
+    // Actualizar empleado
+    gestionPersonal.actualizarEmpleado(empleadoId, empleado);
+    mostrarNotificacion(`✅ Empleado ${empleado.nombre} actualizado correctamente`, 'success');
+    
+    // Cerrar modal y actualizar interfaz
+    cerrarModalEmpleado();
+    gestionPersonal.renderizarListaEmpleados();
+    gestionPersonal.actualizarEstadisticas();
+    
+    console.log('✅ Empleado actualizado:', empleado.nombre);
+  } catch (error) {
+    console.error('❌ Error actualizando empleado:', error);
+    mostrarNotificacion('❌ Error actualizando empleado', 'error');
+  }
 }
 
 // Hacer funciones globales
@@ -1650,3 +2160,11 @@ window.generarReporteEmpleado = generarReporteEmpleado;
 window.generarReporteDepartamento = generarReporteDepartamento;
 window.procesarExportacionEmpleados = procesarExportacionEmpleados;
 window.mostrarResumenHorasColombiano = mostrarResumenHorasColombiano;
+window.editarEmpleado = editarEmpleado;
+window.verEmpleado = verEmpleado;
+window.eliminarEmpleado = eliminarEmpleado;
+window.actualizarEmpleado = actualizarEmpleado;
+window.mostrarNotificacion = mostrarNotificacion;
+window.cerrarNotificacion = cerrarNotificacion;
+window.cargarDatosEjemplo = cargarDatosEjemplo;
+window.generarNomina = generarNomina;
