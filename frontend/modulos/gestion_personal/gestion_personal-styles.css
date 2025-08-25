@@ -984,6 +984,183 @@ input[pattern='[0-9]*']:invalid:not(:placeholder-shown) {
   pointer-events: none;
 }
 
+/* ===== SISTEMA DE CALENDARIO COLOMBIANO Y CÁLCULO DE HORAS ===== */
+
+.resumen-horas-detallado {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.resumen-horas-detallado h5 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #3498db;
+  font-size: 1.2rem;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.resumen-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #3498db;
+}
+
+.resumen-label {
+  font-weight: 600;
+  color: #34495e;
+  font-size: 0.9rem;
+}
+
+.resumen-valor {
+  font-weight: 700;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.resumen-calendario {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.resumen-calendario h6 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.calendario-stats {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.calendario-stat {
+  background: #ecf0f1;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #34495e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 3px solid #3498db;
+}
+
+.calendario-stat i {
+  color: #3498db;
+  font-size: 1rem;
+}
+
+.resumen-salario {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.resumen-salario h6 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.salario-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.salario-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.salario-item:last-child {
+  border-bottom: none;
+}
+
+.salario-item.total {
+  font-size: 1.1rem;
+  padding-top: 15px;
+  border-top: 2px solid #3498db;
+  margin-top: 10px;
+}
+
+.salario-item span:first-child {
+  color: #34495e;
+  font-weight: 500;
+}
+
+.salario-item span:last-child {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.salario-item.total span:last-child {
+  color: #27ae60;
+  font-size: 1.2rem;
+}
+
+/* Indicadores de tipo de día */
+.dia-laboral {
+  background: #e8f5e8;
+  border-left-color: #27ae60;
+}
+
+.dia-festivo {
+  background: #fff3cd;
+  border-left-color: #ffc107;
+}
+
+.dia-domingo {
+  background: #f8d7da;
+  border-left-color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .resumen-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .calendario-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .resumen-item {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 768px) {
