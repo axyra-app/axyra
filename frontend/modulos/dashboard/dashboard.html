@@ -19,6 +19,9 @@
     <link rel="stylesheet" href="dashboard-styles.css" />
     <link rel="stylesheet" href="../../static/modal-fixes.css" />
 
+    <!-- Estilos del Sistema de IA AXYRA -->
+    <link rel="stylesheet" href="../../static/axyra-ai-styles.css" />
+
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -135,6 +138,121 @@
               <i class="fas fa-cog"></i>
               <span>Configuración</span>
             </a>
+          </div>
+        </div>
+
+        <!-- AI Insights Section -->
+        <div class="axyra-ai-insights">
+          <h2 class="axyra-section-title">
+            <i class="fas fa-robot"></i>
+            Insights de IA
+          </h2>
+          <div class="axyra-ai-insights-grid">
+            <div class="axyra-ai-insight-card" id="aiPerformanceInsight">
+              <div class="axyra-ai-insight-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="axyra-ai-insight-content">
+                <h3>Análisis de Performance</h3>
+                <p id="aiPerformanceText">Analizando rendimiento del sistema...</p>
+                <div class="axyra-ai-insight-actions">
+                  <button class="axyra-btn axyra-btn-primary" onclick="axyraAIAssistant.analyzePerformance()">
+                    <i class="fas fa-magic"></i> Analizar
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="axyra-ai-insight-card" id="aiTrendInsight">
+              <div class="axyra-ai-insight-icon">
+                <i class="fas fa-trending-up"></i>
+              </div>
+              <div class="axyra-ai-insight-content">
+                <h3>Tendencias Predictivas</h3>
+                <p id="aiTrendText">Identificando patrones y tendencias...</p>
+                <div class="axyra-ai-insight-actions">
+                  <button class="axyra-btn axyra-btn-secondary" onclick="axyraAIAssistant.analyzeTrends()">
+                    <i class="fas fa-eye"></i> Ver Tendencias
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="axyra-ai-insight-card" id="aiRecommendationInsight">
+              <div class="axyra-ai-insight-icon">
+                <i class="fas fa-lightbulb"></i>
+              </div>
+              <div class="axyra-ai-insight-content">
+                <h3>Recomendaciones IA</h3>
+                <p id="aiRecommendationText">Generando recomendaciones personalizadas...</p>
+                <div class="axyra-ai-insight-actions">
+                  <button class="axyra-btn axyra-btn-success" onclick="axyraAIAssistant.getRecommendations()">
+                    <i class="fas fa-star"></i> Obtener
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Status Section -->
+        <div class="axyra-system-status">
+          <h2 class="axyra-section-title">
+            <i class="fas fa-heartbeat"></i>
+            Estado del Sistema
+          </h2>
+          <div class="axyra-system-status-grid">
+            <div class="axyra-system-status-card" id="errorHandlerStatus">
+              <div class="axyra-system-status-icon">
+                <i class="fas fa-shield-alt"></i>
+              </div>
+              <div class="axyra-system-status-content">
+                <h3>Manejador de Errores</h3>
+                <p id="errorHandlerStatusText">Verificando estado...</p>
+                <div class="axyra-system-status-indicator">
+                  <span class="axyra-status-badge" id="errorHandlerBadge">Verificando</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="axyra-system-status-card" id="performanceOptimizerStatus">
+              <div class="axyra-system-status-icon">
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              <div class="axyra-system-status-content">
+                <h3>Optimizador de Performance</h3>
+                <p id="performanceOptimizerStatusText">Verificando estado...</p>
+                <div class="axyra-system-status-indicator">
+                  <span class="axyra-status-badge" id="performanceOptimizerBadge">Verificando</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="axyra-system-status-card" id="aiAssistantStatus">
+              <div class="axyra-system-status-icon">
+                <i class="fas fa-robot"></i>
+              </div>
+              <div class="axyra-system-status-content">
+                <h3>Asistente de IA</h3>
+                <p id="aiAssistantStatusText">Verificando estado...</p>
+                <div class="axyra-system-status-indicator">
+                  <span class="axyra-status-badge" id="aiAssistantBadge">Verificando</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="axyra-system-status-card" id="realTimeMonitorStatus">
+              <div class="axyra-system-status-icon">
+                <i class="fas fa-eye"></i>
+              </div>
+              <div class="axyra-system-status-content">
+                <h3>Monitor en Tiempo Real</h3>
+                <p id="realTimeMonitorStatusText">Verificando estado...</p>
+                <div class="axyra-system-status-indicator">
+                  <span class="axyra-status-badge" id="realTimeMonitorBadge">Verificando</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -267,6 +385,14 @@
     <script src="../../static/global-search-system.js"></script>
     <script src="../../static/custom-reports-system.js"></script>
     <script src="../../static/auth-manager.js"></script>
+
+    <!-- Sistema de IA AXYRA -->
+    <script src="../../static/error-handler.js"></script>
+    <script src="../../static/performance-optimizer.js"></script>
+    <script src="../../static/real-time-monitor.js"></script>
+    <script src="../../static/ai-assistant.js"></script>
+    <script src="../../static/axyra-integration.js"></script>
+
     <script src="dashboard.js"></script>
   </body>
 </html>

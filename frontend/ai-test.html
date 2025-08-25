@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AXYRA - Test de Sistemas de IA</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+
+    <!-- Estilos AXYRA -->
+    <link rel="stylesheet" href="static/axyra-styles.css" />
+    <link rel="stylesheet" href="static/axyra-ai-styles.css" />
+
+    <style>
+      .test-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+
+      .test-section {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e1e8ed;
+      }
+
+      .test-title {
+        color: #667eea;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: 600;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+
+      .test-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #e1e8ed;
+      }
+
+      .test-card h4 {
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 18px;
+      }
+
+      .test-status {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 15px;
+      }
+
+      .test-status.success {
+        background: #d4edda;
+        color: #155724;
+      }
+
+      .test-status.error {
+        background: #f8d7da;
+        color: #721c24;
+      }
+
+      .test-status.warning {
+        background: #fff3cd;
+        color: #856404;
+      }
+
+      .test-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        margin: 5px;
+        transition: all 0.3s ease;
+      }
+
+      .test-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .test-output {
+        background: #f8f9fa;
+        border: 1px solid #e1e8ed;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        font-family: monospace;
+        font-size: 14px;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .system-info {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      .system-info h3 {
+        color: #1976d2;
+        margin-bottom: 10px;
+      }
+
+      .system-info ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+
+      .system-info li {
+        margin-bottom: 5px;
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <div class="test-section">
+        <h1 class="test-title">🤖 Test de Sistemas de IA AXYRA</h1>
+        <p>Esta página verifica que todos los sistemas de IA estén funcionando correctamente.</p>
+
+        <div class="system-info">
+          <h3>📋 Sistemas a Verificar:</h3>
+          <ul>
+            <li><strong>Error Handler:</strong> Manejo de errores y modo de emergencia</li>
+            <li><strong>Performance Optimizer:</strong> Optimización de rendimiento</li>
+            <li><strong>Real-time Monitor:</strong> Monitoreo en tiempo real</li>
+            <li><strong>AI Assistant:</strong> Asistente inteligente</li>
+            <li><strong>Integration System:</strong> Orquestación de sistemas</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2 class="test-title">🔍 Verificación de Sistemas</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h4>Error Handler</h4>
+            <div class="test-status" id="errorHandlerStatus">Verificando...</div>
+            <p>Verifica el estado del sistema de manejo de errores</p>
+            <button class="test-button" onclick="testErrorHandler()"><i class="fas fa-shield-alt"></i> Probar</button>
+            <div class="test-output" id="errorHandlerOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>Performance Optimizer</h4>
+            <div class="test-status" id="performanceOptimizerStatus">Verificando...</div>
+            <p>Verifica el estado del optimizador de performance</p>
+            <button class="test-button" onclick="testPerformanceOptimizer()">
+              <i class="fas fa-tachometer-alt"></i> Probar
+            </button>
+            <div class="test-output" id="performanceOptimizerOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>Real-time Monitor</h4>
+            <div class="test-status" id="realTimeMonitorStatus">Verificando...</div>
+            <p>Verifica el estado del monitor en tiempo real</p>
+            <button class="test-button" onclick="testRealTimeMonitor()"><i class="fas fa-eye"></i> Probar</button>
+            <div class="test-output" id="realTimeMonitorOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>AI Assistant</h4>
+            <div class="test-status" id="aiAssistantStatus">Verificando...</div>
+            <p>Verifica el estado del asistente de IA</p>
+            <button class="test-button" onclick="testAIAssistant()"><i class="fas fa-robot"></i> Probar</button>
+            <div class="test-output" id="aiAssistantOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>Integration System</h4>
+            <div class="test-status" id="integrationStatus">Verificando...</div>
+            <p>Verifica el estado del sistema de integración</p>
+            <button class="test-button" onclick="testIntegration()"><i class="fas fa-cogs"></i> Probar</button>
+            <div class="test-output" id="integrationOutput"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2 class="test-title">🧪 Pruebas de Funcionalidad</h2>
+        <div class="test-grid">
+          <div class="test-card">
+            <h4>Test de Comunicación</h4>
+            <p>Prueba la comunicación entre sistemas</p>
+            <button class="test-button" onclick="testInterSystemCommunication()">
+              <i class="fas fa-network-wired"></i> Probar Comunicación
+            </button>
+            <div class="test-output" id="communicationOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>Test de IA</h4>
+            <p>Prueba las capacidades de IA</p>
+            <button class="test-button" onclick="testAICapabilities()"><i class="fas fa-brain"></i> Probar IA</button>
+            <div class="test-output" id="aiCapabilitiesOutput"></div>
+          </div>
+
+          <div class="test-card">
+            <h4>Test de Performance</h4>
+            <p>Prueba las optimizaciones de performance</p>
+            <button class="test-button" onclick="testPerformanceOptimizations()">
+              <i class="fas fa-rocket"></i> Probar Performance
+            </button>
+            <div class="test-output" id="performanceOutput"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="test-section">
+        <h2 class="test-title">📊 Estado General del Sistema</h2>
+        <div class="test-card">
+          <h4>Resumen de Estado</h4>
+          <div class="test-output" id="generalStatusOutput">Verificando estado general del sistema...</div>
+          <button class="test-button" onclick="updateGeneralStatus()">
+            <i class="fas fa-sync-alt"></i> Actualizar Estado
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts del Sistema de IA -->
+    <script src="static/error-handler.js"></script>
+    <script src="static/performance-optimizer.js"></script>
+    <script src="static/real-time-monitor.js"></script>
+    <script src="static/ai-assistant.js"></script>
+    <script src="static/axyra-integration.js"></script>
+
+    <script>
+      // Variables globales para el test
+      let testResults = {};
+
+      // Función principal de inicialización
+      async function initializeTest() {
+        console.log('🚀 Iniciando test de sistemas de IA...');
+
+        try {
+          // Esperar a que todos los sistemas se carguen
+          await waitForSystems();
+
+          // Ejecutar verificación automática
+          await runAutomaticTests();
+
+          console.log('✅ Test de sistemas completado');
+        } catch (error) {
+          console.error('❌ Error en test de sistemas:', error);
+        }
+      }
+
+      // Esperar a que los sistemas estén disponibles
+      async function waitForSystems() {
+        const maxWaitTime = 15000; // 15 segundos
+        const startTime = Date.now();
+
+        while (Date.now() - startTime < maxWaitTime) {
+          if (
+            window.axyraErrorHandler &&
+            window.axyraPerformanceOptimizer &&
+            window.axyraRealTimeMonitor &&
+            window.axyraAIAssistant &&
+            window.axyraIntegration
+          ) {
+            return true;
+          }
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        throw new Error('Timeout esperando sistemas de IA');
+      }
+
+      // Ejecutar tests automáticos
+      async function runAutomaticTests() {
+        await testErrorHandler();
+        await testPerformanceOptimizer();
+        await testRealTimeMonitor();
+        await testAIAssistant();
+        await testIntegration();
+        updateGeneralStatus();
+      }
+
+      // Test del Error Handler
+      async function testErrorHandler() {
+        try {
+          const statusElement = document.getElementById('errorHandlerStatus');
+          const outputElement = document.getElementById('errorHandlerOutput');
+
+          if (!window.axyraErrorHandler) {
+            statusElement.className = 'test-status error';
+            statusElement.textContent = 'No Disponible';
+            outputElement.textContent = 'Error: Sistema no disponible';
+            return;
+          }
+
+          // Probar funcionalidades del error handler
+          const errorReport = window.axyraErrorHandler.getErrorReport();
+          const isHealthy = errorReport && errorReport.totalErrors !== undefined;
+
+          if (isHealthy) {
+            statusElement.className = 'test-status success';
+            statusElement.textContent = 'Funcionando';
+            outputElement.textContent = JSON.stringify(errorReport, null, 2);
+            testResults.errorHandler = 'success';
+          } else {
+            statusElement.className = 'test-status warning';
+            statusElement.textContent = 'Advertencia';
+            outputElement.textContent = 'Sistema disponible pero con advertencias';
+            testResults.errorHandler = 'warning';
+          }
+        } catch (error) {
+          document.getElementById('errorHandlerStatus').className = 'test-status error';
+          document.getElementById('errorHandlerStatus').textContent = 'Error';
+          document.getElementById('errorHandlerOutput').textContent = `Error: ${error.message}`;
+          testResults.errorHandler = 'error';
+        }
+      }
+
+      // Test del Performance Optimizer
+      async function testPerformanceOptimizer() {
+        try {
+          const statusElement = document.getElementById('performanceOptimizerStatus');
+          const outputElement = document.getElementById('performanceOptimizerOutput');
+
+          if (!window.axyraPerformanceOptimizer) {
+            statusElement.className = 'test-status error';
+            statusElement.textContent = 'No Disponible';
+            outputElement.textContent = 'Error: Sistema no disponible';
+            return;
+          }
+
+          const performanceReport = window.axyraPerformanceOptimizer.getPerformanceReport();
+          const isHealthy = performanceReport && performanceReport.status;
+
+          if (isHealthy) {
+            statusElement.className = 'test-status success';
+            statusElement.textContent = 'Funcionando';
+            outputElement.textContent = JSON.stringify(performanceReport, null, 2);
+            testResults.performanceOptimizer = 'success';
+          } else {
+            statusElement.className = 'test-status warning';
+            statusElement.textContent = 'Advertencia';
+            outputElement.textContent = 'Sistema disponible pero con advertencias';
+            testResults.performanceOptimizer = 'warning';
+          }
+        } catch (error) {
+          document.getElementById('performanceOptimizerStatus').className = 'test-status error';
+          document.getElementById('performanceOptimizerStatus').textContent = 'Error';
+          document.getElementById('performanceOptimizerOutput').textContent = `Error: ${error.message}`;
+          testResults.performanceOptimizer = 'error';
+        }
+      }
+
+      // Test del Real-time Monitor
+      async function testRealTimeMonitor() {
+        try {
+          const statusElement = document.getElementById('realTimeMonitorStatus');
+          const outputElement = document.getElementById('realTimeMonitorOutput');
+
+          if (!window.axyraRealTimeMonitor) {
+            statusElement.className = 'test-status error';
+            statusElement.textContent = 'No Disponible';
+            outputElement.textContent = 'Error: Sistema no disponible';
+            return;
+          }
+
+          const monitorStatus = window.axyraRealTimeMonitor.getSystemStatus();
+          const isHealthy = monitorStatus && monitorStatus.status;
+
+          if (isHealthy) {
+            statusElement.className = 'test-status success';
+            statusElement.textContent = 'Funcionando';
+            outputElement.textContent = JSON.stringify(monitorStatus, null, 2);
+            testResults.realTimeMonitor = 'success';
+          } else {
+            statusElement.className = 'test-status warning';
+            statusElement.textContent = 'Advertencia';
+            outputElement.textContent = 'Sistema disponible pero con advertencias';
+            testResults.realTimeMonitor = 'warning';
+          }
+        } catch (error) {
+          document.getElementById('realTimeMonitorStatus').className = 'test-status error';
+          document.getElementById('realTimeMonitorStatus').textContent = 'Error';
+          document.getElementById('realTimeMonitorOutput').textContent = `Error: ${error.message}`;
+          testResults.realTimeMonitor = 'error';
+        }
+      }
+
+      // Test del AI Assistant
+      async function testAIAssistant() {
+        try {
+          const statusElement = document.getElementById('aiAssistantStatus');
+          const outputElement = document.getElementById('aiAssistantOutput');
+
+          if (!window.axyraAIAssistant) {
+            statusElement.className = 'test-status error';
+            statusElement.textContent = 'No Disponible';
+            outputElement.textContent = 'Error: Sistema no disponible';
+            return;
+          }
+
+          const assistantStatus = window.axyraAIAssistant.getAssistantStatus();
+          const isHealthy = assistantStatus && assistantStatus.isActive;
+
+          if (isHealthy) {
+            statusElement.className = 'test-status success';
+            statusElement.textContent = 'Funcionando';
+            outputElement.textContent = JSON.stringify(assistantStatus, null, 2);
+            testResults.aiAssistant = 'success';
+          } else {
+            statusElement.className = 'test-status warning';
+            statusElement.textContent = 'Advertencia';
+            outputElement.textContent = 'Sistema disponible pero con advertencias';
+            testElement.aiAssistant = 'warning';
+          }
+        } catch (error) {
+          document.getElementById('aiAssistantStatus').className = 'test-status error';
+          document.getElementById('aiAssistantStatus').textContent = 'Error';
+          document.getElementById('aiAssistantOutput').textContent = `Error: ${error.message}`;
+          testResults.aiAssistant = 'error';
+        }
+      }
+
+      // Test del Integration System
+      async function testIntegration() {
+        try {
+          const statusElement = document.getElementById('integrationStatus');
+          const outputElement = document.getElementById('integrationOutput');
+
+          if (!window.axyraIntegration) {
+            statusElement.className = 'test-status error';
+            statusElement.textContent = 'No Disponible';
+            outputElement.textContent = 'Error: Sistema no disponible';
+            return;
+          }
+
+          // Verificar que la integración esté funcionando
+          const systems = window.axyraIntegration.systems;
+          const isHealthy = systems && systems.size > 0;
+
+          if (isHealthy) {
+            statusElement.className = 'test-status success';
+            statusElement.textContent = 'Funcionando';
+            outputElement.textContent = `Sistemas integrados: ${Array.from(systems.keys()).join(', ')}`;
+            testResults.integration = 'success';
+          } else {
+            statusElement.className = 'test-status warning';
+            statusElement.textContent = 'Advertencia';
+            outputElement.textContent = 'Sistema disponible pero con advertencias';
+            testResults.integration = 'warning';
+          }
+        } catch (error) {
+          document.getElementById('integrationStatus').className = 'test-status error';
+          document.getElementById('integrationStatus').textContent = 'Error';
+          document.getElementById('integrationOutput').textContent = `Error: ${error.message}`;
+          testResults.integration = 'error';
+        }
+      }
+
+      // Test de comunicación entre sistemas
+      async function testInterSystemCommunication() {
+        try {
+          const outputElement = document.getElementById('communicationOutput');
+          outputElement.textContent = 'Probando comunicación entre sistemas...';
+
+          if (window.axyraMessageBus) {
+            const results = window.axyraMessageBus.broadcast({
+              type: 'test_message',
+              content: 'Test de comunicación',
+              timestamp: Date.now(),
+            });
+
+            outputElement.textContent = `Comunicación exitosa:\n${JSON.stringify(results, null, 2)}`;
+          } else {
+            outputElement.textContent = 'Error: Sistema de mensajería no disponible';
+          }
+        } catch (error) {
+          document.getElementById('communicationOutput').textContent = `Error: ${error.message}`;
+        }
+      }
+
+      // Test de capacidades de IA
+      async function testAICapabilities() {
+        try {
+          const outputElement = document.getElementById('aiCapabilitiesOutput');
+          outputElement.textContent = 'Probando capacidades de IA...';
+
+          if (window.axyraAIAssistant) {
+            // Probar análisis de intención
+            const intent = window.axyraAIAssistant.analyzeIntent('ayuda con empleados');
+            const entities = window.axyraAIAssistant.extractEntities('agregar empleado Juan el 15/12/2024');
+
+            outputElement.textContent = `Capacidades de IA probadas:\n\nAnálisis de intención:\n${JSON.stringify(
+              intent,
+              null,
+              2
+            )}\n\nExtracción de entidades:\n${JSON.stringify(entities, null, 2)}`;
+          } else {
+            outputElement.textContent = 'Error: Asistente de IA no disponible';
+          }
+        } catch (error) {
+          document.getElementById('aiCapabilitiesOutput').textContent = `Error: ${error.message}`;
+        }
+      }
+
+      // Test de optimizaciones de performance
+      async function testPerformanceOptimizations() {
+        try {
+          const outputElement = document.getElementById('performanceOutput');
+          outputElement.textContent = 'Probando optimizaciones de performance...';
+
+          if (window.axyraPerformanceOptimizer) {
+            const report = window.axyraPerformanceOptimizer.getPerformanceReport();
+            const suggestions = window.axyraPerformanceOptimizer.getOptimizationSuggestions();
+
+            outputElement.textContent = `Optimizaciones de performance:\n\nReporte:\n${JSON.stringify(
+              report,
+              null,
+              2
+            )}\n\nSugerencias:\n${JSON.stringify(suggestions, null, 2)}`;
+          } else {
+            outputElement.textContent = 'Error: Optimizador de performance no disponible';
+          }
+        } catch (error) {
+          document.getElementById('performanceOutput').textContent = `Error: ${error.message}`;
+        }
+      }
+
+      // Actualizar estado general
+      function updateGeneralStatus() {
+        try {
+          const outputElement = document.getElementById('generalStatusOutput');
+
+          const summary = {
+            timestamp: new Date().toISOString(),
+            totalSystems: 5,
+            workingSystems: 0,
+            warningSystems: 0,
+            errorSystems: 0,
+            details: testResults,
+          };
+
+          // Contar sistemas por estado
+          Object.values(testResults).forEach((status) => {
+            switch (status) {
+              case 'success':
+                summary.workingSystems++;
+                break;
+              case 'warning':
+                summary.warningSystems++;
+                break;
+              case 'error':
+                summary.errorSystems++;
+                break;
+            }
+          });
+
+          // Determinar estado general
+          if (summary.errorSystems > 0) {
+            summary.overallStatus = 'CRÍTICO';
+          } else if (summary.warningSystems > 0) {
+            summary.overallStatus = 'ADVERTENCIA';
+          } else {
+            summary.overallStatus = 'SALUDABLE';
+          }
+
+          outputElement.textContent = JSON.stringify(summary, null, 2);
+        } catch (error) {
+          document.getElementById('generalStatusOutput').textContent = `Error actualizando estado: ${error.message}`;
+        }
+      }
+
+      // Inicializar test cuando se carga la página
+      document.addEventListener('DOMContentLoaded', initializeTest);
+    </script>
+  </body>
+</html>

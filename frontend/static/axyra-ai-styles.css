@@ -1,0 +1,1127 @@
+/* ========================================
+   ESTILOS PARA SISTEMA DE IA AXYRA
+   ======================================== */
+
+/* ========================================
+   ASISTENTE DE IA
+   ======================================== */
+
+.axyra-ai-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 50px;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.axyra-ai-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.axyra-ai-button i {
+  font-size: 18px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.axyra-ai-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  width: 400px;
+  height: 500px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e1e8ed;
+}
+
+.axyra-ai-panel.hidden {
+  display: none;
+}
+
+.axyra-ai-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 20px 20px 0 0;
+}
+
+.axyra-ai-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.axyra-ai-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.axyra-ai-close:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.axyra-ai-messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f8f9fa;
+}
+
+.axyra-ai-message {
+  margin-bottom: 15px;
+  animation: fadeInUp 0.3s ease;
+}
+
+.axyra-ai-message.user {
+  text-align: right;
+}
+
+.axyra-ai-message.system {
+  text-align: left;
+}
+
+.axyra-ai-message-content {
+  display: inline-block;
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  position: relative;
+}
+
+.axyra-ai-message.user .axyra-ai-message-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-bottom-right-radius: 6px;
+}
+
+.axyra-ai-message.system .axyra-ai-message-content {
+  background: white;
+  color: #333;
+  border: 1px solid #e1e8ed;
+  border-bottom-left-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.axyra-ai-sender {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.axyra-ai-message p {
+  margin: 0;
+  line-height: 1.4;
+  font-size: 14px;
+}
+
+.axyra-ai-input {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e1e8ed;
+  display: flex;
+  gap: 10px;
+}
+
+.axyra-ai-input input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 25px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.axyra-ai-input input:focus {
+  border-color: #667eea;
+}
+
+.axyra-ai-input button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.axyra-ai-input button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================
+   MONITOREO EN TIEMPO REAL
+   ======================================== */
+
+.axyra-offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  color: white;
+  padding: 12px 20px;
+  text-align: center;
+  font-weight: 600;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+
+.axyra-offline-banner i {
+  font-size: 16px;
+  animation: blink 1.5s infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.axyra-offline-mode {
+  filter: grayscale(20%);
+}
+
+.axyra-offline-mode::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 107, 107, 0.05);
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* ========================================
+   MODO DE EMERGENCIA
+   ======================================== */
+
+.axyra-emergency-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff4757 0%, #c44569 100%);
+  color: white;
+  padding: 15px 20px;
+  text-align: center;
+  font-weight: 600;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  box-shadow: 0 6px 20px rgba(255, 71, 87, 0.4);
+}
+
+.axyra-emergency-banner i {
+  font-size: 18px;
+  animation: emergencyPulse 1s infinite;
+}
+
+.axyra-emergency-banner button {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.axyra-emergency-banner button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+@keyframes emergencyPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* ========================================
+   INTERFAZ ALTERNATIVA
+   ======================================== */
+
+.axyra-fallback-interface {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  z-index: 10003;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+}
+
+.axyra-fallback-content h3 {
+  color: #667eea;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.axyra-fallback-content p {
+  color: #666;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+.axyra-fallback-content button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s ease;
+}
+
+.axyra-fallback-content button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* ========================================
+   OPTIMIZACIÓN DE PERFORMANCE
+   ======================================== */
+
+.axyra-virtualized-table {
+  position: relative;
+}
+
+.axyra-virtualized-table tbody {
+  position: relative;
+}
+
+.axyra-virtualized-table tbody tr {
+  transition: opacity 0.3s ease;
+}
+
+.axyra-virtualized-table tbody tr[style*='display: none'] {
+  opacity: 0;
+}
+
+/* ========================================
+   INDICADORES DE ESTADO
+   ======================================== */
+
+.axyra-status-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  z-index: 9999;
+  min-width: 200px;
+  border: 1px solid #e1e8ed;
+}
+
+.axyra-status-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  font-weight: 600;
+  color: #333;
+}
+
+.axyra-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.axyra-status-item:last-child {
+  border-bottom: none;
+}
+
+.axyra-status-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.axyra-status-value {
+  font-weight: 600;
+  color: #333;
+}
+
+.axyra-status-value.connected {
+  color: #27ae60;
+}
+
+.axyra-status-value.disconnected {
+  color: #e74c3c;
+}
+
+.axyra-status-value.warning {
+  color: #f39c12;
+}
+
+/* ========================================
+   NOTIFICACIONES EN TIEMPO REAL
+   ======================================== */
+
+.axyra-realtime-notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  z-index: 10004;
+  min-width: 300px;
+  border-left: 4px solid #667eea;
+  animation: slideInDown 0.3s ease;
+}
+
+.axyra-realtime-notification.success {
+  border-left-color: #27ae60;
+}
+
+.axyra-realtime-notification.warning {
+  border-left-color: #f39c12;
+}
+
+.axyra-realtime-notification.error {
+  border-left-color: #e74c3c;
+}
+
+.axyra-realtime-notification.info {
+  border-left-color: #3498db;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .axyra-ai-panel {
+    width: 90vw;
+    height: 70vh;
+    right: 5vw;
+    bottom: 80px;
+  }
+
+  .axyra-ai-button {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+
+  .axyra-ai-button span {
+    display: none;
+  }
+
+  .axyra-status-indicator {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+  }
+
+  .axyra-realtime-notification {
+    left: 10px;
+    right: 10px;
+    transform: none;
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .axyra-ai-panel {
+    width: 95vw;
+    height: 80vh;
+    right: 2.5vw;
+    bottom: 70px;
+  }
+
+  .axyra-ai-header h3 {
+    font-size: 16px;
+  }
+
+  .axyra-ai-message-content {
+    max-width: 90%;
+  }
+}
+
+/* ========================================
+   ANIMACIONES Y TRANSICIONES
+   ======================================== */
+
+.axyra-fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+.axyra-slide-up {
+  animation: slideUp 0.3s ease;
+}
+
+.axyra-bounce {
+  animation: bounce 0.6s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  0%,
+  20%,
+  53%,
+  80%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%,
+  43% {
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+/* ========================================
+   TEMAS OSCUROS
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  .axyra-ai-panel {
+    background: #1a1a1a;
+    border-color: #333;
+  }
+
+  .axyra-ai-messages {
+    background: #0f0f0f;
+  }
+
+  .axyra-ai-message.system .axyra-ai-message-content {
+    background: #2a2a2a;
+    color: #fff;
+    border-color: #444;
+  }
+
+  .axyra-ai-input {
+    background: #1a1a1a;
+    border-top-color: #333;
+  }
+
+  .axyra-ai-input input {
+    background: #2a2a2a;
+    border-color: #444;
+    color: #fff;
+  }
+
+  .axyra-status-indicator {
+    background: #1a1a1a;
+    border-color: #333;
+    color: #fff;
+  }
+
+  .axyra-realtime-notification {
+    background: #1a1a1a;
+    color: #fff;
+  }
+}
+
+/* ========================================
+   ACCESIBILIDAD
+   ======================================== */
+
+.axyra-ai-button:focus,
+.axyra-ai-close:focus,
+.axyra-ai-input button:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.axyra-ai-input input:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* ========================================
+   LOADING STATES
+   ======================================== */
+
+.axyra-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.axyra-loading-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #666;
+  font-style: italic;
+}
+
+/* ========================================
+   TOOLTIPS
+   ======================================== */
+
+.axyra-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.axyra-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10005;
+}
+
+.axyra-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+/* ========================================
+   PROGRESS BARS
+   ======================================== */
+
+.axyra-progress {
+  width: 100%;
+  height: 8px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.axyra-progress-bar {
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.axyra-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+/* ========================================
+   BADGES
+   ======================================== */
+
+.axyra-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.axyra-badge.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.axyra-badge.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.axyra-badge.error {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.axyra-badge.info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* ========================================
+   CARDS
+   ======================================== */
+
+.axyra-card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e1e8ed;
+  transition: all 0.3s ease;
+}
+
+.axyra-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.axyra-card-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.axyra-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: white;
+}
+
+.axyra-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.axyra-card-content {
+  color: #666;
+  line-height: 1.6;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.axyra-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  text-align: center;
+}
+
+.axyra-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.axyra-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.axyra-btn-secondary {
+  background: #f8f9fa;
+  color: #333;
+  border: 2px solid #e1e8ed;
+}
+
+.axyra-btn-secondary:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+.axyra-btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.axyra-btn-success:hover {
+  background: #218838;
+  transform: translateY(-2px);
+}
+
+.axyra-btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.axyra-btn-warning:hover {
+  background: #e0a800;
+  transform: translateY(-2px);
+}
+
+.axyra-btn-danger {
+  background: #dc3545;
+  color: white;
+}
+
+.axyra-btn-danger:hover {
+  background: #c82333;
+  transform: translateY(-2px);
+}
+
+/* ========================================
+   FORMS
+   ======================================== */
+
+.axyra-form-group {
+  margin-bottom: 20px;
+}
+
+.axyra-form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.axyra-form-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+  background: white;
+}
+
+.axyra-form-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.axyra-form-input.error {
+  border-color: #e74c3c;
+}
+
+.axyra-form-error {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* ========================================
+   ALERTS
+   ======================================== */
+
+.axyra-alert {
+  padding: 15px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border-left: 4px solid;
+}
+
+.axyra-alert.success {
+  background: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.axyra-alert.warning {
+  background: #fff3cd;
+  border-color: #ffc107;
+  color: #856404;
+}
+
+.axyra-alert.error {
+  background: #f8d7da;
+  border-color: #dc3545;
+  color: #721c24;
+}
+
+.axyra-alert.info {
+  background: #d1ecf1;
+  border-color: #17a2b8;
+  color: #0c5460;
+}
+
+/* ========================================
+   MODALS
+   ======================================== */
+
+.axyra-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10006;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.axyra-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.axyra-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e1e8ed;
+}
+
+.axyra-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.axyra-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.axyra-modal-close:hover {
+  background-color: #f0f0f0;
+}
+
+.axyra-modal-content {
+  margin-bottom: 20px;
+}
+
+.axyra-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 15px;
+  border-top: 1px solid #e1e8ed;
+}
+
+/* ========================================
+   UTILITIES
+   ======================================== */
+
+.axyra-text-center {
+  text-align: center;
+}
+.axyra-text-left {
+  text-align: left;
+}
+.axyra-text-right {
+  text-align: right;
+}
+
+.axyra-mt-10 {
+  margin-top: 10px;
+}
+.axyra-mt-20 {
+  margin-top: 20px;
+}
+.axyra-mb-10 {
+  margin-bottom: 10px;
+}
+.axyra-mb-20 {
+  margin-bottom: 20px;
+}
+
+.axyra-p-10 {
+  padding: 10px;
+}
+.axyra-p-20 {
+  padding: 20px;
+}
+
+.axyra-hidden {
+  display: none !important;
+}
+.axyra-visible {
+  display: block !important;
+}
+
+.axyra-rounded {
+  border-radius: 8px;
+}
+.axyra-rounded-lg {
+  border-radius: 15px;
+}
+.axyra-rounded-full {
+  border-radius: 50%;
+}
+
+.axyra-shadow {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.axyra-shadow-lg {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.axyra-transition {
+  transition: all 0.3s ease;
+}
+.axyra-transition-fast {
+  transition: all 0.15s ease;
+}
+.axyra-transition-slow {
+  transition: all 0.5s ease;
+}

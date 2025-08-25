@@ -1102,21 +1102,21 @@ class GestionPersonalManager {
   generarComparativas() {
     try {
       console.log('📊 Generando comparativas...');
-      
+
       // Comparativa de empleados por departamento
       const comparativaDepartamentos = document.getElementById('comparativaDepartamentos');
       if (comparativaDepartamentos) {
-        const departamentos = this.departamentos.map(dept => {
-          const empleadosEnDept = this.empleados.filter(emp => emp.departamento === dept.nombre);
+        const departamentos = this.departamentos.map((dept) => {
+          const empleadosEnDept = this.empleados.filter((emp) => emp.departamento === dept.nombre);
           return {
             nombre: dept.nombre,
             cantidad: empleadosEnDept.length,
-            color: dept.color
+            color: dept.color,
           };
         });
-        
+
         let html = '<div class="comparativa-lista">';
-        departamentos.forEach(dept => {
+        departamentos.forEach((dept) => {
           html += `
             <div class="comparativa-item" style="border-left: 4px solid ${dept.color}">
               <div class="comparativa-nombre">${dept.nombre}</div>
@@ -1125,17 +1125,17 @@ class GestionPersonalManager {
           `;
         });
         html += '</div>';
-        
+
         comparativaDepartamentos.innerHTML = html;
       }
-      
+
       // Comparativa de salarios promedio
       const comparativaSalarios = document.getElementById('comparativaSalarios');
       if (comparativaSalarios) {
-        const salariosPorDept = this.departamentos.map(dept => {
-          const empleadosEnDept = this.empleados.filter(emp => emp.departamento === dept.nombre);
+        const salariosPorDept = this.departamentos.map((dept) => {
+          const empleadosEnDept = this.empleados.filter((emp) => emp.departamento === dept.nombre);
           if (empleadosEnDept.length === 0) return { nombre: dept.nombre, promedio: 0 };
-          
+
           const totalSalarios = empleadosEnDept.reduce((total, emp) => {
             let salario = 0;
             if (emp.tipoSalario === 'fijo') {
@@ -1145,15 +1145,15 @@ class GestionPersonalManager {
             }
             return total + salario;
           }, 0);
-          
+
           return {
             nombre: dept.nombre,
-            promedio: totalSalarios / empleadosEnDept.length
+            promedio: totalSalarios / empleadosEnDept.length,
           };
         });
-        
+
         let html = '<div class="comparativa-lista">';
-        salariosPorDept.forEach(dept => {
+        salariosPorDept.forEach((dept) => {
           html += `
             <div class="comparativa-item">
               <div class="comparativa-nombre">${dept.nombre}</div>
@@ -1162,27 +1162,27 @@ class GestionPersonalManager {
           `;
         });
         html += '</div>';
-        
+
         comparativaSalarios.innerHTML = html;
       }
-      
+
       console.log('✅ Comparativas generadas exitosamente');
     } catch (error) {
       console.error('❌ Error generando comparativas:', error);
     }
   }
-  
+
   generarProyecciones() {
     try {
       console.log('📊 Generando proyecciones...');
-      
+
       // Proyección de crecimiento de personal
       const proyeccionPersonal = document.getElementById('proyeccionPersonal');
       if (proyeccionPersonal) {
         const crecimientoEstimado = Math.ceil(this.empleados.length * 0.15); // 15% de crecimiento
         const proyeccion6Meses = this.empleados.length + crecimientoEstimado;
-        const proyeccion12Meses = this.empleados.length + (crecimientoEstimado * 2);
-        
+        const proyeccion12Meses = this.empleados.length + crecimientoEstimado * 2;
+
         let html = `
           <div class="proyeccion-lista">
             <div class="proyeccion-item">
@@ -1199,16 +1199,16 @@ class GestionPersonalManager {
             </div>
           </div>
         `;
-        
+
         proyeccionPersonal.innerHTML = html;
       }
-      
+
       // Proyección de evolución de salarios
       const proyeccionSalarios = document.getElementById('proyeccionSalarios');
       if (proyeccionSalarios) {
         const salarioPromedioActual = this.calcularPromedioSalario();
         const incrementoEstimado = 0.08; // 8% anual
-        
+
         let html = `
           <div class="proyeccion-lista">
             <div class="proyeccion-item">
@@ -1225,10 +1225,10 @@ class GestionPersonalManager {
             </div>
           </div>
         `;
-        
+
         proyeccionSalarios.innerHTML = html;
       }
-      
+
       console.log('✅ Proyecciones generadas exitosamente');
     } catch (error) {
       console.error('❌ Error generando proyecciones:', error);
@@ -1622,9 +1622,7 @@ async function eliminarDepartamento(departamentoId) {
     }
 
     // Verificar si el departamento tiene empleados
-    const empleadosEnDepartamento = gestionPersonal.empleados.filter(
-      (emp) => emp.departamento === departamento.nombre
-    );
+    const empleadosEnDepartamento = gestionPersonal.empleados.filter((emp) => emp.departamento === departamento.nombre);
 
     // Mostrar modal de confirmación profesional
     const modal = document.createElement('div');
@@ -1976,9 +1974,9 @@ function procesarGeneracionNomina() {
     const empleadosActivos = document.querySelector('input[name="empleadosNomina"][value="activos"]').checked;
     const filtrarDepartamento = document.querySelector('input[name="empleadosNomina"][value="departamento"]').checked;
     const filtrarFecha = document.querySelector('input[name="empleadosNomina"][value="fecha"]').checked;
-    
+
     console.log('📊 Generando nómina:', { periodo, fechaCorte, empleadosActivos, filtrarDepartamento, filtrarFecha });
-    
+
     // Crear modal de confirmación profesional
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -2005,7 +2003,9 @@ function procesarGeneracionNomina() {
               </div>
               <div class="nomina-item">
                 <i class="fas fa-filter"></i>
-                <span><strong>Filtros adicionales:</strong> ${filtrarDepartamento || filtrarFecha ? 'Aplicados' : 'Ninguno'}</span>
+                <span><strong>Filtros adicionales:</strong> ${
+                  filtrarDepartamento || filtrarFecha ? 'Aplicados' : 'Ninguno'
+                }</span>
               </div>
             </div>
           </div>
@@ -2027,7 +2027,7 @@ function procesarGeneracionNomina() {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('✅ Modal de confirmación de nómina mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de nómina:', error);
@@ -2038,46 +2038,55 @@ function procesarGeneracionNomina() {
 // Función para confirmar generación de nómina
 function confirmarGeneracionNomina(periodo, fechaCorte, empleadosActivos, filtrarDepartamento, filtrarFecha) {
   try {
-    console.log('📊 Confirmando generación de nómina:', { periodo, fechaCorte, empleadosActivos, filtrarDepartamento, filtrarFecha });
-    
+    console.log('📊 Confirmando generación de nómina:', {
+      periodo,
+      fechaCorte,
+      empleadosActivos,
+      filtrarDepartamento,
+      filtrarFecha,
+    });
+
     // Filtrar empleados según criterios
     let empleadosFiltrados = gestionPersonal.empleados;
-    
+
     if (empleadosActivos) {
-      empleadosFiltrados = empleadosFiltrados.filter(emp => emp.estado === 'activo');
+      empleadosFiltrados = empleadosFiltrados.filter((emp) => emp.estado === 'activo');
     }
-    
+
     if (empleadosFiltrados.length === 0) {
       mostrarNotificacion('❌ No hay empleados para generar nómina con los criterios seleccionados', 'warning');
       return;
     }
-    
+
     // Generar nómina para cada empleado
     const nominasGeneradas = [];
-    
-    empleadosFiltrados.forEach(empleado => {
+
+    empleadosFiltrados.forEach((empleado) => {
       const nomina = generarNomina(empleado, periodo, fechaCorte);
       if (nomina) {
         nominasGeneradas.push(nomina);
       }
     });
-    
+
     if (nominasGeneradas.length === 0) {
       mostrarNotificacion('❌ No se pudieron generar nóminas con los datos disponibles', 'error');
       return;
     }
-    
+
     // Guardar nóminas en el sistema
     gestionPersonal.nominas = [...gestionPersonal.nominas, ...nominasGeneradas];
     gestionPersonal.guardarDatos();
-    
+
     // Actualizar interfaz
     gestionPersonal.renderizarNominas();
     gestionPersonal.actualizarEstadisticas();
-    
-    mostrarNotificacion(`✅ ${nominasGeneradas.length} nóminas generadas exitosamente para el período ${periodo}`, 'success', 'Nóminas Generadas');
+
+    mostrarNotificacion(
+      `✅ ${nominasGeneradas.length} nóminas generadas exitosamente para el período ${periodo}`,
+      'success',
+      'Nóminas Generadas'
+    );
     cerrarModalGenerarNomina();
-    
   } catch (error) {
     console.error('❌ Error confirmando generación de nómina:', error);
     mostrarNotificacion('❌ Error al generar nóminas', 'error');
@@ -2091,9 +2100,9 @@ function generarReporteGeneral() {
     const graficos = document.querySelector('input[name="elementosReporteGeneral"][value="graficos"]').checked;
     const comparativas = document.querySelector('input[name="elementosReporteGeneral"][value="comparativas"]').checked;
     const proyecciones = document.querySelector('input[name="elementosReporteGeneral"][value="proyecciones"]').checked;
-    
+
     console.log('📊 Generando reporte general:', { periodo, graficos, comparativas, proyecciones });
-    
+
     // Crear modal de confirmación profesional
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -2142,7 +2151,7 @@ function generarReporteGeneral() {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('✅ Modal de confirmación de reporte general mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de reporte general:', error);
@@ -2154,7 +2163,7 @@ function generarReporteGeneral() {
 function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) {
   try {
     console.log('📊 Confirmando reporte general:', { periodo, graficos, comparativas, proyecciones });
-    
+
     // Crear modal de reporte con gráficos
     const modal = document.createElement('div');
     modal.className = 'modal-overlay modal-reporte-grande';
@@ -2166,7 +2175,9 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
         </div>
         <div class="modal-body">
           <div class="reporte-contenido">
-            ${graficos ? `
+            ${
+              graficos
+                ? `
               <div class="grafico-seccion">
                 <h4><i class="fas fa-chart-pie"></i> Gráficos de Tendencia</h4>
                 <div class="grafico-container">
@@ -2174,9 +2185,13 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
                   <canvas id="graficoSalarios" width="400" height="200"></canvas>
                 </div>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
             
-            ${comparativas ? `
+            ${
+              comparativas
+                ? `
               <div class="comparativas-seccion">
                 <h4><i class="fas fa-balance-scale"></i> Análisis Comparativo</h4>
                 <div class="comparativas-grid">
@@ -2190,9 +2205,13 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
                   </div>
                 </div>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
             
-            ${proyecciones ? `
+            ${
+              proyecciones
+                ? `
               <div class="proyecciones-seccion">
                 <h4><i class="fas fa-rocket"></i> Proyecciones Futuras</h4>
                 <div class="proyecciones-grid">
@@ -2206,7 +2225,9 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
                   </div>
                 </div>
               </div>
-            ` : ''}
+            `
+                : ''
+            }
           </div>
         </div>
         <div class="modal-footer">
@@ -2221,7 +2242,7 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
     `;
 
     document.body.appendChild(modal);
-    
+
     // Generar gráficos y datos
     if (graficos) {
       setTimeout(() => {
@@ -2229,19 +2250,19 @@ function confirmarReporteGeneral(periodo, graficos, comparativas, proyecciones) 
         gestionPersonal.generarGraficoSalariosDepartamento();
       }, 100);
     }
-    
+
     if (comparativas) {
       setTimeout(() => {
         gestionPersonal.generarComparativas();
       }, 200);
     }
-    
+
     if (proyecciones) {
       setTimeout(() => {
         gestionPersonal.generarProyecciones();
       }, 300);
     }
-    
+
     console.log('✅ Reporte general generado exitosamente');
   } catch (error) {
     console.error('❌ Error generando reporte general:', error);
@@ -2840,10 +2861,10 @@ function generarResumenDepartamento(departamentoFiltro) {
 function procesarExportacionEmpleados() {
   try {
     const formato = document.querySelector('input[name="formatoExport"]:checked').value;
-    const filtros = Array.from(document.querySelectorAll('input[name="filtrosExport"]:checked')).map(cb => cb.value);
-    
+    const filtros = Array.from(document.querySelectorAll('input[name="filtrosExport"]:checked')).map((cb) => cb.value);
+
     console.log('📊 Exportando empleados:', { formato, filtros });
-    
+
     // Crear modal de confirmación profesional
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
@@ -2877,7 +2898,9 @@ function procesarExportacionEmpleados() {
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-success" onclick="confirmarExportacionEmpleados('${formato}', ${JSON.stringify(filtros)}); this.closest('.modal-overlay').remove();">
+          <button class="btn btn-success" onclick="confirmarExportacionEmpleados('${formato}', ${JSON.stringify(
+      filtros
+    )}); this.closest('.modal-overlay').remove();">
             <i class="fas fa-download"></i> Confirmar Exportación
           </button>
           <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
@@ -2888,7 +2911,7 @@ function procesarExportacionEmpleados() {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('✅ Modal de confirmación de exportación mostrado');
   } catch (error) {
     console.error('❌ Error mostrando modal de exportación:', error);
@@ -2900,19 +2923,19 @@ function procesarExportacionEmpleados() {
 function confirmarExportacionEmpleados(formato, filtros) {
   try {
     console.log('📊 Confirmando exportación:', { formato, filtros });
-    
+
     // Filtrar empleados según los filtros seleccionados
     let empleadosFiltrados = gestionPersonal.empleados;
-    
+
     if (filtros.includes('activos')) {
-      empleadosFiltrados = empleadosFiltrados.filter(emp => emp.estado === 'activo');
+      empleadosFiltrados = empleadosFiltrados.filter((emp) => emp.estado === 'activo');
     }
-    
+
     if (empleadosFiltrados.length === 0) {
       mostrarNotificacion('❌ No hay empleados para exportar con los filtros seleccionados', 'warning');
       return;
     }
-    
+
     // Generar archivo según el formato
     if (formato === 'excel') {
       generarExcelEmpleados(empleadosFiltrados, filtros);
@@ -2921,10 +2944,13 @@ function confirmarExportacionEmpleados(formato, filtros) {
     } else if (formato === 'pdf') {
       generarPDFEmpleados(empleadosFiltrados, filtros);
     }
-    
-    mostrarNotificacion(`✅ Exportando ${empleadosFiltrados.length} empleados en formato ${formato.toUpperCase()}`, 'success', 'Exportación Exitosa');
+
+    mostrarNotificacion(
+      `✅ Exportando ${empleadosFiltrados.length} empleados en formato ${formato.toUpperCase()}`,
+      'success',
+      'Exportación Exitosa'
+    );
     cerrarModalExportarEmpleados();
-    
   } catch (error) {
     console.error('❌ Error confirmando exportación:', error);
     mostrarNotificacion('❌ Error al exportar empleados', 'error');
@@ -2937,36 +2963,30 @@ function generarExcelEmpleados(empleados, filtros) {
     // Crear workbook y worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet([]);
-    
+
     // Crear encabezados según filtros
     const headers = ['ID', 'Nombre', 'Cédula', 'Cargo', 'Departamento'];
-    
+
     if (filtros.includes('salarios')) {
       headers.push('Tipo Salario', 'Salario Base', 'Bonificaciones', 'Total Salario');
     }
-    
+
     if (filtros.includes('fechas')) {
       headers.push('Fecha Contratación', 'Estado');
     }
-    
+
     // Agregar encabezados
     XLSX.utils.sheet_add_aoa(ws, [headers], { origin: 'A1' });
-    
+
     // Agregar datos de empleados
-    const datosEmpleados = empleados.map(emp => {
-      const row = [
-        emp.id,
-        emp.nombre,
-        emp.cedula,
-        emp.cargo,
-        emp.departamento
-      ];
-      
+    const datosEmpleados = empleados.map((emp) => {
+      const row = [emp.id, emp.nombre, emp.cedula, emp.cargo, emp.departamento];
+
       if (filtros.includes('salarios')) {
-        const salarioBase = emp.tipoSalario === 'fijo' ? (emp.salarioFijo || 0) : (emp.salarioReferencia || 0);
+        const salarioBase = emp.tipoSalario === 'fijo' ? emp.salarioFijo || 0 : emp.salarioReferencia || 0;
         const bonificaciones = emp.bonificaciones || 0;
         const totalSalario = salarioBase + bonificaciones;
-        
+
         row.push(
           emp.tipoSalario === 'fijo' ? 'Salario Fijo' : 'Por Horas',
           salarioBase.toLocaleString('es-CO'),
@@ -2974,33 +2994,30 @@ function generarExcelEmpleados(empleados, filtros) {
           totalSalario.toLocaleString('es-CO')
         );
       }
-      
+
       if (filtros.includes('fechas')) {
-        row.push(
-          new Date(emp.fechaContratacion).toLocaleDateString('es-CO'),
-          emp.estado
-        );
+        row.push(new Date(emp.fechaContratacion).toLocaleDateString('es-CO'), emp.estado);
       }
-      
+
       return row;
     });
-    
+
     // Agregar datos al worksheet
     XLSX.utils.sheet_add_aoa(ws, datosEmpleados, { origin: 'A2' });
-    
+
     // Aplicar estilos
     aplicarEstilosExcelEmpleados(ws, empleados.length, headers.length);
-    
+
     // Agregar worksheet al workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Empleados');
-    
+
     // Generar nombre del archivo
     const fecha = new Date().toISOString().split('T')[0];
     const nombreArchivo = `Empleados_${fecha}.xlsx`;
-    
+
     // Descargar archivo
     XLSX.writeFile(wb, nombreArchivo);
-    
+
     console.log('📊 Excel de empleados generado exitosamente:', nombreArchivo);
   } catch (error) {
     console.error('❌ Error generando Excel de empleados:', error);
@@ -3013,12 +3030,12 @@ function aplicarEstilosExcelEmpleados(ws, totalEmpleados, totalColumnas) {
   try {
     // Definir rangos
     const range = XLSX.utils.decode_range(ws['!ref']);
-    
+
     // Aplicar estilos a encabezados
     for (let col = range.s.c; col < totalColumnas; col++) {
       const cellAddress = XLSX.utils.encode_cell({ r: 0, c: col });
       if (!ws[cellAddress]) continue;
-      
+
       ws[cellAddress].s = {
         font: { bold: true, color: { rgb: 'FFFFFF' } },
         fill: { fgColor: { rgb: '2E86AB' } },
@@ -3027,17 +3044,17 @@ function aplicarEstilosExcelEmpleados(ws, totalEmpleados, totalColumnas) {
           top: { style: 'thin' },
           bottom: { style: 'thin' },
           left: { style: 'thin' },
-          right: { style: 'thin' }
-        }
+          right: { style: 'thin' },
+        },
       };
     }
-    
+
     // Aplicar estilos a datos
     for (let row = 1; row <= totalEmpleados; row++) {
       for (let col = range.s.c; col < totalColumnas; col++) {
         const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
         if (!ws[cellAddress]) continue;
-        
+
         ws[cellAddress].s = {
           font: { color: { rgb: '2C3E50' } },
           alignment: { horizontal: 'center', vertical: 'center' },
@@ -3045,16 +3062,16 @@ function aplicarEstilosExcelEmpleados(ws, totalEmpleados, totalColumnas) {
             top: { style: 'thin', color: { rgb: 'BDC3C7' } },
             bottom: { style: 'thin', color: { rgb: 'BDC3C7' } },
             left: { style: 'thin', color: { rgb: 'BDC3C7' } },
-            right: { style: 'thin', color: { rgb: 'BDC3C7' } }
-          }
+            right: { style: 'thin', color: { rgb: 'BDC3C7' } },
+          },
         };
       }
     }
-    
+
     // Ajustar ancho de columnas
     const columnWidths = Array(totalColumnas).fill(15);
-    ws['!cols'] = columnWidths.map(width => ({ width }));
-    
+    ws['!cols'] = columnWidths.map((width) => ({ width }));
+
     console.log('🎨 Estilos aplicados al Excel de empleados');
   } catch (error) {
     console.error('❌ Error aplicando estilos al Excel:', error);
@@ -4030,21 +4047,21 @@ function cargarConfiguracionNomina() {
 function generarComparativas() {
   try {
     console.log('�� Generando comparativas...');
-    
+
     // Comparativa de empleados por departamento
     const comparativaDepartamentos = document.getElementById('comparativaDepartamentos');
     if (comparativaDepartamentos) {
-      const departamentos = this.departamentos.map(dept => {
-        const empleadosEnDept = this.empleados.filter(emp => emp.departamento === dept.nombre);
+      const departamentos = this.departamentos.map((dept) => {
+        const empleadosEnDept = this.empleados.filter((emp) => emp.departamento === dept.nombre);
         return {
           nombre: dept.nombre,
           cantidad: empleadosEnDept.length,
-          color: dept.color
+          color: dept.color,
         };
       });
-      
+
       let html = '<div class="comparativa-lista">';
-      departamentos.forEach(dept => {
+      departamentos.forEach((dept) => {
         html += `
           <div class="comparativa-item" style="border-left: 4px solid ${dept.color}">
             <div class="comparativa-nombre">${dept.nombre}</div>
@@ -4053,17 +4070,17 @@ function generarComparativas() {
         `;
       });
       html += '</div>';
-      
+
       comparativaDepartamentos.innerHTML = html;
     }
-    
+
     // Comparativa de salarios promedio
     const comparativaSalarios = document.getElementById('comparativaSalarios');
     if (comparativaSalarios) {
-      const salariosPorDept = this.departamentos.map(dept => {
-        const empleadosEnDept = this.empleados.filter(emp => emp.departamento === dept.nombre);
+      const salariosPorDept = this.departamentos.map((dept) => {
+        const empleadosEnDept = this.empleados.filter((emp) => emp.departamento === dept.nombre);
         if (empleadosEnDept.length === 0) return { nombre: dept.nombre, promedio: 0 };
-        
+
         const totalSalarios = empleadosEnDept.reduce((total, emp) => {
           let salario = 0;
           if (emp.tipoSalario === 'fijo') {
@@ -4073,15 +4090,15 @@ function generarComparativas() {
           }
           return total + salario;
         }, 0);
-        
+
         return {
           nombre: dept.nombre,
-          promedio: totalSalarios / empleadosEnDept.length
+          promedio: totalSalarios / empleadosEnDept.length,
         };
       });
-      
+
       let html = '<div class="comparativa-lista">';
-      salariosPorDept.forEach(dept => {
+      salariosPorDept.forEach((dept) => {
         html += `
           <div class="comparativa-item">
             <div class="comparativa-nombre">${dept.nombre}</div>
@@ -4090,10 +4107,10 @@ function generarComparativas() {
         `;
       });
       html += '</div>';
-      
+
       comparativaSalarios.innerHTML = html;
     }
-    
+
     console.log('✅ Comparativas generadas exitosamente');
   } catch (error) {
     console.error('❌ Error generando comparativas:', error);
@@ -4104,14 +4121,14 @@ function generarComparativas() {
 function generarProyecciones() {
   try {
     console.log('📊 Generando proyecciones...');
-    
+
     // Proyección de crecimiento de personal
     const proyeccionPersonal = document.getElementById('proyeccionPersonal');
     if (proyeccionPersonal) {
       const crecimientoEstimado = Math.ceil(this.empleados.length * 0.15); // 15% de crecimiento
       const proyeccion6Meses = this.empleados.length + crecimientoEstimado;
-      const proyeccion12Meses = this.empleados.length + (crecimientoEstimado * 2);
-      
+      const proyeccion12Meses = this.empleados.length + crecimientoEstimado * 2;
+
       let html = `
         <div class="proyeccion-lista">
           <div class="proyeccion-item">
@@ -4128,16 +4145,16 @@ function generarProyecciones() {
           </div>
         </div>
       `;
-      
+
       proyeccionPersonal.innerHTML = html;
     }
-    
+
     // Proyección de evolución de salarios
     const proyeccionSalarios = document.getElementById('proyeccionSalarios');
     if (proyeccionSalarios) {
       const salarioPromedioActual = this.calcularPromedioSalario();
       const incrementoEstimado = 0.08; // 8% anual
-      
+
       let html = `
         <div class="proyeccion-lista">
           <div class="proyeccion-item">
@@ -4154,10 +4171,10 @@ function generarProyecciones() {
           </div>
         </div>
       `;
-      
+
       proyeccionSalarios.innerHTML = html;
     }
-    
+
     console.log('✅ Proyecciones generadas exitosamente');
   } catch (error) {
     console.error('❌ Error generando proyecciones:', error);
