@@ -5,6 +5,137 @@
     {
       "src": "frontend/**/*",
       "use": "@vercel/static"
+    },
+    {
+      "src": "backend/main.py",
+      "use": "@vercel/python"
     }
-  ]
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/frontend/index.html"
+    },
+    {
+      "src": "/modulos/(.*)",
+      "dest": "/frontend/modulos/$1"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/frontend/static/$1"
+    },
+    {
+      "src": "/backend/(.*)",
+      "dest": "/backend/$1"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/backend/main.py"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot))",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "dest": "/frontend/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/index.html"
+    }
+  ],
+  "functions": {
+    "backend/main.py": {
+      "runtime": "python3.9",
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "PYTHONPATH": "backend"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/(.*\\.(js|css))",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/frontend/login.html"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/frontend/modulos/dashboard/dashboard.html"
+    },
+    {
+      "source": "/gestion-personal",
+      "destination": "/frontend/modulos/gestion_personal/gestion_personal.html"
+    },
+    {
+      "source": "/empleados",
+      "destination": "/frontend/modulos/empleados/empleados.html"
+    },
+    {
+      "source": "/nomina",
+      "destination": "/frontend/modulos/nomina/gestionar_nomina.html"
+    },
+    {
+      "source": "/cuadre-caja",
+      "destination": "/frontend/modulos/cuadre_caja/cuadre_caja.html"
+    },
+    {
+      "source": "/inventario",
+      "destination": "/frontend/modulos/inventario/inventario.html"
+    },
+    {
+      "source": "/configuracion",
+      "destination": "/frontend/modulos/configuracion/configuracion.html"
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "github": {
+    "silent": true
+  }
 }
