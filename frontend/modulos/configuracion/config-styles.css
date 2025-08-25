@@ -595,56 +595,48 @@ input:checked + .axyra-slider:before {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .axyra-config-container {
-        padding: 16px;
-    }
-    
-    .axyra-config-title {
-        font-size: 2rem;
-    }
-    
-    .axyra-security-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-    
-    .axyra-security-item {
-        padding: 20px;
-    }
-    
-    .axyra-company-form {
-        padding: 24px;
-        margin: 0 16px;
-    }
-    
-    .axyra-system-options {
-        padding: 24px;
-    }
-    
-    .axyra-security-actions {
-        flex-direction: column;
-    }
-    
-    .axyra-btn {
-        width: 100%;
-    }
-    
-    .axyra-form-actions {
-        flex-direction: column;
-    }
+  .axyra-config-container {
+    padding: 15px;
+  }
+  
+  .axyra-config-title {
+    font-size: 2rem;
+  }
+  
+  .axyra-config-subtitle {
+    font-size: 1rem;
+  }
+  
+  .axyra-modal-container {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .axyra-modal-footer {
+    flex-direction: column;
+  }
+  
+  .axyra-btn {
+    width: 100%;
+  }
+}
 
-    .axyra-modal-container {
-      width: 95%;
-      margin: 20px;
-    }
-    
-    .axyra-modal-footer {
-      flex-direction: column;
-    }
-    
-    .axyra-btn {
-      width: 100%;
-    }
+/* ===== TEST RESPONSIVE ===== */
+.axyra-responsive-test {
+  animation: responsiveTest 2s ease-in-out;
+}
+
+@keyframes responsiveTest {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 480px) {

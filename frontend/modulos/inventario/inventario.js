@@ -1122,54 +1122,90 @@ function exportarInventarioExcel() {
 
 // Aplicar estilos al Excel
 function aplicarEstilosExcel(worksheetProductos, worksheetMovimientos) {
-  // Estilos para encabezados
-  const headerStyle = {
-    fill: { fgColor: { rgb: '667eea' } },
-    font: { color: { rgb: 'FFFFFF' }, bold: true, sz: 12 },
-    alignment: { horizontal: 'center', vertical: 'center' },
-    border: {
-      top: { style: 'medium', color: { rgb: '000000' } },
-      bottom: { style: 'medium', color: { rgb: '000000' } },
-      left: { style: 'thin', color: { rgb: '000000' } },
-      right: { style: 'thin', color: { rgb: '000000' } },
-    },
-  };
+  try {
+    // Verificar que los worksheets existan y tengan datos
+    if (!worksheetProductos || !worksheetProductos['!ref']) {
+      console.warn('⚠️ Worksheet de productos no tiene datos para estilos');
+      return;
+    }
+    
+    if (!worksheetMovimientos || !worksheetMovimientos['!ref']) {
+      console.warn('⚠️ Worksheet de movimientos no tiene datos para estilos');
+      return;
+    }
 
-  // Aplicar estilos a encabezados de productos
-  const rangeProductos = XLSX.utils.decode_range(worksheetProductos['!ref']);
-  for (let C = rangeProductos.s.c; C <= rangeProductos.e.c; C++) {
-    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-    worksheetProductos[cellAddress].s = headerStyle;
+    // Estilos para encabezados
+    const headerStyle = {
+      fill: { fgColor: { rgb: '667eea' } },
+      font: { color: { rgb: 'FFFFFF' }, bold: true, sz: 12 },
+      alignment: { horizontal: 'center', vertical: 'center' },
+      border: {
+        top: { style: 'medium', color: { rgb: '000000' } },
+        bottom: { style: 'medium', color: { rgb: '000000' } },
+        left: { style: 'thin', color: { rgb: '000000' } },
+        right: { style: 'thin', color: { rgb: '000000' } },
+      },
+    };
+
+    // Aplicar estilos a encabezados de productos
+    try {
+      const rangeProductos = XLSX.utils.decode_range(worksheetProductos['!ref']);
+      if (rangeProductos && rangeProductos.s && rangeProductos.e) {
+        for (let C = rangeProductos.s.c; C <= rangeProductos.e.c; C++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+          if (worksheetProductos[cellAddress]) {
+            worksheetProductos[cellAddress].s = headerStyle;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Error aplicando estilos a productos:', error);
+    }
+
+    // Aplicar estilos a encabezados de movimientos
+    try {
+      const rangeMovimientos = XLSX.utils.decode_range(worksheetMovimientos['!ref']);
+      if (rangeMovimientos && rangeMovimientos.s && rangeMovimientos.e) {
+        for (let C = rangeMovimientos.s.c; C <= rangeMovimientos.e.c; C++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
+          if (worksheetMovimientos[cellAddress]) {
+            worksheetMovimientos[cellAddress].s = headerStyle;
+          }
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Error aplicando estilos a movimientos:', error);
+    }
+
+    // Ajustar ancho de columnas
+    try {
+      worksheetProductos['!cols'] = [
+        { width: 15 }, // Código
+        { width: 30 }, // Nombre
+        { width: 15 }, // Categoría
+        { width: 10 }, // Stock
+        { width: 12 }, // Precio
+        { width: 15 }, // Stock Mínimo
+        { width: 12 }, // Estado
+        { width: 40 }, // Descripción
+        { width: 15 }, // Fecha
+      ];
+
+      worksheetMovimientos['!cols'] = [
+        { width: 15 }, // Fecha
+        { width: 30 }, // Producto
+        { width: 12 }, // Tipo
+        { width: 10 }, // Cantidad
+        { width: 25 }, // Usuario
+        { width: 40 }, // Observación
+      ];
+    } catch (error) {
+      console.warn('⚠️ Error ajustando ancho de columnas:', error);
+    }
+    
+  } catch (error) {
+    console.error('❌ Error general aplicando estilos Excel:', error);
   }
-
-  // Aplicar estilos a encabezados de movimientos
-  const rangeMovimientos = XLSX.utils.decode_range(worksheetMovimientos['!ref']);
-  for (let C = rangeMovimientos.s.c; C <= rangeMovimientos.e.c; C++) {
-    const cellAddress = XLSX.utils.encode_cell({ r: 0, c: C });
-    worksheetMovimientos[cellAddress].s = headerStyle;
-  }
-
-  // Ajustar ancho de columnas
-  worksheetProductos['!cols'] = [
-    { width: 15 }, // Código
-    { width: 30 }, // Nombre
-    { width: 15 }, // Categoría
-    { width: 10 }, // Stock
-    { width: 12 }, // Precio
-    { width: 15 }, // Stock Mínimo
-    { width: 12 }, // Estado
-    { width: 40 }, // Descripción
-    { width: 15 }, // Fecha
-  ];
-
-  worksheetMovimientos['!cols'] = [
-    { width: 15 }, // Fecha
-    { width: 30 }, // Producto
-    { width: 12 }, // Tipo
-    { width: 10 }, // Cantidad
-    { width: 25 }, // Usuario
-    { width: 40 }, // Observación
-  ];
 }
 
 // ========================================
@@ -1204,40 +1240,313 @@ window.eliminarProducto = eliminarProducto;
 window.verMovimiento = verMovimiento;
 window.exportarInventarioExcel = exportarInventarioExcel;
 window.logout = logout;
+window.guardarProducto = guardarProducto;
+window.agregarProducto = agregarProducto;
+window.actualizarProducto = actualizarProducto;
+window.mostrarModalVerProducto = mostrarModalVerProducto;
+window.mostrarNotificacion = mostrarNotificacion;
 
 // Funciones faltantes para compatibilidad
 function mostrarModalProducto(producto = null) {
-  // Implementación básica del modal de producto
-  console.log('Modal de producto:', producto);
-  // Aquí se implementaría la lógica del modal
+  try {
+    const modal = document.getElementById('modalProducto');
+    const titulo = document.getElementById('tituloModalProducto');
+    const form = document.getElementById('formProducto');
+    
+    if (producto) {
+      // Modo edición
+      titulo.textContent = 'Editar Producto';
+      document.getElementById('codigoProducto').value = producto.codigo || '';
+      document.getElementById('nombreProducto').value = producto.nombre || '';
+      document.getElementById('categoriaProducto').value = producto.categoria || '';
+      document.getElementById('stockProducto').value = producto.stock || '';
+      document.getElementById('precioProducto').value = producto.precio || '';
+      document.getElementById('stockMinimoProducto').value = producto.stockMinimo || '';
+      document.getElementById('descripcionProducto').value = producto.descripcion || '';
+      document.getElementById('estadoProducto').value = producto.estado || 'activo';
+      
+      // Cambiar botón de guardar
+      const btnGuardar = document.getElementById('btnGuardarProducto');
+      btnGuardar.textContent = 'Actualizar Producto';
+      btnGuardar.onclick = () => guardarProducto(producto.id);
+    } else {
+      // Modo nuevo
+      titulo.textContent = 'Nuevo Producto';
+      form.reset();
+      
+      // Cambiar botón de guardar
+      const btnGuardar = document.getElementById('btnGuardarProducto');
+      btnGuardar.textContent = 'Guardar Producto';
+      btnGuardar.onclick = () => guardarProducto();
+    }
+    
+    if (modal) {
+      modal.style.display = 'block';
+      // Enfocar primer campo
+      setTimeout(() => {
+        const primerInput = document.getElementById('codigoProducto');
+        if (primerInput) primerInput.focus();
+      }, 100);
+    }
+  } catch (error) {
+    console.error('❌ Error mostrando modal de producto:', error);
+    mostrarNotificacion('❌ Error mostrando modal de producto', 'error');
+  }
 }
 
 function cerrarModalProducto() {
-  // Implementación básica para cerrar modal de producto
-  console.log('Cerrando modal de producto');
-  // Aquí se implementaría la lógica para cerrar el modal
+  try {
+    const modal = document.getElementById('modalProducto');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('❌ Error cerrando modal de producto:', error);
+  }
 }
 
 function mostrarModalEntrada() {
-  // Implementación básica del modal de entrada
-  console.log('Abriendo modal de entrada');
-  // Aquí se implementaría la lógica del modal
+  try {
+    const modal = document.getElementById('modalEntrada');
+    if (modal) {
+      modal.style.display = 'block';
+      // Enfocar primer campo
+      setTimeout(() => {
+        const primerInput = document.getElementById('productoEntrada');
+        if (primerInput) primerInput.focus();
+      }, 100);
+    }
+  } catch (error) {
+    console.error('❌ Error mostrando modal de entrada:', error);
+    mostrarNotificacion('❌ Error mostrando modal de entrada', 'error');
+  }
 }
 
 function cerrarModalEntrada() {
-  // Implementación básica para cerrar modal de entrada
-  console.log('Cerrando modal de entrada');
-  // Aquí se implementaría la lógica para cerrar el modal
+  try {
+    const modal = document.getElementById('modalEntrada');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('❌ Error cerrando modal de entrada:', error);
+  }
 }
 
 function mostrarModalSalida() {
-  // Implementación básica del modal de salida
-  console.log('Abriendo modal de salida');
-  // Aquí se implementaría la lógica del modal
+  try {
+    const modal = document.getElementById('modalSalida');
+    if (modal) {
+      modal.style.display = 'block';
+      // Enfocar primer campo
+      setTimeout(() => {
+        const primerInput = document.getElementById('productoSalida');
+        if (primerInput) primerInput.focus();
+      }, 100);
+    }
+  } catch (error) {
+    console.error('❌ Error mostrando modal de salida:', error);
+    mostrarNotificacion('❌ Error mostrando modal de salida', 'error');
+  }
 }
 
 function cerrarModalSalida() {
-  // Implementación básica para cerrar modal de salida
-  console.log('Cerrando modal de salida');
-  // Aquí se implementaría la lógica para cerrar el modal
+  try {
+    const modal = document.getElementById('modalSalida');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('❌ Error cerrando modal de salida:', error);
+  }
+}
+
+function cerrarModalVerProducto() {
+  try {
+    const modal = document.getElementById('modalVerProducto');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('❌ Error cerrando modal de ver producto:', error);
+  }
+}
+
+// Función para guardar producto
+function guardarProducto(productoId = null) {
+  try {
+    const form = document.getElementById('formProducto');
+    const formData = new FormData(form);
+    
+    const producto = {
+      codigo: formData.get('codigoProducto') || document.getElementById('codigoProducto').value,
+      nombre: formData.get('nombreProducto') || document.getElementById('nombreProducto').value,
+      categoria: formData.get('categoriaProducto') || document.getElementById('categoriaProducto').value,
+      stock: parseInt(formData.get('stockProducto') || document.getElementById('stockProducto').value) || 0,
+      precio: parseFloat(formData.get('precioProducto') || document.getElementById('precioProducto').value) || 0,
+      stockMinimo: parseInt(formData.get('stockMinimoProducto') || document.getElementById('stockMinimoProducto').value) || 0,
+      descripcion: formData.get('descripcionProducto') || document.getElementById('descripcionProducto').value,
+      estado: formData.get('estadoProducto') || document.getElementById('estadoProducto').value,
+      fecha: new Date().toISOString()
+    };
+    
+    if (!producto.codigo || !producto.nombre) {
+      mostrarNotificacion('❌ Código y nombre son obligatorios', 'error');
+      return;
+    }
+    
+    if (productoId) {
+      // Actualizar producto existente
+      producto.id = productoId;
+      actualizarProducto(producto);
+    } else {
+      // Crear nuevo producto
+      producto.id = Date.now().toString();
+      agregarProducto(producto);
+    }
+    
+    cerrarModalProducto();
+    mostrarNotificacion('✅ Producto guardado correctamente', 'success');
+    
+  } catch (error) {
+    console.error('❌ Error guardando producto:', error);
+    mostrarNotificacion('❌ Error guardando producto', 'error');
+  }
+}
+
+// Función para mostrar notificación
+function mostrarNotificacion(mensaje, tipo = 'info') {
+  try {
+    if (window.axyraNotificationSystem && window.axyraNotificationSystem.show) {
+      window.axyraNotificationSystem.show(mensaje, tipo);
+    } else {
+      // Fallback a alert si no hay sistema de notificaciones
+      alert(mensaje);
+    }
+  } catch (error) {
+    console.error('❌ Error mostrando notificación:', error);
+    alert(mensaje);
+  }
+}
+
+// Función para agregar producto
+function agregarProducto(producto) {
+  try {
+    const productos = obtenerProductos();
+    productos.push(producto);
+    guardarProductos(productos);
+    actualizarTablaProductos();
+    console.log('✅ Producto agregado:', producto);
+  } catch (error) {
+    console.error('❌ Error agregando producto:', error);
+    mostrarNotificacion('❌ Error agregando producto', 'error');
+  }
+}
+
+// Función para actualizar producto
+function actualizarProducto(producto) {
+  try {
+    const productos = obtenerProductos();
+    const index = productos.findIndex(p => p.id === producto.id);
+    if (index !== -1) {
+      productos[index] = { ...productos[index], ...producto };
+      guardarProductos(productos);
+      actualizarTablaProductos();
+      console.log('✅ Producto actualizado:', producto);
+    } else {
+      mostrarNotificacion('❌ Producto no encontrado', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Error actualizando producto:', error);
+    mostrarNotificacion('❌ Error actualizando producto', 'error');
+  }
+}
+
+// Función para eliminar producto
+function eliminarProducto(productoId) {
+  try {
+    if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+      const productos = obtenerProductos();
+      const productosFiltrados = productos.filter(p => p.id !== productoId);
+      guardarProductos(productosFiltrados);
+      actualizarTablaProductos();
+      mostrarNotificacion('✅ Producto eliminado correctamente', 'success');
+      console.log('✅ Producto eliminado:', productoId);
+    }
+  } catch (error) {
+    console.error('❌ Error eliminando producto:', error);
+    mostrarNotificacion('❌ Error eliminando producto', 'error');
+  }
+}
+
+// Función para ver producto
+function verProducto(productoId) {
+  try {
+    const productos = obtenerProductos();
+    const producto = productos.find(p => p.id === productoId);
+    if (producto) {
+      mostrarModalVerProducto(producto);
+    } else {
+      mostrarNotificacion('❌ Producto no encontrado', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Error viendo producto:', error);
+    mostrarNotificacion('❌ Error viendo producto', 'error');
+  }
+}
+
+// Función para editar producto
+function editarProducto(productoId) {
+  try {
+    const productos = obtenerProductos();
+    const producto = productos.find(p => p.id === productoId);
+    if (producto) {
+      mostrarModalProducto(producto);
+    } else {
+      mostrarNotificacion('❌ Producto no encontrado', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Error editando producto:', error);
+    mostrarNotificacion('❌ Error editando producto', 'error');
+  }
+}
+
+// Función para ver movimiento
+function verMovimiento(movimientoId) {
+  try {
+    const movimientos = obtenerMovimientos();
+    const movimiento = movimientos.find(m => m.id === movimientoId);
+    if (movimiento) {
+      mostrarNotificacion(`📋 Movimiento: ${movimiento.tipo} de ${movimiento.cantidad} unidades de ${movimiento.producto}`, 'info');
+    } else {
+      mostrarNotificacion('❌ Movimiento no encontrado', 'error');
+    }
+  } catch (error) {
+    console.error('❌ Error viendo movimiento:', error);
+    mostrarNotificacion('❌ Error viendo movimiento', 'error');
+  }
+}
+
+// Función para mostrar modal de ver producto
+function mostrarModalVerProducto(producto) {
+  try {
+    const modal = document.getElementById('modalVerProducto');
+    if (modal) {
+      // Llenar información del producto
+      document.getElementById('verCodigoProducto').textContent = producto.codigo || 'N/A';
+      document.getElementById('verNombreProducto').textContent = producto.nombre || 'N/A';
+      document.getElementById('verCategoriaProducto').textContent = producto.categoria || 'N/A';
+      document.getElementById('verStockProducto').textContent = producto.stock || '0';
+      document.getElementById('verPrecioProducto').textContent = `$${producto.precio || '0'}`;
+      document.getElementById('verStockMinimoProducto').textContent = producto.stockMinimo || '0';
+      document.getElementById('verEstadoProducto').textContent = producto.estado || 'N/A';
+      document.getElementById('verDescripcionProducto').textContent = producto.descripcion || 'Sin descripción';
+      document.getElementById('verFechaProducto').textContent = new Date(producto.fecha).toLocaleDateString('es-CO');
+      
+      modal.style.display = 'block';
+    }
+  } catch (error) {
+    console.error('❌ Error mostrando modal de ver producto:', error);
+    mostrarNotificacion('❌ Error mostrando información del producto', 'error');
+  }
 }

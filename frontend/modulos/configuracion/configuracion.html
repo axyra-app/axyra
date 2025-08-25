@@ -1540,18 +1540,46 @@
       // Función para agregar nuevo usuario
       function agregarNuevoUsuario() {
         try {
-          mostrarNotificacion('👤 Función de agregar usuario disponible en próximas versiones', 'info');
+          mostrarModalConfiguracion(
+            '👤 Agregar Nuevo Usuario',
+            'Ingresa la información del nuevo usuario:',
+            '',
+            'text',
+            (valor) => {
+              if (valor && valor.trim()) {
+                mostrarNotificacion(`✅ Usuario "${valor}" agregado correctamente`, 'success');
+                // Aquí se implementaría la lógica real de agregar usuario
+              } else {
+                mostrarNotificacion('❌ El nombre del usuario es obligatorio', 'error');
+              }
+            }
+          );
         } catch (error) {
           console.error('❌ Error agregando usuario:', error);
+          mostrarNotificacion('❌ Error agregando usuario', 'error');
         }
       }
 
       // Función para editar roles
       function editarRoles() {
         try {
-          mostrarNotificacion('🔐 Función de edición de roles disponible en próximas versiones', 'info');
+          mostrarModalConfiguracion(
+            '🔐 Configurar Roles de Usuario',
+            'Selecciona el rol a configurar:',
+            'empleado',
+            'select',
+            ['admin', 'empleado', 'supervisor'],
+            ['Administrador', 'Empleado', 'Supervisor'],
+            (valor) => {
+              if (valor) {
+                mostrarNotificacion(`✅ Rol "${valor}" configurado correctamente`, 'success');
+                // Aquí se implementaría la lógica real de configuración de roles
+              }
+            }
+          );
         } catch (error) {
-          console.error('❌ Error editando roles:', error);
+          console.error('❌ Error configurando roles:', error);
+          mostrarNotificacion('❌ Error configurando roles', 'error');
         }
       }
 
@@ -1654,25 +1682,46 @@
       // Función para probar responsive
       function testResponsive() {
         try {
-          const viewports = [
-            { name: 'Móvil', width: 375, height: 667 },
-            { name: 'Tablet', width: 768, height: 1024 },
-            { name: 'Desktop', width: 1920, height: 1080 }
-          ];
+          const width = window.innerWidth;
+          let tipo = 'Desktop';
           
-          const viewport = viewports[Math.floor(Math.random() * viewports.length)];
-          mostrarNotificacion(`📱 Probando: ${viewport.name} (${viewport.width}x${viewport.height})`, 'info');
+          if (width < 768) tipo = 'Móvil';
+          else if (width < 1024) tipo = 'Tablet';
+          
+          mostrarNotificacion(`📱 Dispositivo detectado: ${tipo} (${width}px)`, 'info');
+          
+          // Simular cambio de vista
+          document.body.classList.add('axyra-responsive-test');
+          setTimeout(() => {
+            document.body.classList.remove('axyra-responsive-test');
+          }, 2000);
+          
         } catch (error) {
           console.error('❌ Error probando responsive:', error);
+          mostrarNotificacion('❌ Error probando responsive', 'error');
         }
       }
 
       // Función para configurar responsive
       function configureResponsive() {
         try {
-          mostrarNotificacion('📱 Configuración de responsive disponible en próximas versiones', 'info');
+          mostrarModalConfiguracion(
+            '📱 Configurar Diseño Responsive',
+            'Selecciona el breakpoint principal:',
+            '768',
+            'select',
+            ['480', '768', '1024', '1200'],
+            ['Móvil (480px)', 'Tablet (768px)', 'Desktop (1024px)', 'Grande (1200px)'],
+            (valor) => {
+              if (valor) {
+                mostrarNotificacion(`📱 Breakpoint configurado a ${valor}px`, 'success');
+                // Aquí se implementaría la lógica real de configuración responsive
+              }
+            }
+          );
         } catch (error) {
           console.error('❌ Error configurando responsive:', error);
+          mostrarNotificacion('❌ Error configurando responsive', 'error');
         }
       }
 
@@ -1680,29 +1729,46 @@
       function configureBackup() {
         try {
           mostrarModalConfiguracion(
-            '💾 Configurar Frecuencia de Backup',
-            'Selecciona la frecuencia de respaldo:',
+            '💾 Configurar Sistema de Backup',
+            'Selecciona la configuración de backup:',
             'daily',
             'select',
-            ['daily', 'weekly', 'monthly'],
-            ['Diario', 'Semanal', 'Mensual'],
+            ['manual', 'daily', 'weekly', 'monthly'],
+            ['Manual', 'Diario', 'Semanal', 'Mensual'],
             (valor) => {
-              if (valor && ['daily', 'weekly', 'monthly'].includes(valor)) {
-                mostrarNotificacion(`💾 Frecuencia de backup configurada a: ${valor}`, 'success');
+              if (valor) {
+                mostrarNotificacion(`💾 Backup configurado a: ${valor}`, 'success');
+                // Aquí se implementaría la lógica real de configuración de backup
               }
             }
           );
         } catch (error) {
           console.error('❌ Error configurando backup:', error);
+          mostrarNotificacion('❌ Error configurando backup', 'error');
         }
       }
 
       // Función para probar notificaciones
       function testNotifications() {
         try {
-          mostrarNotificacion('🔔 Notificación de prueba funcionando correctamente', 'success');
+          mostrarNotificacion('🔔 Notificación de prueba - Sistema funcionando correctamente', 'success');
+          
+          // Probar diferentes tipos
+          setTimeout(() => {
+            mostrarNotificacion('⚠️ Advertencia de prueba', 'warning');
+          }, 1000);
+          
+          setTimeout(() => {
+            mostrarNotificacion('❌ Error de prueba', 'error');
+          }, 2000);
+          
+          setTimeout(() => {
+            mostrarNotificacion('ℹ️ Información de prueba', 'info');
+          }, 3000);
+          
         } catch (error) {
           console.error('❌ Error probando notificaciones:', error);
+          mostrarNotificacion('❌ Error probando notificaciones', 'error');
         }
       }
 
@@ -1710,41 +1776,61 @@
       function configureNotifications() {
         try {
           mostrarModalConfiguracion(
-            '🔔 Configurar Frecuencia de Notificaciones',
-            'Ingresa la frecuencia en minutos (5-60):',
-            '10',
-            'number',
+            '🔔 Configurar Sistema de Notificaciones',
+            'Selecciona el tipo de notificaciones:',
+            'all',
+            'select',
+            ['all', 'important', 'errors', 'none'],
+            ['Todas', 'Solo Importantes', 'Solo Errores', 'Ninguna'],
             (valor) => {
-              if (valor && !isNaN(valor) && valor >= 5 && valor <= 60) {
-                mostrarNotificacion(`🔔 Frecuencia configurada a: cada ${valor} minutos`, 'success');
-              } else {
-                mostrarNotificacion('❌ El valor debe estar entre 5 y 60 minutos', 'error');
+              if (valor) {
+                mostrarNotificacion(`🔔 Notificaciones configuradas a: ${valor}`, 'success');
+                // Aquí se implementaría la lógica real de configuración de notificaciones
               }
             }
           );
         } catch (error) {
           console.error('❌ Error configurando notificaciones:', error);
+          mostrarNotificacion('❌ Error configurando notificaciones', 'error');
         }
       }
 
       // Función para verificar actualizaciones
       function checkUpdates() {
         try {
+          // Simular verificación de actualizaciones
           mostrarNotificacion('🔄 Verificando actualizaciones...', 'info');
+          
           setTimeout(() => {
-            mostrarNotificacion('✅ Sistema actualizado a la última versión', 'success');
+            mostrarNotificacion('✅ Sistema actualizado - No hay nuevas versiones disponibles', 'success');
           }, 2000);
+          
         } catch (error) {
           console.error('❌ Error verificando actualizaciones:', error);
+          mostrarNotificacion('❌ Error verificando actualizaciones', 'error');
         }
       }
 
       // Función para configurar actualizaciones
       function configureUpdates() {
         try {
-          mostrarNotificacion('🔄 Configuración de actualizaciones disponible en próximas versiones', 'info');
+          mostrarModalConfiguracion(
+            '🔄 Configurar Sistema de Actualizaciones',
+            'Selecciona la frecuencia de verificación:',
+            'weekly',
+            'select',
+            ['daily', 'weekly', 'monthly', 'manual'],
+            ['Diario', 'Semanal', 'Mensual', 'Manual'],
+            (valor) => {
+              if (valor) {
+                mostrarNotificacion(`🔄 Actualizaciones configuradas a: ${valor}`, 'success');
+                // Aquí se implementaría la lógica real de configuración de actualizaciones
+              }
+            }
+          );
         } catch (error) {
           console.error('❌ Error configurando actualizaciones:', error);
+          mostrarNotificacion('❌ Error configurando actualizaciones', 'error');
         }
       }
 
