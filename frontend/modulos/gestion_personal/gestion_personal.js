@@ -104,14 +104,39 @@ class GestionPersonalManager {
 
   formatearSalario(input) {
     let valor = input.value.replace(/[^\d]/g, '');
+    
     if (valor.length > 0) {
-      valor = parseInt(valor).toLocaleString('es-CO');
+      // Convertir a número y formatear con separadores de miles
+      const numero = parseInt(valor);
+      if (!isNaN(numero)) {
+        valor = numero.toLocaleString('es-CO');
+      }
     }
+    
     input.value = valor;
   }
 
   limpiarFormatoSalario(input) {
-    return input.value.replace(/[^\d]/g, '');
+    // Remover todos los caracteres no numéricos excepto el punto decimal
+    let valor = input.value.replace(/[^\d.,]/g, '');
+    
+    // Si hay múltiples puntos o comas, mantener solo el último
+    const partes = valor.split(/[.,]/);
+    if (partes.length > 2) {
+      // Si hay más de 2 partes, es porque hay múltiples separadores
+      // Tomar solo la primera parte (antes del primer separador)
+      valor = partes[0];
+    }
+    
+    // Convertir a número y validar
+    const numero = parseFloat(valor.replace(/[^\d]/g, ''));
+    
+    // Si no es un número válido, retornar 0
+    if (isNaN(numero)) {
+      return '0';
+    }
+    
+    return numero.toString();
   }
 
   llenarSelectorEmpleados() {
@@ -795,17 +820,22 @@ function cerrarModalReporteDepartamento() {
 // Guardar Empleado
 async function guardarEmpleado() {
   try {
+    console.log('🔍 Iniciando guardado de empleado...');
+    
     const form = document.getElementById('formEmpleado');
     if (!form.checkValidity()) {
+      console.log('❌ Formulario no válido');
       form.reportValidity();
       return;
     }
 
     const tipoSalario = document.getElementById('tipoSalarioEmpleado').value;
+    console.log('💰 Tipo de salario seleccionado:', tipoSalario);
 
     // Validar campos específicos según el tipo de salario
     if (tipoSalario === 'fijo') {
       const salarioFijo = gestionPersonal.limpiarFormatoSalario(document.getElementById('salarioFijoEmpleado'));
+      console.log('💵 Salario fijo limpio:', salarioFijo);
       if (!salarioFijo || parseFloat(salarioFijo) <= 0) {
         alert('Por favor ingrese un salario fijo válido');
         return;
@@ -814,6 +844,7 @@ async function guardarEmpleado() {
       const salarioReferencia = gestionPersonal.limpiarFormatoSalario(
         document.getElementById('salarioReferenciaEmpleado')
       );
+      console.log('⏰ Salario referencia limpio:', salarioReferencia);
       if (!salarioReferencia || parseFloat(salarioReferencia) <= 0) {
         alert('Por favor ingrese un salario de referencia válido');
         return;
@@ -832,6 +863,8 @@ async function guardarEmpleado() {
       tipoSalario: tipoSalario,
     };
 
+    console.log('👤 Datos básicos del empleado:', empleado);
+
     // Agregar campos específicos según el tipo de salario
     if (tipoSalario === 'fijo') {
       empleado.salarioFijo = parseFloat(
@@ -841,18 +874,22 @@ async function guardarEmpleado() {
         parseFloat(gestionPersonal.limpiarFormatoSalario(document.getElementById('bonificacionesEmpleado'))) || 0;
       empleado.salarioTotal = empleado.salarioFijo + empleado.bonificaciones;
       empleado.salarioBase = empleado.salarioTotal;
+      console.log('💵 Salario fijo configurado:', empleado.salarioFijo);
     } else if (tipoSalario === 'por_horas') {
       empleado.salarioReferencia = parseFloat(
         gestionPersonal.limpiarFormatoSalario(document.getElementById('salarioReferenciaEmpleado'))
       );
       empleado.salarioBase = empleado.salarioReferencia;
+      console.log('⏰ Salario referencia configurado:', empleado.salarioReferencia);
     }
+
+    console.log('✅ Empleado a guardar:', empleado);
 
     await gestionPersonal.agregarEmpleado(empleado);
     alert('Empleado agregado correctamente');
     cerrarModalEmpleado();
   } catch (error) {
-    console.error('Error al guardar empleado:', error);
+    console.error('❌ Error al guardar empleado:', error);
     alert('Error al guardar empleado: ' + error.message);
   }
 }
