@@ -267,26 +267,41 @@ class GestionPersonalManager {
   }
 
   limpiarFormatoSalario(input) {
-    // Remover todos los caracteres no numéricos excepto el punto decimal
-    let valor = input.value.replace(/[^\d.,]/g, '');
-
-    // Si hay múltiples puntos o comas, mantener solo el último
-    const partes = valor.split(/[.,]/);
-    if (partes.length > 2) {
-      // Si hay más de 2 partes, es porque hay múltiples separadores
-      // Tomar solo la primera parte (antes del primer separador)
-      valor = partes[0];
-    }
-
-    // Convertir a número y validar
-    const numero = parseFloat(valor.replace(/[^\d]/g, ''));
-
-    // Si no es un número válido, retornar 0
-    if (isNaN(numero)) {
+    try {
+      // Obtener el valor del input
+      let valor = input.value || input;
+      
+      // Si es un string, procesarlo; si es un elemento DOM, obtener su valor
+      if (typeof valor === 'string') {
+        // Remover todos los caracteres no numéricos excepto el punto decimal
+        valor = valor.replace(/[^\d.,]/g, '');
+        
+        // Si hay múltiples puntos o comas, mantener solo el último
+        const partes = valor.split(/[.,]/);
+        if (partes.length > 2) {
+          // Si hay más de 2 partes, es porque hay múltiples separadores
+          // Tomar solo la primera parte (antes del primer separador)
+          valor = partes[0];
+        }
+        
+        // Convertir a número y validar
+        const numero = parseFloat(valor.replace(/[^\d]/g, ''));
+        
+        // Si no es un número válido, retornar 0
+        if (isNaN(numero)) {
+          return '0';
+        }
+        
+        console.log('💰 Salario procesado:', { original: input.value || input, procesado: numero });
+        return numero.toString();
+      } else {
+        // Si es un elemento DOM, procesar su valor
+        return this.limpiarFormatoSalario(valor.value);
+      }
+    } catch (error) {
+      console.error('❌ Error en limpiarFormatoSalario:', error);
       return '0';
     }
-
-    return numero.toString();
   }
 
   llenarSelectorEmpleados() {
@@ -542,7 +557,7 @@ class GestionPersonalManager {
             </div>
             <div class="stat-item">
               <span class="stat-label">Total Horas Mes:</span>
-              <span class="stat-value">${this.calcularTotalHorasMes()}</span>
+              <span class="stat-value">${this.calcularTotalHorasMes().toFixed(1)}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Promedio Salario:</span>
@@ -724,7 +739,7 @@ class GestionPersonalManager {
     if (this.nominas.length === 0) {
       return 0;
     }
-    
+
     // Sumar todos los netos de las nóminas
     const totalNeto = this.nominas.reduce((total, nomina) => {
       // Si la nómina tiene un campo neto, usarlo; si no, calcularlo
@@ -736,34 +751,34 @@ class GestionPersonalManager {
         return total + nomina.totalNeto;
       } else {
         // Si no hay campo neto, calcular basado en el salario del empleado
-        const empleado = this.empleados.find(emp => emp.id === nomina.empleadoId);
+        const empleado = this.empleados.find((emp) => emp.id === nomina.empleadoId);
         if (empleado) {
           if (empleado.tipoSalario === 'fijo') {
             return total + (empleado.salarioFijo || 0) + (empleado.bonificaciones || 0);
           } else if (empleado.tipoSalario === 'por_horas') {
             // Para empleados por horas, calcular basado en horas trabajadas
-            const horasEmpleado = this.horas.filter(h => h.empleadoId === empleado.id);
+            const horasEmpleado = this.horas.filter((h) => h.empleadoId === empleado.id);
             const totalHoras = horasEmpleado.reduce((sum, h) => {
               return sum + this.calcularTotalHoras(h.horaEntrada, h.horaSalida);
             }, 0);
             const salarioPorHora = (empleado.salarioReferencia || 0) / 240; // 240 horas mensuales
-            return total + (totalHoras * salarioPorHora);
+            return total + totalHoras * salarioPorHora;
           }
         }
         return total;
       }
     }, 0);
-    
+
     console.log('💰 Total de pagos calculado:', {
       nominas: this.nominas.length,
       totalNeto: totalNeto,
-      nominasDetalle: this.nominas.map(n => ({
+      nominasDetalle: this.nominas.map((n) => ({
         id: n.id,
         empleadoId: n.empleadoId,
-        neto: n.neto || n.salarioNeto || n.totalNeto || 'No definido'
-      }))
+        neto: n.neto || n.salarioNeto || n.totalNeto || 'No definido',
+      })),
     });
-    
+
     return totalNeto;
   }
 
@@ -819,11 +834,11 @@ class GestionPersonalManager {
     }
 
     let html = '<div class="empleados-grid">';
-    
-    this.empleados.forEach(empleado => {
-      const departamento = this.departamentos.find(dep => dep.id === empleado.departamento);
+
+    this.empleados.forEach((empleado) => {
+      const departamento = this.departamentos.find((dep) => dep.id === empleado.departamento);
       const nombreDepartamento = departamento ? departamento.nombre : 'Sin departamento';
-      
+
       html += `
         <div class="empleado-card" data-id="${empleado.id}">
           <div class="empleado-header">
@@ -849,9 +864,10 @@ class GestionPersonalManager {
             <div class="empleado-salario">
               <i class="fas fa-dollar-sign"></i>
               <span>
-                ${empleado.tipoSalario === 'fijo' 
-                  ? `$${(empleado.salarioFijo || 0).toLocaleString('es-CO')} COP`
-                  : `$${(empleado.salarioReferencia || 0).toLocaleString('es-CO')} COP por hora`
+                ${
+                  empleado.tipoSalario === 'fijo'
+                    ? `$${(empleado.salarioFijo || 0).toLocaleString('es-CO')} COP`
+                    : `$${(empleado.salarioReferencia || 0).toLocaleString('es-CO')} COP por hora`
                 }
               </span>
             </div>
@@ -875,10 +891,10 @@ class GestionPersonalManager {
         </div>
       `;
     });
-    
+
     html += '</div>';
     contenedor.innerHTML = html;
-    
+
     console.log('✅ Lista de empleados renderizada:', this.empleados.length);
   }
 }
@@ -1290,17 +1306,304 @@ function procesarGeneracionNomina() {
 
 // Generar Reporte General
 function generarReporteGeneral() {
-  const periodo = document.getElementById('reporteGeneralPeriodo').value;
-  const graficos = document.getElementById('reporteGraficos').checked;
-  const comparativas = document.getElementById('reporteComparativas').checked;
-  const proyecciones = document.getElementById('reporteProyecciones').checked;
+  try {
+    const periodo = document.getElementById('reporteGeneralPeriodo').value;
+    const graficos = document.getElementById('reporteGraficos').checked;
+    const comparativas = document.getElementById('reporteComparativas').checked;
+    const proyecciones = document.getElementById('reporteProyecciones').checked;
 
-  mostrarNotificacion(
-    `Generando reporte general para ${periodo} con: Gráficos: ${graficos}, Comparativas: ${comparativas}, Proyecciones: ${proyecciones}`,
-    'info',
-    'Generación de Reporte General'
-  );
-  cerrarModalReporteGeneral();
+    // Crear modal de reporte con gráficos
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container modal-reporte-grande">
+        <div class="modal-header">
+          <h3><i class="fas fa-chart-line"></i> Reporte General - ${periodo}</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="reporte-contenido">
+            ${graficos ? `
+              <div class="grafico-seccion">
+                <h4><i class="fas fa-chart-bar"></i> Distribución de Empleados por Departamento</h4>
+                <div class="grafico-container">
+                  <canvas id="graficoDepartamentos" width="400" height="200"></canvas>
+                </div>
+              </div>
+              
+              <div class="grafico-seccion">
+                <h4><i class="fas fa-chart-pie"></i> Distribución de Salarios</h4>
+                <div class="grafico-container">
+                  <canvas id="graficoSalarios" width="400" height="200"></canvas>
+                </div>
+              </div>
+              
+              <div class="grafico-seccion">
+                <h4><i class="fas fa-chart-line"></i> Horas Trabajadas por Mes</h4>
+                <div class="grafico-container">
+                  <canvas id="graficoHoras" width="400" height="200"></canvas>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${comparativas ? `
+              <div class="comparativas-seccion">
+                <h4><i class="fas fa-balance-scale"></i> Comparativas</h4>
+                <div class="comparativas-grid">
+                  <div class="comparativa-item">
+                    <h5>Empleados por Tipo de Contrato</h5>
+                    <div id="comparativaContratos"></div>
+                  </div>
+                  <div class="comparativa-item">
+                    <h5>Salarios por Departamento</h5>
+                    <div id="comparativaSalarios"></div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+            
+            ${proyecciones ? `
+              <div class="proyecciones-seccion">
+                <h4><i class="fas fa-rocket"></i> Proyecciones</h4>
+                <div class="proyecciones-grid">
+                  <div class="proyeccion-item">
+                    <h5>Proyección de Costos Laborales</h5>
+                    <div id="proyeccionCostos"></div>
+                  </div>
+                  <div class="proyeccion-item">
+                    <h5>Proyección de Horas</h5>
+                    <div id="proyeccionHoras"></div>
+                  </div>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" onclick="exportarReporteGeneral()">
+            <i class="fas fa-download"></i> Exportar Reporte
+          </button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Generar gráficos después de que el modal esté visible
+    setTimeout(() => {
+      if (graficos) {
+        generarGraficoDepartamentos();
+        generarGraficoSalarios();
+        generarGraficoHoras();
+      }
+      
+      if (comparativas) {
+        generarComparativas();
+      }
+      
+      if (proyecciones) {
+        generarProyecciones();
+      }
+    }, 100);
+
+    mostrarNotificacion(
+      `✅ Reporte general generado para ${periodo}`,
+      'success',
+      'Reporte Generado'
+    );
+
+    console.log('📊 Reporte general generado:', { periodo, graficos, comparativas, proyecciones });
+  } catch (error) {
+    console.error('❌ Error generando reporte general:', error);
+    mostrarNotificacion('❌ Error generando reporte general', 'error');
+  }
+}
+
+// Generar gráfico de departamentos
+function generarGraficoDepartamentos() {
+  try {
+    const ctx = document.getElementById('graficoDepartamentos');
+    if (!ctx) return;
+
+    // Agrupar empleados por departamento
+    const empleadosPorDepartamento = {};
+    gestionPersonal.empleados.forEach(empleado => {
+      const dept = empleado.departamento || 'Sin Departamento';
+      empleadosPorDepartamento[dept] = (empleadosPorDepartamento[dept] || 0) + 1;
+    });
+
+    const labels = Object.keys(empleadosPorDepartamento);
+    const data = Object.values(empleadosPorDepartamento);
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#3498db', '#e74c3c', '#f39c12', '#2ecc71', '#9b59b6',
+            '#1abc9c', '#e67e22', '#34495e', '#95a5a6', '#16a085'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Distribución de Empleados por Departamento'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de departamentos generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de departamentos:', error);
+  }
+}
+
+// Generar gráfico de salarios
+function generarGraficoSalarios() {
+  try {
+    const ctx = document.getElementById('graficoSalarios');
+    if (!ctx) return;
+
+    // Calcular rangos de salarios
+    const rangos = {
+      'Menos de $1M': 0,
+      '$1M - $2M': 0,
+      '$2M - $3M': 0,
+      '$3M - $4M': 0,
+      'Más de $4M': 0
+    };
+
+    gestionPersonal.empleados.forEach(empleado => {
+      let salario = 0;
+      if (empleado.tipoSalario === 'fijo') {
+        salario = (empleado.salarioFijo || 0) + (empleado.bonificaciones || 0);
+      } else if (empleado.tipoSalario === 'por_horas') {
+        salario = (empleado.salarioReferencia || 0) * 240; // 240 horas mensuales
+      }
+
+      if (salario < 1000000) rangos['Menos de $1M']++;
+      else if (salario < 2000000) rangos['$1M - $2M']++;
+      else if (salario < 3000000) rangos['$2M - $3M']++;
+      else if (salario < 4000000) rangos['$3M - $4M']++;
+      else rangos['Más de $4M']++;
+    });
+
+    const labels = Object.keys(rangos);
+    const data = Object.values(rangos);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Cantidad de Empleados',
+          data: data,
+          backgroundColor: '#3498db',
+          borderColor: '#2980b9',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Distribución de Salarios'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de salarios generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de salarios:', error);
+  }
+}
+
+// Generar gráfico de horas
+function generarGraficoHoras() {
+  try {
+    const ctx = document.getElementById('graficoHoras');
+    if (!ctx) return;
+
+    // Calcular horas por mes (últimos 6 meses)
+    const meses = [];
+    const horasPorMes = [];
+    
+    for (let i = 5; i >= 0; i--) {
+      const fecha = new Date();
+      fecha.setMonth(fecha.getMonth() - i);
+      const mes = fecha.toLocaleDateString('es-CO', { month: 'short', year: '2-digit' });
+      meses.push(mes);
+      
+      // Calcular horas del mes
+      const horasMes = gestionPersonal.calcularTotalHorasMes(fecha);
+      horasPorMes.push(horasMes);
+    }
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: meses,
+        datasets: [{
+          label: 'Horas Trabajadas',
+          data: horasPorMes,
+          borderColor: '#e74c3c',
+          backgroundColor: 'rgba(231, 76, 60, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Horas'
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Horas Trabajadas por Mes'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de horas generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de horas:', error);
+  }
 }
 
 // Generar Reporte por Empleado
@@ -1320,15 +1623,359 @@ function generarReporteEmpleado() {
 
 // Generar Reporte por Departamento
 function generarReporteDepartamento() {
-  const departamento = document.getElementById('reporteDepartamentoSelect').value;
-  const periodo = document.getElementById('reporteDepartamentoPeriodo').value;
+  try {
+    const departamento = document.getElementById('reporteDepartamentoSelect').value;
+    const periodo = document.getElementById('reporteDepartamentoPeriodo').value;
 
-  mostrarNotificacion(
-    `Generando reporte de departamento ${departamento || 'todos'} (${periodo})`,
-    'info',
-    'Generación de Reporte'
-  );
-  cerrarModalReporteDepartamento();
+    // Crear modal de reporte por departamento
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container modal-reporte-grande">
+        <div class="modal-header">
+          <h3><i class="fas fa-building"></i> Reporte por Departamento - ${departamento || 'Todos'}</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="reporte-contenido">
+            <div class="grafico-seccion">
+              <h4><i class="fas fa-users"></i> Empleados por Departamento</h4>
+              <div class="grafico-container">
+                <canvas id="graficoEmpleadosDept" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="grafico-seccion">
+              <h4><i class="fas fa-dollar-sign"></i> Salarios por Departamento</h4>
+              <div class="grafico-container">
+                <canvas id="graficoSalariosDept" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="grafico-seccion">
+              <h4><i class="fas fa-clock"></i> Horas Trabajadas por Departamento</h4>
+              <div class="grafico-container">
+                <canvas id="graficoHorasDept" width="400" height="200"></canvas>
+              </div>
+            </div>
+            
+            <div class="resumen-seccion">
+              <h4><i class="fas fa-chart-pie"></i> Resumen del Departamento</h4>
+              <div id="resumenDepartamento" class="resumen-grid"></div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" onclick="exportarReporteDepartamento()">
+            <i class="fas fa-download"></i> Exportar Reporte
+          </button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // Generar gráficos después de que el modal esté visible
+    setTimeout(() => {
+      generarGraficoEmpleadosDepartamento(departamento);
+      generarGraficoSalariosDepartamento(departamento);
+      generarGraficoHorasDepartamento(departamento);
+      generarResumenDepartamento(departamento);
+    }, 100);
+
+    mostrarNotificacion(
+      `✅ Reporte de departamento ${departamento || 'todos'} generado`,
+      'success',
+      'Reporte Generado'
+    );
+
+    console.log('📊 Reporte por departamento generado:', { departamento, periodo });
+  } catch (error) {
+    console.error('❌ Error generando reporte por departamento:', error);
+    mostrarNotificacion('❌ Error generando reporte por departamento', 'error');
+  }
+}
+
+// Generar gráfico de empleados por departamento
+function generarGraficoEmpleadosDepartamento(departamentoFiltro) {
+  try {
+    const ctx = document.getElementById('graficoEmpleadosDept');
+    if (!ctx) return;
+
+    // Filtrar empleados por departamento si se especifica
+    let empleados = gestionPersonal.empleados;
+    if (departamentoFiltro) {
+      empleados = empleados.filter(emp => emp.departamento === departamentoFiltro);
+    }
+
+    // Agrupar por departamento
+    const empleadosPorDept = {};
+    empleados.forEach(emp => {
+      const dept = emp.departamento || 'Sin Departamento';
+      empleadosPorDept[dept] = (empleadosPorDept[dept] || 0) + 1;
+    });
+
+    const labels = Object.keys(empleadosPorDept);
+    const data = Object.values(empleadosPorDept);
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Cantidad de Empleados',
+          data: data,
+          backgroundColor: '#2ecc71',
+          borderColor: '#27ae60',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Empleados por Departamento'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de empleados por departamento generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de empleados por departamento:', error);
+  }
+}
+
+// Generar gráfico de salarios por departamento
+function generarGraficoSalariosDepartamento(departamentoFiltro) {
+  try {
+    const ctx = document.getElementById('graficoSalariosDept');
+    if (!ctx) return;
+
+    // Filtrar empleados por departamento si se especifica
+    let empleados = gestionPersonal.empleados;
+    if (departamentoFiltro) {
+      empleados = empleados.filter(emp => emp.departamento === departamentoFiltro);
+    }
+
+    // Calcular salarios por departamento
+    const salariosPorDept = {};
+    empleados.forEach(emp => {
+      const dept = emp.departamento || 'Sin Departamento';
+      let salario = 0;
+      
+      if (emp.tipoSalario === 'fijo') {
+        salario = (emp.salarioFijo || 0) + (emp.bonificaciones || 0);
+      } else if (emp.tipoSalario === 'por_horas') {
+        salario = (emp.salarioReferencia || 0) * 240; // 240 horas mensuales
+      }
+      
+      if (!salariosPorDept[dept]) {
+        salariosPorDept[dept] = { total: 0, empleados: 0 };
+      }
+      
+      salariosPorDept[dept].total += salario;
+      salariosPorDept[dept].empleados++;
+    });
+
+    // Calcular promedio por departamento
+    const labels = Object.keys(salariosPorDept);
+    const data = labels.map(dept => {
+      const info = salariosPorDept[dept];
+      return info.empleados > 0 ? info.total / info.empleados : 0;
+    });
+
+    new Chart(ctx, {
+      type: 'horizontalBar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Salario Promedio (COP)',
+          data: data,
+          backgroundColor: '#9b59b6',
+          borderColor: '#8e44ad',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Salario Promedio (COP)'
+            }
+          }
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Salarios Promedio por Departamento'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de salarios por departamento generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de salarios por departamento:', error);
+  }
+}
+
+// Generar gráfico de horas por departamento
+function generarGraficoHorasDepartamento(departamentoFiltro) {
+  try {
+    const ctx = document.getElementById('graficoHorasDept');
+    if (!ctx) return;
+
+    // Filtrar empleados por departamento si se especifica
+    let empleados = gestionPersonal.empleados;
+    if (departamentoFiltro) {
+      empleados = empleados.filter(emp => emp.departamento === departamentoFiltro);
+    }
+
+    // Calcular horas por departamento
+    const horasPorDept = {};
+    empleados.forEach(emp => {
+      const dept = emp.departamento || 'Sin Departamento';
+      if (!horasPorDept[dept]) {
+        horasPorDept[dept] = 0;
+      }
+      
+      // Buscar horas del empleado en el mes actual
+      const horasEmpleado = gestionPersonal.horas.filter(h => 
+        h.empleadoId === emp.id &&
+        new Date(h.fecha).getMonth() === new Date().getMonth()
+      );
+      
+      const totalHoras = horasEmpleado.reduce((sum, h) => {
+        return sum + gestionPersonal.calcularTotalHoras(h.horaEntrada, h.horaSalida);
+      }, 0);
+      
+      horasPorDept[dept] += totalHoras;
+    });
+
+    const labels = Object.keys(horasPorDept);
+    const data = Object.values(horasPorDept);
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: [
+            '#e67e22', '#f39c12', '#f1c40f', '#2ecc71', '#1abc9c',
+            '#3498db', '#9b59b6', '#e74c3c', '#34495e', '#95a5a6'
+          ],
+          borderWidth: 2,
+          borderColor: '#fff'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          },
+          title: {
+            display: true,
+            text: 'Horas Trabajadas por Departamento'
+          }
+        }
+      }
+    });
+
+    console.log('📊 Gráfico de horas por departamento generado');
+  } catch (error) {
+    console.error('❌ Error generando gráfico de horas por departamento:', error);
+  }
+}
+
+// Generar resumen del departamento
+function generarResumenDepartamento(departamentoFiltro) {
+  try {
+    const container = document.getElementById('resumenDepartamento');
+    if (!container) return;
+
+    // Filtrar empleados por departamento si se especifica
+    let empleados = gestionPersonal.empleados;
+    if (departamentoFiltro) {
+      empleados = empleados.filter(emp => emp.departamento === departamentoFiltro);
+    }
+
+    // Calcular estadísticas
+    const totalEmpleados = empleados.length;
+    const empleadosActivos = empleados.filter(emp => emp.estado === 'activo').length;
+    const totalSalarios = empleados.reduce((sum, emp) => {
+      let salario = 0;
+      if (emp.tipoSalario === 'fijo') {
+        salario = (emp.salarioFijo || 0) + (emp.bonificaciones || 0);
+      } else if (emp.tipoSalario === 'por_horas') {
+        salario = (emp.salarioReferencia || 0) * 240;
+      }
+      return sum + salario;
+    }, 0);
+
+    const totalHoras = empleados.reduce((sum, emp) => {
+      const horasEmpleado = gestionPersonal.horas.filter(h => 
+        h.empleadoId === emp.id &&
+        new Date(h.fecha).getMonth() === new Date().getMonth()
+      );
+      
+      return sum + horasEmpleado.reduce((sumH, h) => {
+        return sumH + gestionPersonal.calcularTotalHoras(h.horaEntrada, h.horaSalida);
+      }, 0);
+    }, 0);
+
+    const html = `
+      <div class="resumen-item">
+        <span class="resumen-label">Total Empleados:</span>
+        <span class="resumen-valor">${totalEmpleados}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Empleados Activos:</span>
+        <span class="resumen-valor">${empleadosActivos}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Total Salarios:</span>
+        <span class="resumen-valor">$${totalSalarios.toLocaleString('es-CO')} COP</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Total Horas (Mes):</span>
+        <span class="resumen-valor">${totalHoras.toFixed(1)}h</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Promedio Salario:</span>
+        <span class="resumen-valor">$${totalEmpleados > 0 ? (totalSalarios / totalEmpleados).toLocaleString('es-CO') : 0} COP</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Promedio Horas:</span>
+        <span class="resumen-valor">${totalEmpleados > 0 ? (totalHoras / totalEmpleados).toFixed(1) : 0}h</span>
+      </div>
+    `;
+
+    container.innerHTML = html;
+    console.log('📊 Resumen del departamento generado');
+  } catch (error) {
+    console.error('❌ Error generando resumen del departamento:', error);
+  }
 }
 
 // Procesar Exportación de Empleados
@@ -1348,22 +1995,22 @@ function cargarDatosEjemplo() {
         nombre: 'Administración',
         descripcion: 'Departamento de administración y gestión general',
         color: '#3498db',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'dept_002',
         nombre: 'Ventas',
         descripcion: 'Departamento de ventas y atención al cliente',
         color: '#e74c3c',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'dept_003',
         nombre: 'Operaciones',
         descripcion: 'Departamento de operaciones y logística',
         color: '#f39c12',
-        fechaCreacion: new Date().toISOString()
-      }
+        fechaCreacion: new Date().toISOString(),
+      },
     ];
 
     // Datos de ejemplo para empleados
@@ -1380,7 +2027,7 @@ function cargarDatosEjemplo() {
         tipoContrato: 'indefinido',
         fechaContratacion: '2024-01-15',
         estado: 'activo',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'emp_002',
@@ -1394,7 +2041,7 @@ function cargarDatosEjemplo() {
         tipoContrato: 'indefinido',
         fechaContratacion: '2024-02-01',
         estado: 'activo',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'emp_003',
@@ -1407,8 +2054,8 @@ function cargarDatosEjemplo() {
         tipoContrato: 'término fijo',
         fechaContratacion: '2024-03-01',
         estado: 'activo',
-        fechaCreacion: new Date().toISOString()
-      }
+        fechaCreacion: new Date().toISOString(),
+      },
     ];
 
     // Datos de ejemplo para horas
@@ -1420,7 +2067,7 @@ function cargarDatosEjemplo() {
         horaEntrada: '08:00',
         horaSalida: '17:00',
         observaciones: 'Jornada completa',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'hora_002',
@@ -1429,7 +2076,7 @@ function cargarDatosEjemplo() {
         horaEntrada: '09:00',
         horaSalida: '18:00',
         observaciones: 'Jornada completa',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'hora_003',
@@ -1438,8 +2085,8 @@ function cargarDatosEjemplo() {
         horaEntrada: '07:00',
         horaSalida: '15:00',
         observaciones: 'Jornada de 8 horas',
-        fechaCreacion: new Date().toISOString()
-      }
+        fechaCreacion: new Date().toISOString(),
+      },
     ];
 
     // Datos de ejemplo para nóminas
@@ -1454,7 +2101,7 @@ function cargarDatosEjemplo() {
         deducciones: 150000,
         neto: 2550000,
         estado: 'generada',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'nom_002',
@@ -1466,7 +2113,7 @@ function cargarDatosEjemplo() {
         deducciones: 120000,
         neto: 1830000,
         estado: 'generada',
-        fechaCreacion: new Date().toISOString()
+        fechaCreacion: new Date().toISOString(),
       },
       {
         id: 'nom_003',
@@ -1479,8 +2126,8 @@ function cargarDatosEjemplo() {
         deducciones: 5000,
         neto: 59000,
         estado: 'generada',
-        fechaCreacion: new Date().toISOString()
-      }
+        fechaCreacion: new Date().toISOString(),
+      },
     ];
 
     // Cargar datos en el sistema
@@ -1498,12 +2145,12 @@ function cargarDatosEjemplo() {
     gestionPersonal.actualizarEstadisticas();
 
     mostrarNotificacion('✅ Datos de ejemplo cargados correctamente', 'success', 'Datos Cargados');
-    
+
     console.log('📊 Datos de ejemplo cargados:', {
       departamentos: departamentosEjemplo.length,
       empleados: empleadosEjemplo.length,
       horas: horasEjemplo.length,
-      nominas: nominasEjemplo.length
+      nominas: nominasEjemplo.length,
     });
   } catch (error) {
     console.error('❌ Error cargando datos de ejemplo:', error);
@@ -1896,7 +2543,7 @@ function mostrarResumenHorasEnModal(resumen, calculoSalario, empleado) {
 // Función para editar empleado
 function editarEmpleado(empleadoId) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
@@ -1930,7 +2577,7 @@ function editarEmpleado(empleadoId) {
 
     // Mostrar modal
     mostrarModalEmpleado();
-    
+
     console.log('✏️ Editando empleado:', empleado.nombre);
   } catch (error) {
     console.error('❌ Error editando empleado:', error);
@@ -1941,13 +2588,13 @@ function editarEmpleado(empleadoId) {
 // Función para ver empleado
 function verEmpleado(empleadoId) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
     }
 
-    const departamento = gestionPersonal.departamentos.find(dep => dep.id === empleado.departamento);
+    const departamento = gestionPersonal.departamentos.find((dep) => dep.id === empleado.departamento);
     const nombreDepartamento = departamento ? departamento.nombre : 'Sin departamento';
 
     // Crear modal de visualización
@@ -1997,13 +2644,17 @@ function verEmpleado(empleadoId) {
               </div>
               <div class="info-row">
                 <span class="info-label">Estado:</span>
-                <span class="info-value ${empleado.estado === 'activo' ? 'activo' : 'inactivo'}">${empleado.estado}</span>
+                <span class="info-value ${empleado.estado === 'activo' ? 'activo' : 'inactivo'}">${
+      empleado.estado
+    }</span>
               </div>
             </div>
             
             <div class="info-section">
               <h4>Información Salarial</h4>
-              ${empleado.tipoSalario === 'fijo' ? `
+              ${
+                empleado.tipoSalario === 'fijo'
+                  ? `
                 <div class="info-row">
                   <span class="info-label">Salario Base:</span>
                   <span class="info-value">$${(empleado.salarioFijo || 0).toLocaleString('es-CO')} COP</span>
@@ -2012,17 +2663,21 @@ function verEmpleado(empleadoId) {
                   <span class="info-label">Bonificaciones:</span>
                   <span class="info-value">$${(empleado.bonificaciones || 0).toLocaleString('es-CO')} COP</span>
                 </div>
-              ` : `
+              `
+                  : `
                 <div class="info-row">
                   <span class="info-label">Salario por Hora:</span>
                   <span class="info-value">$${(empleado.salarioReferencia || 0).toLocaleString('es-CO')} COP</span>
                 </div>
-              `}
+              `
+              }
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-primary" onclick="editarEmpleado('${empleado.id}'); this.closest('.modal-overlay').remove();">
+          <button class="btn btn-primary" onclick="editarEmpleado('${
+            empleado.id
+          }'); this.closest('.modal-overlay').remove();">
             <i class="fas fa-edit"></i> Editar
           </button>
           <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
@@ -2033,7 +2688,7 @@ function verEmpleado(empleadoId) {
     `;
 
     document.body.appendChild(modal);
-    
+
     console.log('👁️ Visualizando empleado:', empleado.nombre);
   } catch (error) {
     console.error('❌ Error visualizando empleado:', error);
@@ -2044,14 +2699,14 @@ function verEmpleado(empleadoId) {
 // Función para eliminar empleado
 function eliminarEmpleado(empleadoId) {
   try {
-    const empleado = gestionPersonal.empleados.find(emp => emp.id === empleadoId);
+    const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
     if (!empleado) {
       mostrarNotificacion('❌ Empleado no encontrado', 'error');
       return;
     }
 
     // Verificar si el empleado tiene horas registradas
-    const horasEmpleado = gestionPersonal.horas.filter(h => h.empleadoId === empleadoId);
+    const horasEmpleado = gestionPersonal.horas.filter((h) => h.empleadoId === empleadoId);
     if (horasEmpleado.length > 0) {
       mostrarNotificacion('⚠️ No se puede eliminar el empleado porque tiene horas registradas', 'warning');
       return;
@@ -2061,12 +2716,12 @@ function eliminarEmpleado(empleadoId) {
     if (confirm(`¿Estás seguro de que quieres eliminar a ${empleado.nombre}?`)) {
       gestionPersonal.eliminarEmpleado(empleadoId);
       mostrarNotificacion(`✅ Empleado ${empleado.nombre} eliminado correctamente`, 'success');
-      
+
       // Actualizar interfaz
       gestionPersonal.renderizarListaEmpleados();
       gestionPersonal.actualizarEstadisticas();
     }
-    
+
     console.log('🗑️ Eliminando empleado:', empleado.nombre);
   } catch (error) {
     console.error('❌ Error eliminando empleado:', error);
@@ -2110,12 +2765,12 @@ function actualizarEmpleado(empleadoId) {
     // Actualizar empleado
     gestionPersonal.actualizarEmpleado(empleadoId, empleado);
     mostrarNotificacion(`✅ Empleado ${empleado.nombre} actualizado correctamente`, 'success');
-    
+
     // Cerrar modal y actualizar interfaz
     cerrarModalEmpleado();
     gestionPersonal.renderizarListaEmpleados();
     gestionPersonal.actualizarEstadisticas();
-    
+
     console.log('✅ Empleado actualizado:', empleado.nombre);
   } catch (error) {
     console.error('❌ Error actualizando empleado:', error);
@@ -2168,3 +2823,382 @@ window.mostrarNotificacion = mostrarNotificacion;
 window.cerrarNotificacion = cerrarNotificacion;
 window.cargarDatosEjemplo = cargarDatosEjemplo;
 window.generarNomina = generarNomina;
+window.mostrarModalConfiguracionNomina = mostrarModalConfiguracionNomina;
+window.guardarConfiguracionNomina = guardarConfiguracionNomina;
+window.cargarConfiguracionNomina = cargarConfiguracionNomina;
+window.generarGraficoDepartamentos = generarGraficoDepartamentos;
+window.generarGraficoSalarios = generarGraficoSalarios;
+window.generarGraficoHoras = generarGraficoHoras;
+window.generarGraficoEmpleadosDepartamento = generarGraficoEmpleadosDepartamento;
+window.generarGraficoSalariosDepartamento = generarGraficoSalariosDepartamento;
+window.generarGraficoHorasDepartamento = generarGraficoHorasDepartamento;
+window.generarResumenDepartamento = generarResumenDepartamento;
+
+// Modal de Configuración de Nómina
+function mostrarModalConfiguracionNomina() {
+  try {
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-container modal-configuracion-nomina">
+        <div class="modal-header">
+          <h3><i class="fas fa-cog"></i> Configuración de Nómina</h3>
+          <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="configuracion-nomina-form">
+            <div class="configuracion-grupo">
+              <h5><i class="fas fa-percentage"></i> Deducciones</h5>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Salud (%):</span>
+                <input type="number" class="configuracion-input" id="deduccionSalud" value="4" min="0" max="20" step="0.1">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Pensión (%):</span>
+                <input type="number" class="configuracion-input" id="deduccionPension" value="4" min="0" max="20" step="0.1">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Riesgos Laborales (%):</span>
+                <input type="number" class="configuracion-input" id="deduccionRiesgos" value="0.522" min="0" max="10" step="0.001">
+              </div>
+            </div>
+            
+            <div class="configuracion-grupo">
+              <h5><i class="fas fa-clock"></i> Horas de Trabajo</h5>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas por día:</span>
+                <input type="number" class="configuracion-input" id="horasPorDia" value="8" min="1" max="24">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Días por mes:</span>
+                <input type="number" class="configuracion-input" id="diasPorMes" value="22" min="1" max="31">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas mensuales estándar:</span>
+                <input type="number" class="configuracion-input" id="horasMensuales" value="240" min="1" max="744">
+              </div>
+            </div>
+            
+            <div class="configuracion-grupo">
+              <h5><i class="fas fa-calculator"></i> Recargos</h5>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas extras (%):</span>
+                <input type="number" class="configuracion-input" id="recargoExtras" value="25" min="0" max="100" step="1">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas nocturnas (%):</span>
+                <input type="number" class="configuracion-input" id="recargoNocturnas" value="35" min="0" max="100" step="1">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas dominicales (%):</span>
+                <input type="number" class="configuracion-input" id="recargoDominicales" value="75" min="0" max="100" step="1">
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Horas festivas (%):</span>
+                <input type="number" class="configuracion-input" id="recargoFestivas" value="75" min="0" max="100" step="1">
+              </div>
+            </div>
+            
+            <div class="configuracion-grupo">
+              <h5><i class="fas fa-toggle-on"></i> Opciones</h5>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Calcular automáticamente:</span>
+                <label class="configuracion-toggle">
+                  <input type="checkbox" id="calculoAutomatico" checked>
+                  <span class="configuracion-slider"></span>
+                </label>
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Incluir bonificaciones:</span>
+                <label class="configuracion-toggle">
+                  <input type="checkbox" id="incluirBonificaciones" checked>
+                  <span class="configuracion-slider"></span>
+                </label>
+              </div>
+              <div class="configuracion-campo">
+                <span class="configuracion-label">Redondear a 2 decimales:</span>
+                <label class="configuracion-toggle">
+                  <input type="checkbox" id="redondearDecimales" checked>
+                  <span class="configuracion-slider"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" onclick="guardarConfiguracionNomina()">
+            <i class="fas fa-save"></i> Guardar Configuración
+          </button>
+          <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">
+            <i class="fas fa-times"></i> Cerrar
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+    
+    // Cargar configuración actual
+    cargarConfiguracionNomina();
+    
+    console.log('⚙️ Modal de configuración de nómina mostrado');
+  } catch (error) {
+    console.error('❌ Error mostrando modal de configuración de nómina:', error);
+    mostrarNotificacion('❌ Error mostrando configuración de nómina', 'error');
+  }
+}
+
+// Guardar configuración de nómina
+function guardarConfiguracionNomina() {
+  try {
+    const configuracion = {
+      deducciones: {
+        salud: parseFloat(document.getElementById('deduccionSalud').value) || 4,
+        pension: parseFloat(document.getElementById('deduccionPension').value) || 4,
+        riesgos: parseFloat(document.getElementById('deduccionRiesgos').value) || 0.522
+      },
+      horas: {
+        porDia: parseInt(document.getElementById('horasPorDia').value) || 8,
+        porMes: parseInt(document.getElementById('diasPorMes').value) || 22,
+        mensuales: parseInt(document.getElementById('horasMensuales').value) || 240
+      },
+      recargos: {
+        extras: parseFloat(document.getElementById('recargoExtras').value) || 25,
+        nocturnas: parseFloat(document.getElementById('recargoNocturnas').value) || 35,
+        dominicales: parseFloat(document.getElementById('recargoDominicales').value) || 75,
+        festivas: parseFloat(document.getElementById('recargoFestivas').value) || 75
+      },
+      opciones: {
+        calculoAutomatico: document.getElementById('calculoAutomatico').checked,
+        incluirBonificaciones: document.getElementById('incluirBonificaciones').checked,
+        redondearDecimales: document.getElementById('redondearDecimales').checked
+      }
+    };
+
+    // Guardar en localStorage
+    localStorage.setItem('configuracionNomina', JSON.stringify(configuracion));
+    
+    // Actualizar configuración global
+    if (gestionPersonal) {
+      gestionPersonal.configuracionNomina = configuracion;
+    }
+
+    mostrarNotificacion('✅ Configuración de nómina guardada correctamente', 'success', 'Configuración Guardada');
+    
+    // Cerrar modal
+    document.querySelector('.modal-overlay').remove();
+    
+    console.log('💾 Configuración de nómina guardada:', configuracion);
+  } catch (error) {
+    console.error('❌ Error guardando configuración de nómina:', error);
+    mostrarNotificacion('❌ Error guardando configuración de nómina', 'error');
+  }
+}
+
+// Cargar configuración de nómina
+function cargarConfiguracionNomina() {
+  try {
+    const configuracion = JSON.parse(localStorage.getItem('configuracionNomina')) || {
+      deducciones: { salud: 4, pension: 4, riesgos: 0.522 },
+      horas: { porDia: 8, porMes: 22, mensuales: 240 },
+      recargos: { extras: 25, nocturnas: 35, dominicales: 75, festivas: 75 },
+      opciones: { calculoAutomatico: true, incluirBonificaciones: true, redondearDecimales: true }
+    };
+
+    // Aplicar valores a los campos
+    document.getElementById('deduccionSalud').value = configuracion.deducciones.salud;
+    document.getElementById('deduccionPension').value = configuracion.deducciones.pension;
+    document.getElementById('deduccionRiesgos').value = configuracion.deducciones.riesgos;
+    document.getElementById('horasPorDia').value = configuracion.horas.porDia;
+    document.getElementById('diasPorMes').value = configuracion.horas.porMes;
+    document.getElementById('horasMensuales').value = configuracion.horas.mensuales;
+    document.getElementById('recargoExtras').value = configuracion.recargos.extras;
+    document.getElementById('recargoNocturnas').value = configuracion.recargos.nocturnas;
+    document.getElementById('recargoDominicales').value = configuracion.recargos.dominicales;
+    document.getElementById('recargoFestivas').value = configuracion.recargos.festivas;
+    document.getElementById('calculoAutomatico').checked = configuracion.opciones.calculoAutomatico;
+    document.getElementById('incluirBonificaciones').checked = configuracion.opciones.incluirBonificaciones;
+    document.getElementById('redondearDecimales').checked = configuracion.opciones.redondearDecimales;
+
+    console.log('📥 Configuración de nómina cargada:', configuracion);
+  } catch (error) {
+    console.error('❌ Error cargando configuración de nómina:', error);
+  }
+}
+
+// Generar comparativas
+function generarComparativas() {
+  try {
+    // Comparativa de empleados por tipo de contrato
+    const comparativaContratos = document.getElementById('comparativaContratos');
+    if (comparativaContratos) {
+      const contratos = {};
+      gestionPersonal.empleados.forEach(emp => {
+        const tipo = emp.tipoContrato || 'No especificado';
+        contratos[tipo] = (contratos[tipo] || 0) + 1;
+      });
+
+      let html = '<div class="comparativa-lista">';
+      Object.entries(contratos).forEach(([tipo, cantidad]) => {
+        const porcentaje = ((cantidad / gestionPersonal.empleados.length) * 100).toFixed(1);
+        html += `
+          <div class="comparativa-item-detalle">
+            <span class="comparativa-tipo">${tipo}</span>
+            <div class="comparativa-barra">
+              <div class="comparativa-progreso" style="width: ${porcentaje}%"></div>
+            </div>
+            <span class="comparativa-valor">${cantidad} (${porcentaje}%)</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      comparativaContratos.innerHTML = html;
+    }
+
+    // Comparativa de salarios por departamento
+    const comparativaSalarios = document.getElementById('comparativaSalarios');
+    if (comparativaSalarios) {
+      const salariosPorDept = {};
+      gestionPersonal.empleados.forEach(emp => {
+        const dept = emp.departamento || 'Sin Departamento';
+        let salario = 0;
+        
+        if (emp.tipoSalario === 'fijo') {
+          salario = (emp.salarioFijo || 0) + (emp.bonificaciones || 0);
+        } else if (emp.tipoSalario === 'por_horas') {
+          salario = (emp.salarioReferencia || 0) * 240;
+        }
+        
+        if (!salariosPorDept[dept]) {
+          salariosPorDept[dept] = { total: 0, empleados: 0 };
+        }
+        
+        salariosPorDept[dept].total += salario;
+        salariosPorDept[dept].empleados++;
+      });
+
+      let html = '<div class="comparativa-lista">';
+      Object.entries(salariosPorDept).forEach(([dept, info]) => {
+        const promedio = info.empleados > 0 ? info.total / info.empleados : 0;
+        html += `
+          <div class="comparativa-item-detalle">
+            <span class="comparativa-tipo">${dept}</span>
+            <div class="comparativa-barra">
+              <div class="comparativa-progreso" style="width: ${Math.min((promedio / 5000000) * 100, 100)}%"></div>
+            </div>
+            <span class="comparativa-valor">$${promedio.toLocaleString('es-CO')} COP</span>
+          </div>
+        `;
+      });
+      html += '</div>';
+      comparativaSalarios.innerHTML = html;
+    }
+
+    console.log('📊 Comparativas generadas');
+  } catch (error) {
+    console.error('❌ Error generando comparativas:', error);
+  }
+}
+
+// Generar proyecciones
+function generarProyecciones() {
+  try {
+    // Proyección de costos laborales
+    const proyeccionCostos = document.getElementById('proyeccionCostos');
+    if (proyeccionCostos) {
+      const mesActual = new Date().getMonth();
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      
+      // Calcular tendencia de los últimos 3 meses
+      const costosMensuales = [];
+      for (let i = 2; i >= 0; i--) {
+        const mes = (mesActual - i + 12) % 12;
+        const costosMes = gestionPersonal.empleados.reduce((sum, emp) => {
+          let salario = 0;
+          if (emp.tipoSalario === 'fijo') {
+            salario = (emp.salarioFijo || 0) + (emp.bonificaciones || 0);
+          } else if (emp.tipoSalario === 'por_horas') {
+            salario = (emp.salarioReferencia || 0) * 240;
+          }
+          return sum + salario;
+        }, 0);
+        costosMensuales.push(costosMes);
+      }
+
+      // Calcular proyección (promedio simple)
+      const promedioCostos = costosMensuales.reduce((sum, costo) => sum + costo, 0) / costosMensuales.length;
+      const proyeccion3Meses = promedioCostos * 3;
+
+      let html = `
+        <div class="proyeccion-item-detalle">
+          <h6>Costos de los Últimos 3 Meses</h6>
+          <div class="proyeccion-meses">
+            ${costosMensuales.map((costo, i) => `
+              <div class="proyeccion-mes">
+                <span class="proyeccion-mes-nombre">${meses[(mesActual - 2 + i + 12) % 12]}</span>
+                <span class="proyeccion-mes-valor">$${costo.toLocaleString('es-CO')}</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="proyeccion-item-detalle">
+          <h6>Proyección a 3 Meses</h6>
+          <div class="proyeccion-valor-grande">
+            $${proyeccion3Meses.toLocaleString('es-CO')} COP
+          </div>
+          <div class="proyeccion-tendencia">
+            <i class="fas fa-arrow-up"></i> Promedio mensual: $${promedioCostos.toLocaleString('es-CO')} COP
+          </div>
+        </div>
+      `;
+      proyeccionCostos.innerHTML = html;
+    }
+
+    // Proyección de horas
+    const proyeccionHoras = document.getElementById('proyeccionHoras');
+    if (proyeccionHoras) {
+      const mesActual = new Date().getMonth();
+      const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      
+      // Calcular tendencia de las últimas 3 meses
+      const horasMensuales = [];
+      for (let i = 2; i >= 0; i--) {
+        const mes = (mesActual - i + 12) % 12;
+        const horasMes = gestionPersonal.calcularTotalHorasMes(new Date(2024, mes, 1));
+        horasMensuales.push(horasMes);
+      }
+
+      // Calcular proyección
+      const promedioHoras = horasMensuales.reduce((sum, horas) => sum + horas, 0) / horasMensuales.length;
+      const proyeccion3Meses = promedioHoras * 3;
+
+      let html = `
+        <div class="proyeccion-item-detalle">
+          <h6>Horas de los Últimos 3 Meses</h6>
+          <div class="proyeccion-meses">
+            ${horasMensuales.map((horas, i) => `
+              <div class="proyeccion-mes">
+                <span class="proyeccion-mes-nombre">${meses[(mesActual - 2 + i + 12) % 12]}</span>
+                <span class="proyeccion-mes-valor">${horas.toFixed(1)}h</span>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="proyeccion-item-detalle">
+          <h6>Proyección a 3 Meses</h6>
+          <div class="proyeccion-valor-grande">
+            ${proyeccion3Meses.toFixed(1)} horas
+          </div>
+          <div class="proyeccion-tendencia">
+            <i class="fas fa-arrow-up"></i> Promedio mensual: ${promedioHoras.toFixed(1)} horas
+          </div>
+        </div>
+      `;
+      proyeccionHoras.innerHTML = html;
+    }
+
+    console.log('📊 Proyecciones generadas');
+  } catch (error) {
+    console.error('❌ Error generando proyecciones:', error);
+  }
+}
