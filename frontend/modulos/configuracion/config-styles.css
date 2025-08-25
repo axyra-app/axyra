@@ -14,27 +14,34 @@
     --axyra-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-/* Configuration Container */
+/* ===== ESTILOS ESPECÍFICOS PARA CONFIGURACIÓN ===== */
+
+/* Espaciado para header fijo */
+.axyra-main-content {
+  padding-top: 120px !important;
+  min-height: calc(100vh - 120px);
+}
+
 .axyra-config-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
 .axyra-config-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--axyra-dark);
-    margin-bottom: 8px;
-    text-align: center;
+  text-align: center;
+  margin: 20px 0 10px 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a365d;
 }
 
 .axyra-config-subtitle {
-    font-size: 1.1rem;
-    color: var(--axyra-secondary);
-    font-weight: 400;
-    text-align: center;
-    margin-bottom: 40px;
+  text-align: center;
+  margin: 0 0 30px 0;
+  font-size: 1.1rem;
+  color: #4a5568;
+  line-height: 1.6;
 }
 
 /* Section Titles */

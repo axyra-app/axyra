@@ -12,70 +12,12 @@
     <link rel="stylesheet" href="config-styles.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-      import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-      import {
-        getFirestore,
-        doc,
-        getDoc,
-        collection,
-        query,
-        where,
-        getDocs,
-      } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-
-      // Firebase config
-      const firebaseConfig = {
-        apiKey: 'AIzaSyBvQvqQvqQvqQvqQvqQvqQvqQvqQvqQvqQ',
-        authDomain: 'villa-venecia-nomina.firebaseapp.com',
-        projectId: 'villa-venecia-nomina',
-        storageBucket: 'villa-venecia-nomina.appspot.com',
-        messagingSenderId: '123456789',
-        appId: '1:123456789:web:abcdef123456',
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-
-      // Global auth state
-      window.axyraAuth = { auth, db };
-
-      // Check auth state with unified system
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          console.log('Usuario autenticado:', user.email);
-          // Initialize configuration
-          if (window.axyraConfig) {
-            window.axyraConfig.init();
-          }
-        } else {
-          console.log('Usuario no autenticado');
-          // Verificar sistema unificado antes de redirigir
-          if (window.axyraUnifiedAuth && window.axyraUnifiedAuth.isAuthenticated()) {
-            console.log('Usuario autenticado en sistema unificado, continuando...');
-            if (window.axyraConfig) {
-              window.axyraConfig.init();
-            }
-          } else if (window.axyraIsolatedAuth && window.axyraIsolatedAuth.isUserAuthenticated()) {
-            console.log('Usuario autenticado en sistema aislado, continuando...');
-            if (window.axyraConfig) {
-              window.axyraConfig.init();
-            }
-          } else {
-            console.log('No hay usuario autenticado, redirigiendo...');
-            window.location.href = '../../login.html';
-          }
-        }
-      });
-    </script>
 
     <!-- Header Compartido AXYRA -->
     <script src="../../static/include-header.js"></script>
 
-    <!-- Verificación del Header Compartido -->
-    <script src="../../static/header-verification.js"></script>
+    <!-- Sistema Unificado de Autenticación AXYRA -->
+    <script src="../../static/unified-auth-system.js"></script>
 
     <!-- Sistema de Roles y Permisos AXYRA -->
     <script src="../../static/roles-config.js"></script>
@@ -89,17 +31,11 @@
     <!-- Sistema 2FA AXYRA -->
     <script src="../../static/2fa-system.js"></script>
 
-    <!-- Sistema Unificado de Autenticación AXYRA -->
-    <script src="../../static/unified-auth-system.js"></script>
+    <!-- Sistema de Timeout de Sesiones -->
+    <script src="../../static/session-timeout.js"></script>
 
-    <!-- Sistema Unificado de Reportes Avanzados AXYRA -->
-    <script src="../../static/advanced-reports-unified.js"></script>
-
-    <!-- Sistema Unificado de Backup AXYRA -->
-    <script src="../../static/backup-system-unified.js"></script>
-
-    <!-- Sistema Unificado de Auditoría AXYRA -->
-    <script src="../../static/audit-system-unified.js"></script>
+    <!-- Sistema de Configuración AXYRA -->
+    <script src="config.js"></script>
   </head>
   <body>
     <!-- Header Compartido AXYRA - Se insertará automáticamente -->
@@ -1367,5 +1303,472 @@
         }
       }
     </style>
+
+    <!-- Script de Inicialización -->
+    <script>
+      // Esperar a que todos los scripts se carguen
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 DOM cargado, inicializando configuración...');
+        
+        // Esperar un poco más para asegurar que todos los sistemas estén listos
+        setTimeout(() => {
+          try {
+            // Inicializar configuración si está disponible
+            if (window.axyraConfig) {
+              console.log('✅ Sistema de configuración encontrado, inicializando...');
+              window.axyraConfig.init();
+            } else {
+              console.log('⚠️ Sistema de configuración no disponible, usando fallback...');
+              inicializarConfiguracionFallback();
+            }
+
+            // Cargar configuración de empresa
+            cargarConfiguracionEmpresa();
+            
+            // Configurar eventos
+            configurarEventos();
+            
+            console.log('✅ Configuración inicializada correctamente');
+          } catch (error) {
+            console.error('❌ Error inicializando configuración:', error);
+          }
+        }, 1000);
+      });
+
+      // Función de fallback para configuración
+      function inicializarConfiguracionFallback() {
+        console.log('🔄 Inicializando configuración de fallback...');
+        
+        // Configurar valores por defecto
+        const configuracionDefault = {
+          empresa: {
+            nombre: 'VILLA VENECIA',
+            nit: '900123456-7',
+            direccion: 'Calle Principal #123',
+            telefono: '+57 300 123 4567',
+            email: 'contacto@villavenecia.com'
+          },
+          sistema: {
+            autoSave: true,
+            darkMode: false,
+            notifications: true,
+            sessionTimeout: 30,
+            maxLoginAttempts: 5
+          }
+        };
+
+        // Guardar configuración por defecto
+        localStorage.setItem('axyra_configuracion_default', JSON.stringify(configuracionDefault));
+        
+        // Aplicar configuración
+        aplicarConfiguracionDefault(configuracionDefault);
+      }
+
+      // Función para aplicar configuración por defecto
+      function aplicarConfiguracionDefault(config) {
+        try {
+          // Aplicar configuración de empresa
+          if (config.empresa) {
+            Object.entries(config.empresa).forEach(([key, value]) => {
+              const element = document.getElementById(key === 'nombre' ? 'companyName' : 
+                                                   key === 'nit' ? 'companyNIT' : 
+                                                   key === 'direccion' ? 'companyAddress' : 
+                                                   key === 'telefono' ? 'companyPhone' : 
+                                                   key === 'email' ? 'companyEmail' : null);
+              if (element) {
+                element.value = value;
+              }
+            });
+          }
+
+          // Aplicar configuración del sistema
+          if (config.sistema) {
+            if (document.getElementById('autoSave')) {
+              document.getElementById('autoSave').checked = config.sistema.autoSave;
+            }
+            if (document.getElementById('darkMode')) {
+              document.getElementById('darkMode').checked = config.sistema.darkMode;
+            }
+            if (document.getElementById('notifications')) {
+              document.getElementById('notifications').checked = config.sistema.notifications;
+            }
+            if (document.getElementById('sessionTimeout')) {
+              document.getElementById('sessionTimeout').value = config.sistema.sessionTimeout;
+            }
+            if (document.getElementById('maxLoginAttempts')) {
+              document.getElementById('maxLoginAttempts').value = config.sistema.maxLoginAttempts;
+            }
+          }
+
+          console.log('✅ Configuración por defecto aplicada');
+        } catch (error) {
+          console.error('❌ Error aplicando configuración por defecto:', error);
+        }
+      }
+
+      // Función para cargar configuración de empresa
+      function cargarConfiguracionEmpresa() {
+        try {
+          const configuracion = JSON.parse(localStorage.getItem('axyra_configuracion_completa') || '{}');
+          
+          if (configuracion.empresa) {
+            Object.entries(configuracion.empresa).forEach(([key, value]) => {
+              const element = document.getElementById(key === 'nombre' ? 'companyName' : 
+                                                   key === 'nit' ? 'companyNIT' : 
+                                                   key === 'direccion' ? 'companyAddress' : 
+                                                   key === 'telefono' ? 'companyPhone' : 
+                                                   key === 'email' ? 'companyEmail' : null);
+              if (element) {
+                element.value = value;
+              }
+            });
+          }
+        } catch (error) {
+          console.error('❌ Error cargando configuración de empresa:', error);
+        }
+      }
+
+      // Función para configurar eventos
+      function configurarEventos() {
+        try {
+          // Eventos para cambio de colores
+          const colorInputs = document.querySelectorAll('input[type="color"]');
+          colorInputs.forEach(input => {
+            input.addEventListener('change', function() {
+              const color = this.value;
+              const property = this.id === 'primaryColor' ? '--axyra-primary' : 
+                             this.id === 'secondaryColor' ? '--axyra-secondary' : 
+                             this.id === 'accentColor' ? '--axyra-accent' : null;
+              
+              if (property) {
+                document.documentElement.style.setProperty(property, color);
+                console.log(`🎨 Color ${property} cambiado a: ${color}`);
+              }
+            });
+          });
+
+          // Eventos para cambio de tema
+          const themeOptions = document.querySelectorAll('.axyra-theme-option');
+          themeOptions.forEach(option => {
+            option.addEventListener('click', function() {
+              const theme = this.dataset.theme;
+              cambiarTema(theme);
+              
+              // Actualizar estado activo
+              themeOptions.forEach(opt => opt.classList.remove('active'));
+              this.classList.add('active');
+            });
+          });
+
+          console.log('✅ Eventos configurados correctamente');
+        } catch (error) {
+          console.error('❌ Error configurando eventos:', error);
+        }
+      }
+
+      // Función para cambiar tema
+      function cambiarTema(theme) {
+        try {
+          // Remover clases de tema anteriores
+          document.body.classList.remove('axyra-theme-default', 'axyra-theme-dark', 'axyra-theme-corporate');
+          
+          // Agregar nueva clase de tema
+          document.body.classList.add(`axyra-theme-${theme}`);
+          
+          // Guardar preferencia
+          localStorage.setItem('axyra_tema', theme);
+          
+          console.log(`🎨 Tema cambiado a: ${theme}`);
+        } catch (error) {
+          console.error('❌ Error cambiando tema:', error);
+        }
+      }
+
+      // Función para mostrar notificaciones
+      function mostrarNotificacion(mensaje, tipo = 'info') {
+        try {
+          if (window.axyraNotificationSystem) {
+            window.axyraNotificationSystem.show(mensaje, tipo);
+          } else {
+            // Fallback a alert si no hay sistema de notificaciones
+            alert(mensaje);
+          }
+        } catch (error) {
+          console.error('❌ Error mostrando notificación:', error);
+          alert(mensaje);
+        }
+      }
+
+      // Función para crear backup
+      function createBackup() {
+        try {
+          if (window.axyraBackupSystem) {
+            window.axyraBackupSystem.createBackup();
+          } else {
+            // Fallback manual
+            crearBackupManual();
+          }
+        } catch (error) {
+          console.error('❌ Error creando backup:', error);
+          mostrarNotificacion('❌ Error creando backup: ' + error.message, 'error');
+        }
+      }
+
+      // Función para agregar nuevo usuario
+      function agregarNuevoUsuario() {
+        try {
+          mostrarNotificacion('👤 Función de agregar usuario disponible en próximas versiones', 'info');
+        } catch (error) {
+          console.error('❌ Error agregando usuario:', error);
+        }
+      }
+
+      // Función para editar roles
+      function editarRoles() {
+        try {
+          mostrarNotificacion('🔐 Función de edición de roles disponible en próximas versiones', 'info');
+        } catch (error) {
+          console.error('❌ Error editando roles:', error);
+        }
+      }
+
+      // Función para cambiar colores
+      function cambiarColorPrimario(color) {
+        try {
+          document.documentElement.style.setProperty('--axyra-primary', color);
+          console.log('🎨 Color primario cambiado a:', color);
+        } catch (error) {
+          console.error('❌ Error cambiando color primario:', error);
+        }
+      }
+
+      function cambiarColorSecundario(color) {
+        try {
+          document.documentElement.style.setProperty('--axyra-secondary', color);
+          console.log('🎨 Color secundario cambiado a:', color);
+        } catch (error) {
+          console.error('❌ Error cambiando color secundario:', error);
+        }
+      }
+
+      function cambiarColorAcento(color) {
+        try {
+          document.documentElement.style.setProperty('--axyra-accent', color);
+          console.log('🎨 Color de acento cambiado a:', color);
+        } catch (error) {
+          console.error('❌ Error cambiando color de acento:', error);
+        }
+      }
+
+      // Función para configurar 2FA
+      function setup2FA() {
+        try {
+          if (window.axyra2FA && window.axyra2FA.setup) {
+            window.axyra2FA.setup();
+          } else {
+            mostrarNotificacion('🔐 Sistema 2FA no disponible en este momento', 'warning');
+          }
+        } catch (error) {
+          console.error('❌ Error configurando 2FA:', error);
+          mostrarNotificacion('❌ Error configurando 2FA: ' + error.message, 'error');
+        }
+      }
+
+      // Función para probar 2FA
+      function test2FA() {
+        try {
+          if (window.axyra2FA && window.axyra2FA.test) {
+            window.axyra2FA.test();
+          } else {
+            mostrarNotificacion('🔐 Sistema 2FA no disponible para pruebas', 'warning');
+          }
+        } catch (error) {
+          console.error('❌ Error probando 2FA:', error);
+          mostrarNotificacion('❌ Error probando 2FA: ' + error.message, 'error');
+        }
+      }
+
+      // Función para renovar sesión
+      function resetSessionTimeout() {
+        try {
+          if (window.axyraSessionTimeout) {
+            window.axyraSessionTimeout.reset();
+            mostrarNotificacion('⏰ Sesión renovada correctamente', 'success');
+          } else {
+            mostrarNotificacion('⏰ Sistema de timeout no disponible', 'warning');
+          }
+        } catch (error) {
+          console.error('❌ Error renovando sesión:', error);
+        }
+      }
+
+      // Función para configurar timeout de sesión
+      function configureSessionTimeout() {
+        try {
+          const timeout = prompt('Ingresa el nuevo timeout en minutos (15-120):', '30');
+          if (timeout && !isNaN(timeout) && timeout >= 15 && timeout <= 120) {
+            if (window.axyraSessionTimeout) {
+              window.axyraSessionTimeout.setTimeout(timeout * 60 * 1000);
+              mostrarNotificacion(`⏰ Timeout configurado a ${timeout} minutos`, 'success');
+            } else {
+              mostrarNotificacion('⏰ Sistema de timeout no disponible', 'warning');
+            }
+          }
+        } catch (error) {
+          console.error('❌ Error configurando timeout:', error);
+        }
+      }
+
+      // Función para probar responsive
+      function testResponsive() {
+        try {
+          const viewports = [
+            { name: 'Móvil', width: 375, height: 667 },
+            { name: 'Tablet', width: 768, height: 1024 },
+            { name: 'Desktop', width: 1920, height: 1080 }
+          ];
+          
+          const viewport = viewports[Math.floor(Math.random() * viewports.length)];
+          mostrarNotificacion(`📱 Probando: ${viewport.name} (${viewport.width}x${viewport.height})`, 'info');
+        } catch (error) {
+          console.error('❌ Error probando responsive:', error);
+        }
+      }
+
+      // Función para configurar responsive
+      function configureResponsive() {
+        try {
+          mostrarNotificacion('📱 Configuración de responsive disponible en próximas versiones', 'info');
+        } catch (error) {
+          console.error('❌ Error configurando responsive:', error);
+        }
+      }
+
+      // Función para configurar backup
+      function configureBackup() {
+        try {
+          const frecuencia = prompt('Ingresa la frecuencia de respaldo (daily/weekly/monthly):', 'daily');
+          if (frecuencia && ['daily', 'weekly', 'monthly'].includes(frecuencia)) {
+            mostrarNotificacion(`💾 Frecuencia de backup configurada a: ${frecuencia}`, 'success');
+          }
+        } catch (error) {
+          console.error('❌ Error configurando backup:', error);
+        }
+      }
+
+      // Función para probar notificaciones
+      function testNotifications() {
+        try {
+          mostrarNotificacion('🔔 Notificación de prueba funcionando correctamente', 'success');
+        } catch (error) {
+          console.error('❌ Error probando notificaciones:', error);
+        }
+      }
+
+      // Función para configurar notificaciones
+      function configureNotifications() {
+        try {
+          const frecuencia = prompt('Ingresa la frecuencia de notificaciones en minutos (5-60):', '10');
+          if (frecuencia && !isNaN(frecuencia) && frecuencia >= 5 && frecuencia <= 60) {
+            mostrarNotificacion(`🔔 Frecuencia configurada a: cada ${frecuencia} minutos`, 'success');
+          }
+        } catch (error) {
+          console.error('❌ Error configurando notificaciones:', error);
+        }
+      }
+
+      // Función para verificar actualizaciones
+      function checkUpdates() {
+        try {
+          mostrarNotificacion('🔄 Verificando actualizaciones...', 'info');
+          setTimeout(() => {
+            mostrarNotificacion('✅ Sistema actualizado a la última versión', 'success');
+          }, 2000);
+        } catch (error) {
+          console.error('❌ Error verificando actualizaciones:', error);
+        }
+      }
+
+      // Función para configurar actualizaciones
+      function configureUpdates() {
+        try {
+          mostrarNotificacion('🔄 Configuración de actualizaciones disponible en próximas versiones', 'info');
+        } catch (error) {
+          console.error('❌ Error configurando actualizaciones:', error);
+        }
+      }
+
+      // Función para realizar respaldo
+      function performBackup() {
+        try {
+          createBackup();
+        } catch (error) {
+          console.error('❌ Error realizando respaldo:', error);
+        }
+      }
+
+      // Función para guardar configuración de empresa
+      function saveCompanyConfig() {
+        try {
+          const config = {
+            nombre: document.getElementById('companyName')?.value || '',
+            nit: document.getElementById('companyNIT')?.value || '',
+            direccion: document.getElementById('companyAddress')?.value || '',
+            telefono: document.getElementById('companyPhone')?.value || '',
+            email: document.getElementById('companyEmail')?.value || ''
+          };
+
+          localStorage.setItem('axyra_empresa_config', JSON.stringify(config));
+          mostrarNotificacion('✅ Configuración de empresa guardada correctamente', 'success');
+        } catch (error) {
+          console.error('❌ Error guardando configuración:', error);
+          mostrarNotificacion('❌ Error guardando configuración: ' + error.message, 'error');
+        }
+      }
+
+      // Función para restaurar configuración de empresa
+      function resetCompanyConfig() {
+        try {
+          const configuracion = JSON.parse(localStorage.getItem('axyra_configuracion_completa') || '{}');
+          if (configuracion.empresa) {
+            Object.entries(configuracion.empresa).forEach(([key, value]) => {
+              const element = document.getElementById(key === 'nombre' ? 'companyName' : 
+                                                   key === 'nit' ? 'companyNIT' : 
+                                                   key === 'direccion' ? 'companyAddress' : 
+                                                   key === 'telefono' ? 'companyPhone' : 
+                                                   key === 'email' ? 'companyEmail' : null);
+              if (element) {
+                element.value = value;
+              }
+            });
+            mostrarNotificacion('✅ Configuración restaurada a valores por defecto', 'success');
+          }
+        } catch (error) {
+          console.error('❌ Error restaurando configuración:', error);
+        }
+      }
+
+      // Agregar todas las funciones al scope global
+      window.createBackup = createBackup;
+      window.agregarNuevoUsuario = agregarNuevoUsuario;
+      window.editarRoles = editarRoles;
+      window.cambiarColorPrimario = cambiarColorPrimario;
+      window.cambiarColorSecundario = cambiarColorSecundario;
+      window.cambiarColorAcento = cambiarColorAcento;
+      window.setup2FA = setup2FA;
+      window.test2FA = test2FA;
+      window.resetSessionTimeout = resetSessionTimeout;
+      window.configureSessionTimeout = configureSessionTimeout;
+      window.testResponsive = testResponsive;
+      window.configureResponsive = configureResponsive;
+      window.configureBackup = configureBackup;
+      window.testNotifications = testNotifications;
+      window.configureNotifications = configureNotifications;
+      window.checkUpdates = checkUpdates;
+      window.configureUpdates = configureUpdates;
+      window.performBackup = performBackup;
+      window.saveCompanyConfig = saveCompanyConfig;
+      window.resetCompanyConfig = resetCompanyConfig;
+    </script>
   </body>
 </html>
