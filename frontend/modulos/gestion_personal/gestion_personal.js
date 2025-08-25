@@ -45,33 +45,158 @@ class GestionPersonalManager {
 
   async cargarDatos() {
     try {
-      // Cargar datos específicos del usuario actual
-      const empleados = localStorage.getItem(`empleados_${this.usuarioActual.id}`);
-      const departamentos = localStorage.getItem(`departamentos_${this.usuarioActual.id}`);
-      const horas = localStorage.getItem(`horas_${this.usuarioActual.id}`);
-      const nominas = localStorage.getItem(`nominas_${this.usuarioActual.id}`);
+      // Intentar cargar desde Firebase primero
+      if (typeof firebase !== 'undefined' && firebase.firestore && this.usuarioActual) {
+        try {
+          console.log('🔥 Cargando datos desde Firebase...');
+          
+          // Cargar empleados
+          const empleadosSnapshot = await firebase.firestore()
+            .collection('empleados')
+            .where('userId', '==', this.usuarioActual.uid || this.usuarioActual.id)
+            .get();
+          
+          this.empleados = empleadosSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
 
-      this.empleados = empleados ? JSON.parse(empleados) : [];
-      this.departamentos = departamentos ? JSON.parse(departamentos) : [];
-      this.horas = horas ? JSON.parse(horas) : [];
-      this.nominas = nominas ? JSON.parse(nominas) : [];
+          // Cargar departamentos
+          const departamentosSnapshot = await firebase.firestore()
+            .collection('departamentos')
+            .where('userId', '==', this.usuarioActual.uid || this.usuarioActual.id)
+            .get();
+          
+          this.departamentos = departamentosSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
 
-      // Llenar selectores
+          // Cargar horas
+          const horasSnapshot = await firebase.firestore()
+            .collection('horas')
+            .where('userId', '==', this.usuarioActual.uid || this.usuarioActual.id)
+            .get();
+          
+          this.horas = horasSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          // Cargar nóminas
+          const nominasSnapshot = await firebase.firestore()
+            .collection('nominas')
+            .where('userId', '==', this.usuarioActual.uid || this.usuarioActual.id)
+            .get();
+          
+          this.nominas = nominasSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+
+          console.log('✅ Datos cargados desde Firebase:', {
+            empleados: this.empleados.length,
+            departamentos: this.departamentos.length,
+            horas: this.horas.length,
+            nominas: this.nominas.length
+          });
+
+          // Guardar en localStorage como respaldo
+          this.guardarDatos();
+          return;
+        } catch (firebaseError) {
+          console.warn('⚠️ Error cargando desde Firebase, usando localStorage:', firebaseError);
+        }
+      }
+
+      // Fallback a localStorage
+      console.log('💾 Cargando datos desde localStorage...');
+      const empleadosGuardados = localStorage.getItem(`empleados_${this.usuarioActual.id}`);
+      const departamentosGuardados = localStorage.getItem(`departamentos_${this.usuarioActual.id}`);
+      const horasGuardadas = localStorage.getItem(`horas_${this.usuarioActual.id}`);
+      const nominasGuardadas = localStorage.getItem(`nominas_${this.usuarioActual.id}`);
+
+      if (empleadosGuardados) this.empleados = JSON.parse(empleadosGuardados);
+      if (departamentosGuardados) this.departamentos = JSON.parse(departamentosGuardados);
+      if (horasGuardadas) this.horas = JSON.parse(horasGuardadas);
+      if (nominasGuardadas) this.nominas = JSON.parse(nominasGuardadas);
+
+      console.log('✅ Datos cargados desde localStorage:', {
+        empleados: this.empleados.length,
+        departamentos: this.departamentos.length,
+        horas: this.horas.length,
+        nominas: this.nominas.length
+      });
+
       this.llenarSelectorEmpleados();
       this.llenarSelectorDepartamentos();
     } catch (error) {
-      console.error('Error cargando datos:', error);
+      console.error('❌ Error cargando datos:', error);
     }
   }
 
-  guardarDatos() {
+  async guardarDatos() {
     try {
+      // Guardar en localStorage como respaldo
       localStorage.setItem(`empleados_${this.usuarioActual.id}`, JSON.stringify(this.empleados));
       localStorage.setItem(`departamentos_${this.usuarioActual.id}`, JSON.stringify(this.departamentos));
       localStorage.setItem(`horas_${this.usuarioActual.id}`, JSON.stringify(this.horas));
       localStorage.setItem(`nominas_${this.usuarioActual.id}`, JSON.stringify(this.nominas));
+
+      // Intentar guardar en Firebase si está disponible
+      if (typeof firebase !== 'undefined' && firebase.firestore && this.usuarioActual) {
+        try {
+          console.log('🔥 Guardando datos en Firebase...');
+          
+          // Guardar empleados
+          const empleadosRef = firebase.firestore().collection('empleados');
+          for (const empleado of this.empleados) {
+            await empleadosRef.doc(empleado.id).set({
+              ...empleado,
+              userId: this.usuarioActual.uid || this.usuarioActual.id,
+              fechaActualizacion: new Date().toISOString()
+            });
+          }
+
+          // Guardar departamentos
+          const departamentosRef = firebase.firestore().collection('departamentos');
+          for (const departamento of this.departamentos) {
+            await departamentosRef.doc(departamento.id).set({
+              ...departamento,
+              userId: this.usuarioActual.uid || this.usuarioActual.id,
+              fechaActualizacion: new Date().toISOString()
+            });
+          }
+
+          // Guardar horas
+          const horasRef = firebase.firestore().collection('horas');
+          for (const hora of this.horas) {
+            await horasRef.doc(hora.id).set({
+              ...hora,
+              userId: this.usuarioActual.uid || this.usuarioActual.id,
+              fechaActualizacion: new Date().toISOString()
+            });
+          }
+
+          // Guardar nóminas
+          const nominasRef = firebase.firestore().collection('nominas');
+          for (const nomina of this.nominas) {
+            await nominasRef.doc(nomina.id).set({
+              ...nomina,
+              userId: this.usuarioActual.uid || this.usuarioActual.id,
+              fechaActualizacion: new Date().toISOString()
+            });
+          }
+
+          console.log('✅ Datos guardados en Firebase correctamente');
+        } catch (firebaseError) {
+          console.warn('⚠️ Error guardando en Firebase, usando solo localStorage:', firebaseError);
+        }
+      } else {
+        console.log('ℹ️ Firebase no disponible, usando solo localStorage');
+      }
     } catch (error) {
-      console.error('Error guardando datos:', error);
+      console.error('❌ Error guardando datos:', error);
     }
   }
 

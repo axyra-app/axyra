@@ -206,21 +206,21 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Nombre Completo *</label>
-                <input type="text" id="nombreEmpleado" required placeholder="Ingrese el nombre completo" />
+                <input type="text" id="nombreEmpleado" name="nombreEmpleado" required placeholder="Ingrese el nombre completo" />
               </div>
               <div class="form-group">
                 <label>Cédula *</label>
-                <input type="text" id="cedulaEmpleado" required placeholder="Ingrese la cédula" />
+                <input type="text" id="cedulaEmpleado" name="cedulaEmpleado" required placeholder="Ingrese la cédula" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Cargo *</label>
-                <input type="text" id="cargoEmpleado" required placeholder="Ingrese el cargo" />
+                <input type="text" id="cargoEmpleado" name="cargoEmpleado" required placeholder="Ingrese el cargo" />
               </div>
               <div class="form-group">
                 <label>Departamento *</label>
-                <select id="departamentoEmpleado" required>
+                <select id="departamentoEmpleado" name="departamentoEmpleado" required>
                   <option value="">Seleccione departamento</option>
                 </select>
               </div>
@@ -228,14 +228,14 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Tipo de Salario *</label>
-                <select id="tipoSalarioEmpleado" required onchange="cambiarTipoSalario()">
+                <select id="tipoSalarioEmpleado" name="tipoSalarioEmpleado" required onchange="cambiarTipoSalario()">
                   <option value="fijo">Salario Fijo Mensual</option>
                   <option value="por_horas">Salario por Horas Trabajadas</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Tipo de Contrato *</label>
-                <select id="tipoContratoEmpleado" required>
+                <select id="tipoContratoEmpleado" name="tipoContratoEmpleado" required>
                   <option value="indefinido">Indefinido</option>
                   <option value="fijo">Fijo</option>
                   <option value="obra_labor">Obra o Labor</option>
@@ -251,6 +251,7 @@
                 <input
                   type="text"
                   id="salarioFijoEmpleado"
+                  name="salarioFijoEmpleado"
                   required
                   placeholder="Ej: 1423500"
                   class="salario-input"
@@ -263,6 +264,7 @@
                 <input
                   type="text"
                   id="bonificacionesEmpleado"
+                  name="bonificacionesEmpleado"
                   placeholder="Ej: 100000"
                   class="salario-input"
                   maxlength="15"
@@ -278,6 +280,7 @@
                 <input
                   type="text"
                   id="salarioReferenciaEmpleado"
+                  name="salarioReferenciaEmpleado"
                   required
                   placeholder="Ej: 1423500"
                   class="salario-input"
@@ -293,11 +296,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Fecha de Contratación *</label>
-                <input type="date" id="fechaContratacionEmpleado" required />
+                <input type="date" id="fechaContratacionEmpleado" name="fechaContratacionEmpleado" required />
               </div>
               <div class="form-group">
                 <label>Estado *</label>
-                <select id="estadoEmpleado" required>
+                <select id="estadoEmpleado" name="estadoEmpleado" required>
                   <option value="activo">Activo</option>
                   <option value="inactivo">Inactivo</option>
                   <option value="vacaciones">Vacaciones</option>
@@ -348,6 +351,7 @@
                   <input
                     type="text"
                     id="nombreDepartamento"
+                    name="nombreDepartamento"
                     required
                     placeholder="Ingrese el nombre del departamento"
                   />
@@ -355,7 +359,7 @@
                 <div class="form-group">
                   <label>Color de Identificación</label>
                   <div class="color-picker-container">
-                    <input type="color" id="colorDepartamento" value="#4f81bd" />
+                    <input type="color" id="colorDepartamento" name="colorDepartamento" value="#4f81bd" />
                     <div id="colorPreview" class="color-preview"></div>
                   </div>
                 </div>
@@ -364,6 +368,7 @@
                 <label>Descripción</label>
                 <textarea
                   id="descripcionDepartamento"
+                  name="descripcionDepartamento"
                   placeholder="Describa las funciones y responsabilidades del departamento"
                 ></textarea>
               </div>
@@ -444,29 +449,30 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Empleado *</label>
-                <select id="empleadoHoras" required>
+                <select id="empleadoHoras" name="empleadoHoras" required>
                   <option value="">Seleccione empleado</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Fecha *</label>
-                <input type="date" id="fechaHoras" required />
+                <input type="date" id="fechaHoras" name="fechaHoras" required />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Hora de Entrada *</label>
-                <input type="time" id="horaEntrada" required />
+                <input type="time" id="horaEntrada" name="horaEntrada" required />
               </div>
               <div class="form-group">
                 <label>Hora de Salida *</label>
-                <input type="time" id="horaSalida" required />
+                <input type="time" id="horaSalida" name="horaSalida" required />
               </div>
             </div>
             <div class="form-group">
               <label>Observaciones</label>
               <textarea
                 id="observacionesHoras"
+                name="observacionesHoras"
                 placeholder="Observaciones adicionales sobre las horas trabajadas"
               ></textarea>
             </div>
