@@ -458,39 +458,39 @@
 
 /* ===== CAMPOS NUMÉRICOS ===== */
 
-input[pattern="[0-9]*"] {
+input[pattern='[0-9]*'] {
   font-family: 'Courier New', monospace;
   font-weight: 500;
   letter-spacing: 0.5px;
 }
 
-input[pattern="[0-9]*"]:focus {
+input[pattern='[0-9]*']:focus {
   border-color: #4f81bd;
   box-shadow: 0 0 0 3px rgba(79, 129, 189, 0.1);
 }
 
-input[pattern="[0-9]*"]:valid {
+input[pattern='[0-9]*']:valid {
   border-color: #10b981;
   background-color: #f0fdf4;
 }
 
-input[pattern="[0-9]*"]:invalid:not(:placeholder-shown) {
+input[pattern='[0-9]*']:invalid:not(:placeholder-shown) {
   border-color: #ef4444;
   background-color: #fef2f2;
 }
 
-.empleado-form input[pattern="[0-9]*"] {
+.empleado-form input[pattern='[0-9]*'] {
   text-align: right;
   padding-right: 15px;
 }
 
-.empleado-form input[pattern="[0-9]*"]::placeholder {
+.empleado-form input[pattern='[0-9]*']::placeholder {
   text-align: left;
   color: #9ca3af;
 }
 
-.empleado-form .form-group:has(input[pattern="[0-9]*"]) label::after {
-  content: " (COP)";
+.empleado-form .form-group:has(input[pattern='[0-9]*']) label::after {
+  content: ' (COP)';
   font-size: 0.8rem;
   color: #6b7280;
   font-weight: normal;
@@ -513,7 +513,7 @@ input[pattern="[0-9]*"]:invalid:not(:placeholder-shown) {
   gap: 10px;
 }
 
-.color-picker-container input[type="color"] {
+.color-picker-container input[type='color'] {
   width: 60px;
   height: 45px;
   padding: 5px;
@@ -651,8 +651,8 @@ input[pattern="[0-9]*"]:invalid:not(:placeholder-shown) {
   cursor: pointer;
 }
 
-.checkbox-group input[type="checkbox"],
-.checkbox-group input[type="radio"] {
+.checkbox-group input[type='checkbox'],
+.checkbox-group input[type='radio'] {
   width: auto;
   margin: 0;
   accent-color: #4f81bd;
@@ -819,64 +819,64 @@ input[pattern="[0-9]*"]:invalid:not(:placeholder-shown) {
   .gestion-personal-tabs {
     flex-direction: column;
   }
-  
+
   .tab-header {
     flex-direction: column;
     gap: 15px;
     align-items: stretch;
   }
-  
+
   .tab-actions {
     justify-content: center;
   }
-  
+
   .form-row {
     grid-template-columns: 1fr;
   }
-  
+
   .checkbox-group {
     grid-template-columns: 1fr;
   }
-  
+
   .departamentos-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-container {
     width: 95%;
     margin: 20px;
   }
-  
+
   .modal-header {
     padding: 15px 20px;
   }
-  
+
   .modal-body {
     padding: 20px;
   }
-  
+
   .modal-footer {
     padding: 15px 20px;
     flex-direction: column;
   }
-  
+
   .btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .gestion-personal-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .stat-card {
     padding: 20px;
   }
-  
+
   .stat-card h3 {
     font-size: 1.5rem;
   }
-  
+
   .stat-card i {
     font-size: 2rem;
   }
@@ -886,23 +886,23 @@ input[pattern="[0-9]*"]:invalid:not(:placeholder-shown) {
   .gestion-personal-container {
     padding: 15px;
   }
-  
+
   .gestion-personal-title {
     font-size: 2rem;
   }
-  
+
   .gestion-personal-subtitle {
     font-size: 1rem;
   }
-  
+
   .gestion-personal-content {
     padding: 20px;
   }
-  
+
   .modal-body {
     padding: 15px;
   }
-  
+
   .btn {
     padding: 10px 20px;
     font-size: 13px;

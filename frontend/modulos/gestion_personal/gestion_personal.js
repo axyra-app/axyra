@@ -400,14 +400,14 @@ class GestionPersonalManager {
         <div class="departamento-header">
           <div class="departamento-color" style="background-color: ${departamento.color}"></div>
           <div class="departamento-nombre">${departamento.nombre}</div>
-        </div>
+                </div>
         <div class="departamento-descripcion">${departamento.descripcion || 'Sin descripción'}</div>
         <div class="departamento-actions">
           <button class="btn btn-small btn-danger" onclick="eliminarDepartamento('${departamento.id}')">
             <i class="fas fa-trash"></i> Eliminar
           </button>
-        </div>
-      </div>
+                </div>
+                </div>
     `
       )
       .join('');
@@ -704,16 +704,16 @@ function mostrarModalCalculoHoras() {
         <div class="resumen-item">
           <span class="label">Total Empleados:</span>
           <span class="value">${gestionPersonal.empleados.length}</span>
-        </div>
+                </div>
         <div class="resumen-item">
           <span class="label">Horas del Mes:</span>
           <span class="value">${gestionPersonal.calcularTotalHorasMes().toFixed(1)}</span>
-        </div>
+                    </div>
         <div class="resumen-item">
           <span class="label">Promedio por Empleado:</span>
           <span class="value">${gestionPersonal.calcularPromedioHoras().toFixed(1)}</span>
-        </div>
-      `;
+                </div>
+            `;
     }
     modal.style.display = 'block';
   }

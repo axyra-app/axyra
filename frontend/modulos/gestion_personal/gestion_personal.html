@@ -17,7 +17,7 @@
   </head>
   <body>
     <!-- Header Compartido AXYRA - Se insertará automáticamente -->
-    
+
     <div class="gestion-personal-container">
       <div class="gestion-personal-header">
         <h1 class="gestion-personal-title">
@@ -101,7 +101,7 @@
               </button>
             </div>
           </div>
-          
+
           <div id="listaEmpleados" class="empleados-lista">
             <!-- Los empleados se renderizarán aquí -->
           </div>
@@ -126,7 +126,7 @@
               </button>
             </div>
           </div>
-          
+
           <div id="listaHoras" class="horas-lista">
             <!-- Las horas se renderizarán aquí -->
           </div>
@@ -145,7 +145,7 @@
               </button>
             </div>
           </div>
-          
+
           <div id="listaNominas" class="nominas-lista">
             <!-- Las nóminas se renderizarán aquí -->
           </div>
@@ -167,7 +167,7 @@
               </button>
             </div>
           </div>
-          
+
           <div id="reportesContenido" class="reportes-lista">
             <!-- Los reportes se renderizarán aquí -->
           </div>
@@ -189,17 +189,17 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Nombre Completo *</label>
-                <input type="text" id="nombreEmpleado" required placeholder="Ingrese el nombre completo">
+                <input type="text" id="nombreEmpleado" required placeholder="Ingrese el nombre completo" />
               </div>
               <div class="form-group">
                 <label>Cédula *</label>
-                <input type="text" id="cedulaEmpleado" required placeholder="Ingrese la cédula">
+                <input type="text" id="cedulaEmpleado" required placeholder="Ingrese la cédula" />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Cargo *</label>
-                <input type="text" id="cargoEmpleado" required placeholder="Ingrese el cargo">
+                <input type="text" id="cargoEmpleado" required placeholder="Ingrese el cargo" />
               </div>
               <div class="form-group">
                 <label>Departamento *</label>
@@ -226,34 +226,57 @@
                 </select>
               </div>
             </div>
-            
+
             <!-- Campos para Salario Fijo -->
-            <div id="camposSalarioFijo" class="form-row" style="display: none;">
+            <div id="camposSalarioFijo" class="form-row" style="display: none">
               <div class="form-group">
                 <label>Salario Base Mensual *</label>
-                <input type="text" id="salarioFijoEmpleado" required placeholder="Ingrese el salario mensual" pattern="[0-9]*" inputmode="numeric">
+                <input
+                  type="text"
+                  id="salarioFijoEmpleado"
+                  required
+                  placeholder="Ingrese el salario mensual"
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                />
                 <small class="form-help">Ingrese el salario en pesos colombianos (COP)</small>
               </div>
               <div class="form-group">
                 <label>Bonificaciones Mensuales</label>
-                <input type="text" id="bonificacionesEmpleado" placeholder="Bonificaciones adicionales" pattern="[0-9]*" inputmode="numeric">
+                <input
+                  type="text"
+                  id="bonificacionesEmpleado"
+                  placeholder="Bonificaciones adicionales"
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                />
                 <small class="form-help">Opcional: Bonificaciones adicionales en pesos colombianos</small>
               </div>
             </div>
-            
+
             <!-- Campos para Salario por Horas -->
-            <div id="camposSalarioHoras" class="form-row" style="display: none;">
+            <div id="camposSalarioHoras" class="form-row" style="display: none">
               <div class="form-group">
                 <label>Salario Base Mensual (Referencia)</label>
-                <input type="text" id="salarioReferenciaEmpleado" required placeholder="Salario base de referencia" pattern="[0-9]*" inputmode="numeric">
-                <small class="form-help">Este valor se usará como referencia para cálculos. Los valores por hora se configuran en el gestor de horas.</small>
+                <input
+                  type="text"
+                  id="salarioReferenciaEmpleado"
+                  required
+                  placeholder="Salario base de referencia"
+                  pattern="[0-9]*"
+                  inputmode="numeric"
+                />
+                <small class="form-help"
+                  >Este valor se usará como referencia para cálculos. Los valores por hora se configuran en el gestor de
+                  horas.</small
+                >
               </div>
             </div>
-            
+
             <div class="form-row">
               <div class="form-group">
                 <label>Fecha de Contratación *</label>
-                <input type="date" id="fechaContratacionEmpleado" required>
+                <input type="date" id="fechaContratacionEmpleado" required />
               </div>
               <div class="form-group">
                 <label>Estado *</label>
@@ -292,12 +315,12 @@
             <div id="listaDepartamentos" class="departamentos-grid">
               <!-- Los departamentos se renderizarán aquí -->
             </div>
-            <div id="mensajeNoDepartamentos" class="no-data" style="display: none;">
+            <div id="mensajeNoDepartamentos" class="no-data" style="display: none">
               <i class="fas fa-info-circle"></i>
               <p>No hay departamentos creados. Crea el primero para comenzar.</p>
             </div>
           </div>
-          
+
           <!-- Formulario para Nuevo Departamento -->
           <div class="departamento-nuevo">
             <h4><i class="fas fa-plus"></i> Agregar Nuevo Departamento</h4>
@@ -305,19 +328,27 @@
               <div class="form-row">
                 <div class="form-group">
                   <label>Nombre del Departamento *</label>
-                  <input type="text" id="nombreDepartamento" required placeholder="Ingrese el nombre del departamento">
+                  <input
+                    type="text"
+                    id="nombreDepartamento"
+                    required
+                    placeholder="Ingrese el nombre del departamento"
+                  />
                 </div>
                 <div class="form-group">
                   <label>Color de Identificación</label>
                   <div class="color-picker-container">
-                    <input type="color" id="colorDepartamento" value="#4f81bd">
+                    <input type="color" id="colorDepartamento" value="#4f81bd" />
                     <div id="colorPreview" class="color-preview"></div>
                   </div>
                 </div>
               </div>
               <div class="form-group">
                 <label>Descripción</label>
-                <textarea id="descripcionDepartamento" placeholder="Describa las funciones y responsabilidades del departamento"></textarea>
+                <textarea
+                  id="descripcionDepartamento"
+                  placeholder="Describa las funciones y responsabilidades del departamento"
+                ></textarea>
               </div>
             </form>
           </div>
@@ -347,18 +378,27 @@
               <div class="form-group">
                 <label>Formato de Archivo</label>
                 <div class="checkbox-group">
-                  <label><input type="radio" name="formatoExport" value="excel" checked> Excel (.xlsx)</label>
-                  <label><input type="radio" name="formatoExport" value="csv"> CSV (.csv)</label>
-                  <label><input type="radio" name="formatoExport" value="pdf"> PDF (.pdf)</label>
+                  <label><input type="radio" name="formatoExport" value="excel" checked /> Excel (.xlsx)</label>
+                  <label><input type="radio" name="formatoExport" value="csv" /> CSV (.csv)</label>
+                  <label><input type="radio" name="formatoExport" value="pdf" /> PDF (.pdf)</label>
                 </div>
               </div>
               <div class="form-group">
                 <label>Filtros de Datos</label>
                 <div class="checkbox-group">
-                  <label><input type="checkbox" name="filtrosExport" value="activos" checked> Solo empleados activos</label>
-                  <label><input type="checkbox" name="filtrosExport" value="departamento"> Incluir departamento</label>
-                  <label><input type="checkbox" name="filtrosExport" value="salarios"> Incluir información salarial</label>
-                  <label><input type="checkbox" name="filtrosExport" value="fechas"> Incluir fechas de contratación</label>
+                  <label
+                    ><input type="checkbox" name="filtrosExport" value="activos" checked /> Solo empleados
+                    activos</label
+                  >
+                  <label
+                    ><input type="checkbox" name="filtrosExport" value="departamento" /> Incluir departamento</label
+                  >
+                  <label
+                    ><input type="checkbox" name="filtrosExport" value="salarios" /> Incluir información salarial</label
+                  >
+                  <label
+                    ><input type="checkbox" name="filtrosExport" value="fechas" /> Incluir fechas de contratación</label
+                  >
                 </div>
               </div>
             </div>
@@ -393,29 +433,30 @@
               </div>
               <div class="form-group">
                 <label>Fecha *</label>
-                <input type="date" id="fechaHoras" required>
+                <input type="date" id="fechaHoras" required />
               </div>
             </div>
             <div class="form-row">
               <div class="form-group">
                 <label>Hora de Entrada *</label>
-                <input type="time" id="horaEntrada" required>
+                <input type="time" id="horaEntrada" required />
               </div>
               <div class="form-group">
                 <label>Hora de Salida *</label>
-                <input type="time" id="horaSalida" required>
+                <input type="time" id="horaSalida" required />
               </div>
             </div>
             <div class="form-group">
               <label>Observaciones</label>
-              <textarea id="observacionesHoras" placeholder="Observaciones adicionales sobre las horas trabajadas"></textarea>
+              <textarea
+                id="observacionesHoras"
+                placeholder="Observaciones adicionales sobre las horas trabajadas"
+              ></textarea>
             </div>
           </form>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-success" onclick="guardarHoras()">
-            <i class="fas fa-save"></i> Guardar Horas
-          </button>
+          <button class="btn btn-success" onclick="guardarHoras()"><i class="fas fa-save"></i> Guardar Horas</button>
           <button class="btn btn-secondary" onclick="cerrarModalRegistroHoras()">
             <i class="fas fa-times"></i> Cancelar
           </button>
@@ -469,10 +510,12 @@
               <div class="form-group">
                 <label>Tipos de Horas</label>
                 <div class="checkbox-group">
-                  <label><input type="checkbox" name="tiposHoras" value="ordinarias" checked> Horas Ordinarias</label>
-                  <label><input type="checkbox" name="tiposHoras" value="extras" checked> Horas Extras</label>
-                  <label><input type="checkbox" name="tiposHoras" value="nocturnas" checked> Horas Nocturnas</label>
-                  <label><input type="checkbox" name="tiposHoras" value="dominicales" checked> Horas Dominicales</label>
+                  <label><input type="checkbox" name="tiposHoras" value="ordinarias" checked /> Horas Ordinarias</label>
+                  <label><input type="checkbox" name="tiposHoras" value="extras" checked /> Horas Extras</label>
+                  <label><input type="checkbox" name="tiposHoras" value="nocturnas" checked /> Horas Nocturnas</label>
+                  <label
+                    ><input type="checkbox" name="tiposHoras" value="dominicales" checked /> Horas Dominicales</label
+                  >
                 </div>
               </div>
             </div>
@@ -516,11 +559,11 @@
             <div class="form-row">
               <div class="form-group">
                 <label>Fecha Inicio</label>
-                <input type="date" id="fechaInicioReporte">
+                <input type="date" id="fechaInicioReporte" />
               </div>
               <div class="form-group">
                 <label>Fecha Fin</label>
-                <input type="date" id="fechaFinReporte">
+                <input type="date" id="fechaFinReporte" />
               </div>
             </div>
           </div>
@@ -557,15 +600,23 @@
               </div>
               <div class="form-group">
                 <label>Fecha de Corte</label>
-                <input type="date" id="fechaCorteNomina">
+                <input type="date" id="fechaCorteNomina" />
               </div>
             </div>
             <div class="form-group">
               <label>Empleados a Incluir</label>
               <div class="checkbox-group">
-                <label><input type="checkbox" name="empleadosNomina" value="activos" checked> Solo empleados activos</label>
-                <label><input type="checkbox" name="empleadosNomina" value="departamento"> Filtrar por departamento</label>
-                <label><input type="checkbox" name="empleadosNomina" value="fecha"> Filtrar por fecha de contratación</label>
+                <label
+                  ><input type="checkbox" name="empleadosNomina" value="activos" checked /> Solo empleados
+                  activos</label
+                >
+                <label
+                  ><input type="checkbox" name="empleadosNomina" value="departamento" /> Filtrar por departamento</label
+                >
+                <label
+                  ><input type="checkbox" name="empleadosNomina" value="fecha" /> Filtrar por fecha de
+                  contratación</label
+                >
               </div>
             </div>
           </div>
@@ -604,9 +655,9 @@
             <div class="form-group">
               <label>Elementos del Reporte</label>
               <div class="checkbox-group">
-                <label><input type="checkbox" id="reporteGraficos" checked> Gráficos de tendencia</label>
-                <label><input type="checkbox" id="reporteComparativas" checked> Análisis comparativo</label>
-                <label><input type="checkbox" id="reporteProyecciones"> Proyecciones futuras</label>
+                <label><input type="checkbox" id="reporteGraficos" checked /> Gráficos de tendencia</label>
+                <label><input type="checkbox" id="reporteComparativas" checked /> Análisis comparativo</label>
+                <label><input type="checkbox" id="reporteProyecciones" /> Proyecciones futuras</label>
               </div>
             </div>
           </div>
@@ -650,10 +701,10 @@
             <div class="form-group">
               <label>Elementos del Reporte</label>
               <div class="checkbox-group">
-                <label><input type="checkbox" id="reporteHorasTrabajadas" checked> Horas trabajadas</label>
-                <label><input type="checkbox" id="reporteSalarios" checked> Cálculo de salarios</label>
-                <label><input type="checkbox" id="reporteRendimiento" checked> Análisis de rendimiento</label>
-                <label><input type="checkbox" id="reporteComparativas" checked> Comparativas</label>
+                <label><input type="checkbox" id="reporteHorasTrabajadas" checked /> Horas trabajadas</label>
+                <label><input type="checkbox" id="reporteSalarios" checked /> Cálculo de salarios</label>
+                <label><input type="checkbox" id="reporteRendimiento" checked /> Análisis de rendimiento</label>
+                <label><input type="checkbox" id="reporteComparativas" checked /> Comparativas</label>
               </div>
             </div>
           </div>
@@ -697,10 +748,10 @@
             <div class="form-group">
               <label>Elementos del Reporte</label>
               <div class="checkbox-group">
-                <label><input type="checkbox" id="reporteProductividad" checked> Métricas de productividad</label>
-                <label><input type="checkbox" id="reporteCostos" checked> Costos laborales</label>
-                <label><input type="checkbox" id="reporteEficiencia" checked> Análisis de eficiencia</label>
-                <label><input type="checkbox" id="reporteComparativas" checked> Comparativas</label>
+                <label><input type="checkbox" id="reporteProductividad" checked /> Métricas de productividad</label>
+                <label><input type="checkbox" id="reporteCostos" checked /> Costos laborales</label>
+                <label><input type="checkbox" id="reporteEficiencia" checked /> Análisis de eficiencia</label>
+                <label><input type="checkbox" id="reporteComparativas" checked /> Comparativas</label>
               </div>
             </div>
           </div>
@@ -717,7 +768,7 @@
     </div>
 
     <!-- Sistema de Notificaciones Silencioso -->
-    <div id="notificacionesContainer" class="notificaciones-container" style="display: none;">
+    <div id="notificacionesContainer" class="notificaciones-container" style="display: none">
       <div id="notificacion" class="notificacion">
         <span id="notificacionTexto"></span>
         <button onclick="cerrarNotificacion()" class="notificacion-cerrar">&times;</button>
