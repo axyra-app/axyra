@@ -1922,6 +1922,121 @@
           }
         }, 5000);
       }
+
+      // Función para verificar autenticación
+      async function verificarAutenticacion() {
+        try {
+          console.log('🔐 Verificando autenticación en cuadre de caja...');
+          
+          // Verificar si hay usuario en localStorage
+          const usuarioLocal = localStorage.getItem('axyra_user');
+          if (usuarioLocal) {
+            const usuario = JSON.parse(usuarioLocal);
+            console.log('✅ Usuario autenticado con localStorage en cuadre de caja:', usuario.email || usuario.nombre);
+            return usuario;
+          }
+          
+          // Verificar si hay usuario en Firebase
+          if (typeof firebase !== 'undefined' && firebase.auth) {
+            const usuarioFirebase = firebase.auth().currentUser;
+            if (usuarioFirebase) {
+              console.log('✅ Usuario autenticado con Firebase en cuadre de caja:', usuarioFirebase.email);
+              
+              // Guardar en localStorage para consistencia
+              const usuario = {
+                uid: usuarioFirebase.uid,
+                email: usuarioFirebase.email,
+                nombre: usuarioFirebase.displayName || 'Usuario',
+                rol: 'empleado'
+              };
+              localStorage.setItem('axyra_user', JSON.stringify(usuario));
+              
+              return usuario;
+            }
+          }
+          
+          // Si no hay usuario autenticado, redirigir al login
+          console.warn('⚠️ No hay usuario autenticado, redirigiendo al login...');
+          window.location.href = '../../login.html';
+          return null;
+          
+        } catch (error) {
+          console.error('❌ Error verificando autenticación:', error);
+          window.location.href = '../../login.html';
+          return null;
+        }
+      }
+
+      // Función para mostrar notificaciones
+      function mostrarNotificacion(mensaje, tipo = 'info', titulo = 'AXYRA') {
+        try {
+          // Crear notificación si no existe
+          let notificacion = document.getElementById('notificacionSistema');
+          if (!notificacion) {
+            notificacion = document.createElement('div');
+            notificacion.id = 'notificacionSistema';
+            notificacion.className = 'notificacion-sistema';
+            notificacion.innerHTML = `
+              <div class="notificacion ${tipo}">
+                <div class="notificacion-icono">
+                  <i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : tipo === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                </div>
+                <div class="notificacion-contenido">
+                  <h4>${titulo}</h4>
+                  <p>${mensaje}</p>
+                </div>
+                <button class="notificacion-cerrar" onclick="cerrarNotificacion()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            `;
+            document.body.appendChild(notificacion);
+          } else {
+            // Actualizar notificación existente
+            const icono = notificacion.querySelector('.notificacion-icono i');
+            const tituloElement = notificacion.querySelector('.notificacion-contenido h4');
+            const mensajeElement = notificacion.querySelector('.notificacion-contenido p');
+            
+            if (icono) icono.className = `fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : tipo === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}`;
+            if (tituloElement) tituloElement.textContent = titulo;
+            if (mensajeElement) mensajeElement.textContent = mensaje;
+            
+            // Actualizar clases
+            const notifDiv = notificacion.querySelector('.notificacion');
+            notifDiv.className = `notificacion ${tipo}`;
+          }
+          
+          // Mostrar notificación
+          notificacion.style.display = 'block';
+          notificacion.classList.add('mostrar');
+          
+          // Auto-ocultar después de 5 segundos
+          setTimeout(() => {
+            cerrarNotificacion();
+          }, 5000);
+          
+          console.log(`📢 Notificación mostrada: ${tipo} - ${mensaje}`);
+        } catch (error) {
+          console.error('❌ Error mostrando notificación:', error);
+          // Fallback a alert nativo
+          alert(`${titulo}: ${mensaje}`);
+        }
+      }
+      
+      // Función para cerrar notificaciones
+      function cerrarNotificacion() {
+        try {
+          const notificacion = document.getElementById('notificacionSistema');
+          if (notificacion) {
+            notificacion.classList.remove('mostrar');
+            setTimeout(() => {
+              notificacion.style.display = 'none';
+            }, 300);
+          }
+        } catch (error) {
+          console.error('❌ Error cerrando notificación:', error);
+        }
+      }
     </script>
 
     <style>
@@ -2237,6 +2352,104 @@
         .axyra-ultima-factura-monto {
           font-size: 2rem;
         }
+      }
+
+      /* Estilos para notificaciones */
+      .notificacion-sistema {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        max-width: 400px;
+        display: none;
+      }
+      
+      .notificacion {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        padding: 20px;
+        margin-bottom: 15px;
+        border-left: 4px solid #3498db;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        transform: translateX(100%);
+        transition: all 0.3s ease;
+      }
+      
+      .notificacion.mostrar {
+        transform: translateX(0);
+      }
+      
+      .notificacion.success {
+        border-left-color: #10b981;
+      }
+      
+      .notificacion.error {
+        border-left-color: #ef4444;
+      }
+      
+      .notificacion.warning {
+        border-left-color: #f59e0b;
+      }
+      
+      .notificacion.info {
+        border-left-color: #3498db;
+      }
+      
+      .notificacion-icono {
+        font-size: 1.5rem;
+        color: #3498db;
+      }
+      
+      .notificacion.success .notificacion-icono {
+        color: #10b981;
+      }
+      
+      .notificacion.error .notificacion-icono {
+        color: #ef4444;
+      }
+      
+      .notificacion.warning .notificacion-icono {
+        color: #f59e0b;
+      }
+      
+      .notificacion.info .notificacion-icono {
+        color: #3498db;
+      }
+      
+      .notificacion-contenido {
+        flex: 1;
+      }
+      
+      .notificacion-contenido h4 {
+        margin: 0 0 5px 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      
+      .notificacion-contenido p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #6b7280;
+        line-height: 1.4;
+      }
+      
+      .notificacion-cerrar {
+        background: none;
+        border: none;
+        color: #9ca3af;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      }
+      
+      .notificacion-cerrar:hover {
+        background: #f3f4f6;
+        color: #6b7280;
       }
     </style>
 

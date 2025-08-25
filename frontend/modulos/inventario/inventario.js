@@ -1249,45 +1249,86 @@ window.mostrarNotificacion = mostrarNotificacion;
 // Funciones faltantes para compatibilidad
 function mostrarModalProducto(producto = null) {
   try {
+    console.log('🔍 Buscando modal de producto...');
     const modal = document.getElementById('modalProducto');
+    
+    if (!modal) {
+      console.error('❌ Modal de producto no encontrado en el DOM');
+      mostrarNotificacion('❌ Error: Modal de producto no encontrado', 'error');
+      return;
+    }
+    
+    console.log('✅ Modal de producto encontrado:', modal);
+    
     const titulo = document.getElementById('tituloModalProducto');
     const form = document.getElementById('formProducto');
     
+    if (!titulo || !form) {
+      console.error('❌ Elementos del modal no encontrados');
+      mostrarNotificacion('❌ Error: Elementos del modal incompletos', 'error');
+      return;
+    }
+    
     if (producto) {
       // Modo edición
+      console.log('✏️ Editando producto:', producto);
       titulo.textContent = 'Editar Producto';
-      document.getElementById('codigoProducto').value = producto.codigo || '';
-      document.getElementById('nombreProducto').value = producto.nombre || '';
-      document.getElementById('categoriaProducto').value = producto.categoria || '';
-      document.getElementById('stockProducto').value = producto.stock || '';
-      document.getElementById('precioProducto').value = producto.precio || '';
-      document.getElementById('stockMinimoProducto').value = producto.stockMinimo || '';
-      document.getElementById('descripcionProducto').value = producto.descripcion || '';
-      document.getElementById('estadoProducto').value = producto.estado || 'activo';
+      
+      // Llenar campos del formulario
+      const campos = {
+        'codigoProducto': producto.codigo || '',
+        'nombreProducto': producto.nombre || '',
+        'categoriaProducto': producto.categoria || '',
+        'stockProducto': producto.stock || '',
+        'precioProducto': producto.precio || '',
+        'stockMinimoProducto': producto.stockMinimo || '',
+        'descripcionProducto': producto.descripcion || '',
+        'estadoProducto': producto.estado || 'activo'
+      };
+      
+      Object.keys(campos).forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+          campo.value = campos[campoId];
+        } else {
+          console.warn(`⚠️ Campo no encontrado: ${campoId}`);
+        }
+      });
       
       // Cambiar botón de guardar
       const btnGuardar = document.getElementById('btnGuardarProducto');
-      btnGuardar.textContent = 'Actualizar Producto';
-      btnGuardar.onclick = () => guardarProducto(producto.id);
+      if (btnGuardar) {
+        btnGuardar.textContent = 'Actualizar Producto';
+        btnGuardar.onclick = () => guardarProducto(producto.id);
+      }
     } else {
       // Modo nuevo
+      console.log('➕ Creando nuevo producto');
       titulo.textContent = 'Nuevo Producto';
       form.reset();
       
       // Cambiar botón de guardar
       const btnGuardar = document.getElementById('btnGuardarProducto');
-      btnGuardar.textContent = 'Guardar Producto';
-      btnGuardar.onclick = () => guardarProducto();
+      if (btnGuardar) {
+        btnGuardar.textContent = 'Guardar Producto';
+        btnGuardar.onclick = () => guardarProducto();
+      }
     }
     
-    if (modal) {
-      modal.style.display = 'block';
-      // Enfocar primer campo
-      setTimeout(() => {
-        const primerInput = document.getElementById('codigoProducto');
-        if (primerInput) primerInput.focus();
-      }, 100);
-    }
+    // Mostrar modal
+    modal.style.display = 'block';
+    modal.classList.add('mostrar');
+    
+    // Enfocar primer campo
+    setTimeout(() => {
+      const primerInput = document.getElementById('codigoProducto');
+      if (primerInput) {
+        primerInput.focus();
+        console.log('🎯 Primer campo enfocado:', primerInput);
+      }
+    }, 100);
+    
+    console.log('✅ Modal de producto mostrado correctamente');
   } catch (error) {
     console.error('❌ Error mostrando modal de producto:', error);
     mostrarNotificacion('❌ Error mostrando modal de producto', 'error');
