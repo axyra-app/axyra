@@ -18,6 +18,23 @@
   <body>
     <!-- Header Compartido AXYRA - Se insertará automáticamente -->
 
+    <!-- Sistema de Notificaciones Profesionales -->
+    <div id="notificacionesSistema" class="notificaciones-sistema">
+      <div id="notificacion" class="notificacion">
+        <div class="notificacion-icono">
+          <i id="notificacionIcono" class="fas fa-info-circle"></i>
+        </div>
+        <div class="notificacion-contenido">
+          <h4 id="notificacionTitulo">Notificación</h4>
+          <p id="notificacionMensaje">Mensaje de la notificación</p>
+        </div>
+        <button class="notificacion-cerrar" onclick="cerrarNotificacion()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Contenido Principal -->
     <div class="gestion-personal-container">
       <div class="gestion-personal-header">
         <h1 class="gestion-personal-title">
@@ -230,25 +247,25 @@
             <!-- Campos para Salario Fijo -->
             <div id="camposSalarioFijo" class="form-row" style="display: none">
               <div class="form-group">
-                <label>Salario Base Mensual *</label>
+                <label>Salario Base Mensual (COP) *</label>
                 <input
                   type="text"
                   id="salarioFijoEmpleado"
                   required
-                  placeholder="Ingrese el salario mensual"
-                  pattern="[0-9]*"
-                  inputmode="numeric"
+                  placeholder="Ej: 1423500"
+                  class="salario-input"
+                  maxlength="15"
                 />
                 <small class="form-help">Ingrese el salario en pesos colombianos (COP)</small>
               </div>
               <div class="form-group">
-                <label>Bonificaciones Mensuales</label>
+                <label>Bonificaciones Mensuales (COP)</label>
                 <input
                   type="text"
                   id="bonificacionesEmpleado"
-                  placeholder="Bonificaciones adicionales"
-                  pattern="[0-9]*"
-                  inputmode="numeric"
+                  placeholder="Ej: 100000"
+                  class="salario-input"
+                  maxlength="15"
                 />
                 <small class="form-help">Opcional: Bonificaciones adicionales en pesos colombianos</small>
               </div>
@@ -257,14 +274,14 @@
             <!-- Campos para Salario por Horas -->
             <div id="camposSalarioHoras" class="form-row" style="display: none">
               <div class="form-group">
-                <label>Salario Base Mensual (Referencia)</label>
+                <label>Salario Base Mensual (Referencia) (COP) *</label>
                 <input
                   type="text"
                   id="salarioReferenciaEmpleado"
                   required
-                  placeholder="Salario base de referencia"
-                  pattern="[0-9]*"
-                  inputmode="numeric"
+                  placeholder="Ej: 1423500"
+                  class="salario-input"
+                  maxlength="15"
                 />
                 <small class="form-help"
                   >Este valor se usará como referencia para cálculos. Los valores por hora se configuran en el gestor de
@@ -764,14 +781,6 @@
             <i class="fas fa-times"></i> Cancelar
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Sistema de Notificaciones Silencioso -->
-    <div id="notificacionesContainer" class="notificaciones-container" style="display: none">
-      <div id="notificacion" class="notificacion">
-        <span id="notificacionTexto"></span>
-        <button onclick="cerrarNotificacion()" class="notificacion-cerrar">&times;</button>
       </div>
     </div>
 

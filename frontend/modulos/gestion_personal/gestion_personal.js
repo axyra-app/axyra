@@ -93,10 +93,31 @@ class GestionPersonalManager {
     camposSalario.forEach((id) => {
       const campo = document.getElementById(id);
       if (campo) {
-        campo.addEventListener('input', (e) => this.formatearSalario(e.target));
-        campo.addEventListener('blur', (e) => this.formatearSalario(e.target));
+        // Formatear al escribir
+        campo.addEventListener('input', (e) => {
+          let valor = e.target.value.replace(/[^\d]/g, '');
+          if (valor.length > 0) {
+            const numero = parseInt(valor);
+            if (!isNaN(numero)) {
+              e.target.value = numero.toLocaleString('es-CO');
+            }
+          }
+        });
+        
+        // Limpiar formato al enfocar
         campo.addEventListener('focus', (e) => {
           e.target.value = e.target.value.replace(/[^\d]/g, '');
+        });
+        
+        // Formatear al perder el foco
+        campo.addEventListener('blur', (e) => {
+          let valor = e.target.value.replace(/[^\d]/g, '');
+          if (valor.length > 0) {
+            const numero = parseInt(valor);
+            if (!isNaN(numero)) {
+              e.target.value = numero.toLocaleString('es-CO');
+            }
+          }
         });
       }
     });
@@ -104,7 +125,7 @@ class GestionPersonalManager {
 
   formatearSalario(input) {
     let valor = input.value.replace(/[^\d]/g, '');
-    
+
     if (valor.length > 0) {
       // Convertir a número y formatear con separadores de miles
       const numero = parseInt(valor);
@@ -112,14 +133,14 @@ class GestionPersonalManager {
         valor = numero.toLocaleString('es-CO');
       }
     }
-    
+
     input.value = valor;
   }
 
   limpiarFormatoSalario(input) {
     // Remover todos los caracteres no numéricos excepto el punto decimal
     let valor = input.value.replace(/[^\d.,]/g, '');
-    
+
     // Si hay múltiples puntos o comas, mantener solo el último
     const partes = valor.split(/[.,]/);
     if (partes.length > 2) {
@@ -127,15 +148,15 @@ class GestionPersonalManager {
       // Tomar solo la primera parte (antes del primer separador)
       valor = partes[0];
     }
-    
+
     // Convertir a número y validar
     const numero = parseFloat(valor.replace(/[^\d]/g, ''));
-    
+
     // Si no es un número válido, retornar 0
     if (isNaN(numero)) {
       return '0';
     }
-    
+
     return numero.toString();
   }
 
@@ -821,7 +842,7 @@ function cerrarModalReporteDepartamento() {
 async function guardarEmpleado() {
   try {
     console.log('🔍 Iniciando guardado de empleado...');
-    
+
     const form = document.getElementById('formEmpleado');
     if (!form.checkValidity()) {
       console.log('❌ Formulario no válido');
@@ -837,7 +858,7 @@ async function guardarEmpleado() {
       const salarioFijo = gestionPersonal.limpiarFormatoSalario(document.getElementById('salarioFijoEmpleado'));
       console.log('💵 Salario fijo limpio:', salarioFijo);
       if (!salarioFijo || parseFloat(salarioFijo) <= 0) {
-        alert('Por favor ingrese un salario fijo válido');
+        mostrarNotificacion('Por favor ingrese un salario fijo válido', 'warning', 'Atención');
         return;
       }
     } else if (tipoSalario === 'por_horas') {
@@ -846,7 +867,7 @@ async function guardarEmpleado() {
       );
       console.log('⏰ Salario referencia limpio:', salarioReferencia);
       if (!salarioReferencia || parseFloat(salarioReferencia) <= 0) {
-        alert('Por favor ingrese un salario de referencia válido');
+        mostrarNotificacion('Por favor ingrese un salario de referencia válido', 'warning', 'Atención');
         return;
       }
     }
@@ -886,11 +907,11 @@ async function guardarEmpleado() {
     console.log('✅ Empleado a guardar:', empleado);
 
     await gestionPersonal.agregarEmpleado(empleado);
-    alert('Empleado agregado correctamente');
+    mostrarNotificacion('Empleado agregado correctamente', 'success', 'Éxito');
     cerrarModalEmpleado();
   } catch (error) {
     console.error('❌ Error al guardar empleado:', error);
-    alert('Error al guardar empleado: ' + error.message);
+    mostrarNotificacion('Error al guardar empleado: ' + error.message, 'error', 'Error');
   }
 }
 
@@ -911,12 +932,12 @@ async function guardarDepartamento() {
     };
 
     await gestionPersonal.agregarDepartamento(departamento);
-    alert('Departamento agregado correctamente');
+    mostrarNotificacion('Departamento agregado correctamente', 'success', 'Éxito');
     document.getElementById('formDepartamento').reset();
     gestionPersonal.renderizarListaDepartamentos();
   } catch (error) {
     console.error('Error al guardar departamento:', error);
-    alert('Error al guardar departamento: ' + error.message);
+    mostrarNotificacion('Error al guardar departamento: ' + error.message, 'error', 'Error');
   }
 }
 
@@ -925,11 +946,11 @@ async function eliminarDepartamento(departamentoId) {
   try {
     if (confirm('¿Está seguro de que desea eliminar este departamento? Esta acción no se puede deshacer.')) {
       await gestionPersonal.eliminarDepartamento(departamentoId);
-      alert('Departamento eliminado correctamente');
+      mostrarNotificacion('Departamento eliminado correctamente', 'success', 'Éxito');
     }
   } catch (error) {
     console.error('Error al eliminar departamento:', error);
-    alert('Error al eliminar departamento: ' + error.message);
+    mostrarNotificacion('Error al eliminar departamento: ' + error.message, 'error', 'Error');
   }
 }
 
@@ -952,18 +973,18 @@ async function guardarHoras() {
     };
 
     await gestionPersonal.agregarHora(hora);
-    alert('Horas registradas correctamente');
+    mostrarNotificacion('Horas registradas correctamente', 'success', 'Éxito');
     cerrarModalRegistroHoras();
   } catch (error) {
     console.error('Error al guardar horas:', error);
-    alert('Error al guardar horas: ' + error.message);
+    mostrarNotificacion('Error al guardar horas: ' + error.message, 'error', 'Error');
   }
 }
 
 // Procesar Exportación
 function procesarExportacion() {
   const periodo = document.getElementById('periodoExport').value;
-  alert(`Exportando datos para el período: ${periodo}`);
+  mostrarNotificacion(`Exportando datos para el período: ${periodo}`, 'info', 'Exportación');
   cerrarModalExportarExcel();
 }
 
@@ -974,10 +995,12 @@ function generarReporteHoras() {
   const fechaInicio = document.getElementById('fechaInicioReporte').value;
   const fechaFin = document.getElementById('fechaFinReporte').value;
 
-  alert(
+  mostrarNotificacion(
     `Generando reporte de horas para: Empleado: ${empleado || 'Todos'}, Departamento: ${
       departamento || 'Todos'
-    }, Período: ${fechaInicio} - ${fechaFin}`
+    }, Período: ${fechaInicio} - ${fechaFin}`,
+    'info',
+    'Generación de Reporte'
   );
   cerrarModalReporteHoras();
 }
@@ -987,7 +1010,7 @@ function procesarGeneracionNomina() {
   const periodo = document.getElementById('periodoNomina').value;
   const fechaCorte = document.getElementById('fechaCorteNomina').value;
 
-  alert(`Generando nómina para el período: ${periodo}, Fecha de corte: ${fechaCorte}`);
+  mostrarNotificacion(`Generando nómina para el período: ${periodo}, Fecha de corte: ${fechaCorte}`, 'info', 'Generación de Nómina');
   cerrarModalGenerarNomina();
 }
 
@@ -998,8 +1021,10 @@ function generarReporteGeneral() {
   const comparativas = document.getElementById('reporteComparativas').checked;
   const proyecciones = document.getElementById('reporteProyecciones').checked;
 
-  alert(
-    `Generando reporte general para ${periodo} con: Gráficos: ${graficos}, Comparativas: ${comparativas}, Proyecciones: ${proyecciones}`
+  mostrarNotificacion(
+    `Generando reporte general para ${periodo} con: Gráficos: ${graficos}, Comparativas: ${comparativas}, Proyecciones: ${proyecciones}`,
+    'info',
+    'Generación de Reporte General'
   );
   cerrarModalReporteGeneral();
 }
@@ -1010,12 +1035,12 @@ function generarReporteEmpleado() {
   const periodo = document.getElementById('reporteEmpleadoPeriodo').value;
 
   if (!empleadoId) {
-    alert('Por favor seleccione un empleado');
+    mostrarNotificacion('Por favor seleccione un empleado', 'warning', 'Atención');
     return;
   }
 
   const empleado = gestionPersonal.empleados.find((emp) => emp.id === empleadoId);
-  alert(`Generando reporte para ${empleado.nombre} (${periodo})`);
+  mostrarNotificacion(`Generando reporte para ${empleado.nombre} (${periodo})`, 'info', 'Generación de Reporte');
   cerrarModalReporteEmpleado();
 }
 
@@ -1024,14 +1049,14 @@ function generarReporteDepartamento() {
   const departamento = document.getElementById('reporteDepartamentoSelect').value;
   const periodo = document.getElementById('reporteDepartamentoPeriodo').value;
 
-  alert(`Generando reporte de departamento ${departamento || 'todos'} (${periodo})`);
+  mostrarNotificacion(`Generando reporte de departamento ${departamento || 'todos'} (${periodo})`, 'info', 'Generación de Reporte');
   cerrarModalReporteDepartamento();
 }
 
 // Procesar Exportación de Empleados
 function procesarExportacionEmpleados() {
   const formato = document.querySelector('input[name="formatoExport"]:checked').value;
-  alert(`Exportando empleados en formato: ${formato}`);
+  mostrarNotificacion(`Exportando empleados en formato: ${formato}`, 'info', 'Exportación de Empleados');
   cerrarModalExportarEmpleados();
 }
 
@@ -1039,31 +1064,51 @@ function procesarExportacionEmpleados() {
 function cargarDatosEjemplo() {
   if (typeof cargarDatosEjemplo === 'function') {
     cargarDatosEjemplo();
-    alert('Datos de ejemplo cargados correctamente');
+    mostrarNotificacion('Datos de ejemplo cargados correctamente', 'success', 'Éxito');
     location.reload();
   } else {
-    alert('Función de datos de ejemplo no disponible');
+    mostrarNotificacion('Función de datos de ejemplo no disponible', 'warning', 'Atención');
   }
 }
 
-// Sistema de Notificaciones Silencioso
-function mostrarNotificacion(mensaje, tipo = 'info') {
-  const container = document.getElementById('notificacionesContainer');
+// Sistema de Notificaciones Profesionales
+function mostrarNotificacion(mensaje, tipo = 'info', titulo = 'AXYRA') {
   const notificacion = document.getElementById('notificacion');
-  const texto = document.getElementById('notificacionTexto');
+  const tituloElement = document.getElementById('notificacionTitulo');
+  const mensajeElement = document.getElementById('notificacionMensaje');
+  const iconoElement = document.getElementById('notificacionIcono');
 
-  if (container && notificacion && texto) {
-    texto.textContent = mensaje;
+  if (notificacion && tituloElement && mensajeElement && iconoElement) {
+    // Configurar contenido
+    tituloElement.textContent = titulo;
+    mensajeElement.textContent = mensaje;
+    
+    // Configurar tipo y icono
     notificacion.className = `notificacion notificacion-${tipo}`;
-    container.style.display = 'block';
-
+    
+    // Configurar icono según el tipo
+    const iconos = {
+      success: 'fa-check-circle',
+      error: 'fa-exclamation-circle',
+      warning: 'fa-exclamation-triangle',
+      info: 'fa-info-circle'
+    };
+    
+    iconoElement.className = `fas ${iconos[tipo] || iconos.info}`;
+    
+    // Mostrar notificación
+    notificacion.classList.add('mostrar');
+    
+    // Ocultar automáticamente después de 5 segundos
     setTimeout(() => {
-      container.style.display = 'none';
-    }, 3000);
+      cerrarNotificacion();
+    }, 5000);
   }
 }
 
 function cerrarNotificacion() {
-  const container = document.getElementById('notificacionesContainer');
-  if (container) container.style.display = 'none';
+  const notificacion = document.getElementById('notificacion');
+  if (notificacion) {
+    notificacion.classList.remove('mostrar');
+  }
 }
