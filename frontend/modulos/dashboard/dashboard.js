@@ -83,8 +83,8 @@ class AxyraDashboard {
       console.log('✅ Datos del dashboard cargados');
     } catch (error) {
       console.error('❌ Error cargando datos:', error);
-      // Usar datos de ejemplo como fallback
-      this.usarDatosEjemplo();
+      // No usar datos de ejemplo - mantener dashboard vacío
+      this.limpiarDatos();
     }
   }
 
@@ -169,32 +169,20 @@ class AxyraDashboard {
     }
   }
 
-  usarDatosEjemplo() {
-    console.log('🔄 Usando datos de ejemplo...');
+  limpiarDatos() {
+    console.log('🧹 Limpiando datos del dashboard...');
 
-    this.data.empleados = [
-      { id: '1', nombre: 'Juan Pérez', departamento: 'Administración', salario: 2500000, estado: 'activo' },
-      { id: '2', nombre: 'María García', departamento: 'Ventas', salario: 2200000, estado: 'activo' },
-      { id: '3', nombre: 'Carlos López', departamento: 'Producción', salario: 2000000, estado: 'activo' },
-    ];
+    this.data.empleados = [];
+    this.data.horas = [];
+    this.data.nominas = [];
+    this.data.departamentos = [];
 
-    this.data.horas = [
-      { id: '1', empleadoId: '1', fecha: '2024-01-15', horas: 8, tipo: 'ordinarias' },
-      { id: '2', empleadoId: '2', fecha: '2024-01-15', horas: 8, tipo: 'ordinarias' },
-      { id: '3', empleadoId: '3', fecha: '2024-01-15', horas: 8, tipo: 'ordinarias' },
-    ];
-
-    this.data.nominas = [
-      { id: '1', empleadoId: '1', mes: '01', año: '2024', total: 2500000 },
-      { id: '2', empleadoId: '2', mes: '01', año: '2024', total: 2200000 },
-      { id: '3', empleadoId: '3', mes: '01', año: '2024', total: 2000000 },
-    ];
-
-    this.data.departamentos = [
-      { id: '1', nombre: 'Administración', color: '#4f81bd' },
-      { id: '2', nombre: 'Ventas', color: '#9bbb59' },
-      { id: '3', nombre: 'Producción', color: '#c0504d' },
-    ];
+    this.metrics.totalEmpleados = 0;
+    this.metrics.horasMes = 0;
+    this.metrics.totalPagos = 0;
+    this.metrics.nominasGeneradas = 0;
+    this.metrics.promedioHoras = 0;
+    this.metrics.totalDepartamentos = 0;
 
     this.calcularMetricas();
     this.actualizarMetricas();

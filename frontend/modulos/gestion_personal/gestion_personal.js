@@ -4406,3 +4406,166 @@ function actualizarDepartamento(departamentoId) {
     mostrarNotificacion('❌ Error actualizando departamento', 'error');
   }
 }
+
+// Función para cambiar entre pestañas
+function cambiarTab(tabName) {
+  console.log(`🔄 Cambiando a pestaña: ${tabName}`);
+
+  // Ocultar todas las pestañas
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  tabPanes.forEach((pane) => {
+    pane.classList.remove('active');
+  });
+
+  // Desactivar todos los botones de pestaña
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns.forEach((btn) => {
+    btn.classList.remove('active');
+  });
+
+  // Mostrar la pestaña seleccionada
+  const selectedPane = document.getElementById(`tab-${tabName}`);
+  if (selectedPane) {
+    selectedPane.classList.add('active');
+  }
+
+  // Activar el botón de la pestaña seleccionada
+  const selectedBtn = document.querySelector(`[onclick="cambiarTab('${tabName}')"]`);
+  if (selectedBtn) {
+    selectedBtn.classList.add('active');
+  }
+
+  // Cargar contenido específico de la pestaña
+  switch (tabName) {
+    case 'empleados':
+      if (window.gestionPersonalManager) {
+        window.gestionPersonalManager.renderizarEmpleados();
+      }
+      break;
+    case 'horas':
+      cargarGestionHoras();
+      break;
+    case 'nomina':
+      cargarGestionNomina();
+      break;
+  }
+
+  console.log(`✅ Pestaña ${tabName} activada`);
+}
+
+// Función para cargar gestión de horas
+function cargarGestionHoras() {
+  console.log('⏰ Cargando gestión de horas...');
+  const tabHoras = document.getElementById('tab-horas');
+
+  if (tabHoras) {
+    tabHoras.innerHTML = `
+      <div class="modulo-header">
+        <h2><i class="fas fa-clock"></i> Gestión de Horas</h2>
+        <p>Control y administración de horarios de trabajo</p>
+        <div class="modulo-actions">
+          <button class="btn btn-primary" onclick="registrarHoras()">
+            <i class="fas fa-plus"></i> Registrar Horas
+          </button>
+          <button class="btn btn-secondary" onclick="generarReporteHoras()">
+            <i class="fas fa-file-alt"></i> Reporte
+          </button>
+        </div>
+      </div>
+      
+      <div class="resumen-section">
+        <div class="resumen-grid">
+          <div class="resumen-card">
+            <h4>Horas del Mes</h4>
+            <div class="valor">0.0</div>
+            <p class="descripcion">Total de horas registradas</p>
+          </div>
+          <div class="resumen-card">
+            <h4>Promedio Diario</h4>
+            <div class="valor">0.0</div>
+            <p class="descripcion">Horas promedio por día</p>
+          </div>
+          <div class="resumen-card">
+            <h4>Empleados Activos</h4>
+            <div class="valor">0</div>
+            <p class="descripcion">Con horas registradas</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tabla-section">
+        <h3><i class="fas fa-table"></i> Registro de Horas</h3>
+        <p>Aquí se mostrará la tabla de horas registradas</p>
+      </div>
+    `;
+  }
+}
+
+// Función para cargar gestión de nómina
+function cargarGestionNomina() {
+  console.log('💰 Cargando gestión de nómina...');
+  const tabNomina = document.getElementById('tab-nomina');
+
+  if (tabNomina) {
+    tabNomina.innerHTML = `
+      <div class="modulo-header">
+        <h2><i class="fas fa-file-invoice-dollar"></i> Gestión de Nómina</h2>
+        <p>Cálculo y administración de salarios y prestaciones</p>
+        <div class="modulo-actions">
+          <button class="btn btn-primary" onclick="calcularNomina()">
+            <i class="fas fa-calculator"></i> Calcular Nómina
+          </button>
+          <button class="btn btn-secondary" onclick="generarReporteNomina()">
+            <i class="fas fa-file-alt"></i> Reporte
+          </button>
+        </div>
+      </div>
+      
+      <div class="resumen-section">
+        <div class="resumen-grid">
+          <div class="resumen-card">
+            <h4>Total Nómina</h4>
+            <div class="valor">$0</div>
+            <p class="descripcion">Total a pagar este mes</p>
+          </div>
+          <div class="resumen-card">
+            <h4>Empleados</h4>
+            <div class="valor">0</div>
+            <p class="descripcion">Empleados en nómina</p>
+          </div>
+          <div class="resumen-card">
+            <h4>Promedio Salario</h4>
+            <div class="valor">$0</div>
+            <p class="descripcion">Salario promedio</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tabla-section">
+        <h3><i class="fas fa-table"></i> Nómina del Mes</h3>
+        <p>Aquí se mostrará la tabla de nómina</p>
+      </div>
+    `;
+  }
+}
+
+// Funciones placeholder para las acciones
+function registrarHoras() {
+  console.log('⏰ Función registrar horas - pendiente de implementar');
+  alert('Función de registro de horas en desarrollo');
+}
+
+function generarReporteHoras() {
+  console.log('📊 Función generar reporte horas - pendiente de implementar');
+  alert('Función de reporte de horas en desarrollo');
+}
+
+function calcularNomina() {
+  console.log('💰 Función calcular nómina - pendiente de implementar');
+  alert('Función de cálculo de nómina en desarrollo');
+}
+
+function generarReporteNomina() {
+  console.log('📊 Función generar reporte nómina - pendiente de implementar');
+  alert('Función de reporte de nómina en desarrollo');
+}

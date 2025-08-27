@@ -189,6 +189,37 @@
           </div>
         </div>
       </div>
+
+      <!-- Pestañas de Navegación -->
+      <div class="tabs-navigation">
+        <button class="tab-btn active" onclick="cambiarTab('empleados')"><i class="fas fa-users"></i> Empleados</button>
+        <button class="tab-btn" onclick="cambiarTab('horas')"><i class="fas fa-clock"></i> Gestión de Horas</button>
+        <button class="tab-btn" onclick="cambiarTab('nomina')">
+          <i class="fas fa-file-invoice-dollar"></i> Nómina
+        </button>
+      </div>
+
+      <!-- Contenido de las Pestañas -->
+      <div class="tab-content">
+        <!-- Pestaña Empleados -->
+        <div id="tab-empleados" class="tab-pane active">
+          <!-- El contenido de empleados ya está aquí -->
+        </div>
+
+        <!-- Pestaña Gestión de Horas -->
+        <div id="tab-horas" class="tab-pane">
+          <h2>Gestión de Horas</h2>
+          <p>Contenido de la pestaña de Gestión de Horas.</p>
+          <!-- Aquí se cargará el contenido de la gestión de horas -->
+        </div>
+
+        <!-- Pestaña Nómina -->
+        <div id="tab-nomina" class="tab-pane">
+          <h2>Nómina</h2>
+          <p>Contenido de la pestaña de Nómina.</p>
+          <!-- Aquí se cargará el contenido de la nómina -->
+        </div>
+      </div>
     </div>
 
     <!-- Modal Nuevo/Editar Empleado -->
