@@ -1,737 +1,685 @@
-/* AXYRA Configuration Styles */
-:root {
-    --axyra-primary: #2563eb;
-    --axyra-primary-dark: #1d4ed8;
-    --axyra-secondary: #64748b;
-    --axyra-success: #10b981;
-    --axyra-warning: #f59e0b;
-    --axyra-error: #ef4444;
-    --axyra-info: #3b82f6;
-    --axyra-light: #f8fafc;
-    --axyra-dark: #1e293b;
-    --axyra-border: #e2e8f0;
-    --axyra-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    --axyra-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
+/* ========================================
+   ESTILOS DEL MÓDULO DE CONFIGURACIÓN AXYRA
+   ======================================== */
 
-/* ===== ESTILOS ESPECÍFICOS PARA CONFIGURACIÓN ===== */
-
-/* Espaciado para header fijo */
-.axyra-main-content {
-  padding-top: 120px !important;
-  min-height: calc(100vh - 120px);
-}
-
-.axyra-config-container {
-  max-width: 1200px;
+.config-container {
+  padding: 2rem;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
 }
 
-.axyra-config-title {
+/* Header del Módulo */
+.modulo-header {
   text-align: center;
-  margin: 20px 0 10px 0;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  border-radius: 20px;
+  color: white;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+}
+
+.modulo-title {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #1a365d;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
 }
 
-.axyra-config-subtitle {
-  text-align: center;
-  margin: 0 0 30px 0;
-  font-size: 1.1rem;
-  color: #4a5568;
-  line-height: 1.6;
+.modulo-title i {
+  font-size: 2rem;
+  color: #1f2937;
 }
 
-/* Section Titles */
-.axyra-section-title {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: var(--axyra-dark);
-    margin-bottom: 24px;
-    text-align: center;
-    position: relative;
+.modulo-subtitle {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
 }
 
-.axyra-section-title::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(90deg, var(--axyra-primary), var(--axyra-info));
-    border-radius: 2px;
+.modulo-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
-/* Security Section */
-.axyra-security-section {
-    margin-bottom: 60px;
+.modulo-actions .btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.axyra-security-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 24px;
+.modulo-actions .btn-primary {
+  background: #10b981;
+  color: white;
 }
 
-.axyra-security-item {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: var(--axyra-shadow);
-    border: 2px solid transparent;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+.modulo-actions .btn-primary:hover {
+  background: #059669;
+  transform: translateY(-2px);
 }
 
-.axyra-security-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--axyra-primary), var(--axyra-info));
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
+.modulo-actions .btn-secondary {
+  background: #8b5cf6;
+  color: white;
 }
 
-.axyra-security-item:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--axyra-shadow-lg);
-    border-color: var(--axyra-primary);
+.modulo-actions .btn-secondary:hover {
+  background: #7c3aed;
+  transform: translateY(-2px);
 }
 
-.axyra-security-item:hover::before {
-    transform: scaleX(1);
+.modulo-actions .btn-info {
+  background: #3b82f6;
+  color: white;
 }
 
-.axyra-security-icon {
-    width: 60px;
-    height: 60px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, var(--axyra-primary), var(--axyra-info));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
+.modulo-actions .btn-info:hover {
+  background: #2563eb;
+  transform: translateY(-2px);
 }
 
-.axyra-security-item:hover .axyra-security-icon {
-    transform: scale(1.1) rotate(5deg);
-}
-
-.axyra-security-icon i {
-    font-size: 28px;
-    color: white;
-}
-
-.axyra-security-content h4 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--axyra-dark);
-    margin-bottom: 12px;
-}
-
-.axyra-security-content p {
-    color: var(--axyra-secondary);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    margin-bottom: 20px;
-}
-
-/* Status Indicators */
-.axyra-2fa-status,
-.axyra-session-info,
-.axyra-responsive-info,
-.axyra-backup-info,
-.axyra-notifications-info,
-.axyra-updates-info {
-    margin: 16px 0;
-    padding: 12px 16px;
-    border-radius: 8px;
-    background: var(--axyra-light);
-    border: 1px solid var(--axyra-border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.axyra-2fa-label,
-.axyra-session-label,
-.axyra-responsive-label,
-.axyra-backup-label,
-.axyra-notifications-label,
-.axyra-updates-label {
-    font-weight: 500;
-    color: var(--axyra-secondary);
-    font-size: 0.9rem;
-}
-
-.axyra-2fa-value,
-.axyra-session-time,
-.axyra-responsive-status,
-.axyra-backup-date,
-.axyra-notifications-frequency,
-.axyra-updates-version {
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.axyra-2fa-value.enabled {
-    color: var(--axyra-success);
-}
-
-.axyra-2fa-value.disabled {
-    color: var(--axyra-error);
-}
-
-.axyra-responsive-status.mobile {
-    color: var(--axyra-warning);
-}
-
-.axyra-responsive-status.desktop {
-    color: var(--axyra-success);
-}
-
-/* Security Actions */
-.axyra-security-actions {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.axyra-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-decoration: none;
-    min-width: 120px;
-    justify-content: center;
-}
-
-.axyra-btn-primary {
-    background: var(--axyra-primary);
-    color: white;
-}
-
-.axyra-btn-primary:hover {
-    background: var(--axyra-primary-dark);
-    transform: translateY(-1px);
-    box-shadow: var(--axyra-shadow);
-}
-
-.axyra-btn-secondary {
-    background: var(--axyra-light);
-    color: var(--axyra-dark);
-    border: 1px solid var(--axyra-border);
-}
-
-.axyra-btn-secondary:hover {
-    background: var(--axyra-border);
-    transform: translateY(-1px);
-}
-
-.axyra-btn i {
-    font-size: 14px;
-}
-
-/* Company Section */
-.axyra-company-section {
-    margin-bottom: 60px;
-}
-
-.axyra-company-form {
-    background: white;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: var(--axyra-shadow);
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.axyra-form-group {
-    margin-bottom: 24px;
-}
-
-.axyra-form-group label {
-    display: block;
-    font-weight: 600;
-    color: var(--axyra-dark);
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-.axyra-form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid var(--axyra-border);
-    border-radius: 8px;
-    font-size: 14px;
-    transition: all 0.2s ease;
-    background: white;
-}
-
-.axyra-form-input:focus {
-    outline: none;
-    border-color: var(--axyra-primary);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-.axyra-form-input::placeholder {
-    color: var(--axyra-secondary);
-}
-
-.axyra-form-actions {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin-top: 32px;
-}
-
-/* System Section */
-.axyra-system-section {
-    margin-bottom: 40px;
-}
-
-.axyra-system-options {
-    background: white;
-    border-radius: 16px;
-    padding: 32px;
-    box-shadow: var(--axyra-shadow);
-}
-
-.axyra-option-group {
-    margin-bottom: 32px;
-}
-
-.axyra-option-group:last-child {
-    margin-bottom: 0;
-}
-
-.axyra-option-group h4 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--axyra-dark);
-    margin-bottom: 20px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid var(--axyra-border);
-}
-
-.axyra-option-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 0;
-    border-bottom: 1px solid var(--axyra-light);
-}
-
-.axyra-option-item:last-child {
-    border-bottom: none;
-}
-
-.axyra-option-label {
-    font-weight: 500;
-    color: var(--axyra-dark);
-    font-size: 0.9rem;
-}
-
-/* Switches */
-.axyra-switch {
-    position: relative;
-    display: inline-block;
-    width: 50px;
-    height: 24px;
-}
-
-.axyra-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.axyra-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--axyra-border);
-    transition: 0.3s;
-    border-radius: 24px;
-}
-
-.axyra-slider:before {
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.3s;
-    border-radius: 50%;
-}
-
-input:checked + .axyra-slider {
-    background-color: var(--axyra-primary);
-}
-
-input:checked + .axyra-slider:before {
-    transform: translateX(26px);
-}
-
-/* Selects */
-.axyra-form-select {
-    padding: 8px 12px;
-    border: 2px solid var(--axyra-border);
-    border-radius: 6px;
-    background: white;
-    color: var(--axyra-dark);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.axyra-form-select:focus {
-    outline: none;
-    border-color: var(--axyra-primary);
-}
-
-/* ===== MODALES PROFESIONALES DE CONFIGURACIÓN ===== */
-
-.axyra-modal-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 10000;
-  backdrop-filter: blur(8px);
-  animation: fadeIn 0.3s ease-out;
-}
-
-.axyra-modal-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+/* Navegación de Configuración */
+.config-nav {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow: hidden;
-  animation: slideIn 0.3s ease-out;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
 }
 
-.axyra-modal-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px 25px;
+.config-nav-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.axyra-modal-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
+.config-nav-header h3 {
+  font-size: 1.25rem;
   font-weight: 600;
+  color: #1f2937;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 0.5rem;
 }
 
-.axyra-modal-close {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 24px;
+.config-nav-header h3 i {
+  color: #f59e0b;
+}
+
+.config-tabs {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.config-tab {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 0;
-  width: 32px;
-  height: 32px;
+  transition: all 0.2s ease;
+  font-weight: 500;
   display: flex;
   align-items: center;
-  justify-content: center;
-  border-radius: 50%;
+  gap: 0.5rem;
+}
+
+.config-tab:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.config-tab.active {
+  background: #f59e0b;
+  color: white;
+  border-color: #f59e0b;
+}
+
+.config-tab i {
+  font-size: 1rem;
+}
+
+/* Contenido de Configuración */
+.config-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.config-section {
+  margin-bottom: 3rem;
+}
+
+.config-section:last-child {
+  margin-bottom: 0;
+}
+
+.config-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.config-section-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.config-section-header h3 i {
+  color: #f59e0b;
+  font-size: 1.25rem;
+}
+
+.config-section-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Formularios de Configuración */
+.config-form {
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border: 1px solid #e5e7eb;
+}
+
+.config-form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.config-form-header h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.config-form-header h4 i {
+  color: #6b7280;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.form-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-grupo.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-grupo label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.form-grupo input,
+.form-grupo select,
+.form-grupo textarea {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-grupo input:focus,
+.form-grupo select:focus,
+.form-grupo textarea:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.form-grupo textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Configuración de Empresa */
+.empresa-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.empresa-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
   transition: all 0.2s ease;
 }
 
-.axyra-modal-close:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-.axyra-modal-body {
-  padding: 25px;
-}
-
-.axyra-modal-mensaje {
-  margin: 0 0 20px 0;
-  font-size: 1rem;
-  color: #4a5568;
-  line-height: 1.6;
-  text-align: center;
-}
-
-.axyra-modal-input-container {
-  margin-bottom: 20px;
-}
-
-.axyra-modal-input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  background: #f8fafc;
-}
-
-.axyra-modal-input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: white;
-}
-
-.axyra-modal-input[type="number"] {
-  text-align: center;
-  font-weight: 600;
-  color: #2d3748;
-}
-
-.axyra-modal-input[type="select"] {
-  cursor: pointer;
-}
-
-.axyra-modal-footer {
-  padding: 20px 25px;
-  background: #f8fafc;
-  border-top: 1px solid #e2e8f0;
-  display: flex;
-  gap: 15px;
-  justify-content: flex-end;
-}
-
-/* Botones del modal */
-.axyra-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  text-decoration: none;
-  min-width: 100px;
-  justify-content: center;
-}
-
-.axyra-btn-success {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-}
-
-.axyra-btn-success:hover {
+.empresa-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-.axyra-btn-secondary {
-  background: #e2e8f0;
-  color: #4a5568;
-  border: 2px solid #cbd5e0;
+.empresa-card h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.axyra-btn-secondary:hover {
-  background: #cbd5e0;
-  border-color: #a0aec0;
-  transform: translateY(-1px);
+.empresa-card h5 i {
+  color: #f59e0b;
 }
 
-/* Animaciones */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.empresa-card p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -60%);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, -50%);
-  }
+/* Configuración de Usuarios */
+.usuarios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
-/* Responsive */
+.usuario-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.usuario-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.usuario-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.usuario-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.usuario-info h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.usuario-info p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.usuario-rol {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.5rem;
+  display: inline-block;
+}
+
+.usuario-rol.admin {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.usuario-rol.usuario {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.usuario-rol.gerente {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.usuario-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-xs {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+}
+
+.btn-xs:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.btn-xs.btn-edit {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.btn-xs.btn-edit:hover {
+  background: #2563eb;
+}
+
+.btn-xs.btn-delete {
+  background: #ef4444;
+  color: white;
+  border-color: #ef4444;
+}
+
+.btn-xs.btn-delete:hover {
+  background: #dc2626;
+}
+
+/* Configuración de Sistema */
+.sistema-config {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.config-item {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.config-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.config-item-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.config-item-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #f59e0b;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.config-item-info h5 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.config-item-info p {
+  color: #6b7280;
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.config-toggle {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+  margin-top: 0.5rem;
+}
+
+.config-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #f59e0b;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Configuración de Backup */
+.backup-status {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.backup-status h4 {
+  color: #166534;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.backup-status h4 i {
+  color: #10b981;
+}
+
+.backup-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.backup-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.backup-item i {
+  color: #10b981;
+  font-size: 1rem;
+}
+
+.backup-item span {
+  color: #166534;
+  font-size: 0.875rem;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .axyra-config-container {
-    padding: 15px;
+  .config-container {
+    padding: 1rem;
   }
-  
-  .axyra-config-title {
+
+  .modulo-header {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .modulo-title {
     font-size: 2rem;
+    flex-direction: column;
+    gap: 0.5rem;
   }
-  
-  .axyra-config-subtitle {
-    font-size: 1rem;
+
+  .modulo-actions {
+    flex-direction: column;
+    align-items: center;
   }
-  
-  .axyra-modal-container {
-    width: 95%;
-    margin: 20px;
+
+  .modulo-actions .btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
   }
-  
-  .axyra-modal-footer {
+
+  .config-tabs {
     flex-direction: column;
   }
-  
-  .axyra-btn {
-    width: 100%;
-  }
-}
 
-/* ===== TEST RESPONSIVE ===== */
-.axyra-responsive-test {
-  animation: responsiveTest 2s ease-in-out;
-}
+  .config-tab {
+    justify-content: center;
+  }
 
-@keyframes responsiveTest {
-  0% {
-    transform: scale(1);
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  50% {
-    transform: scale(1.02);
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.3);
+
+  .empresa-info {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
-  100% {
-    transform: scale(1);
+
+  .usuarios-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .sistema-config {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .backup-info {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
-    .axyra-config-title {
-        font-size: 1.8rem;
-    }
-    
-    .axyra-section-title {
-        font-size: 1.5rem;
-    }
-    
-    .axyra-security-item {
-        padding: 16px;
-    }
-    
-    .axyra-security-icon {
-        width: 50px;
-        height: 50px;
-    }
-    
-    .axyra-security-icon i {
-        font-size: 24px;
-    }
-    
-    .axyra-company-form {
-        padding: 20px;
-        margin: 0 8px;
-    }
-    
-    .axyra-system-options {
-        padding: 20px;
-    }
-}
+  .modulo-header {
+    padding: 1rem;
+  }
 
-/* Dark Mode Support */
-.axyra-dark-mode {
-    background: var(--axyra-dark);
-    color: white;
-}
+  .modulo-title {
+    font-size: 1.75rem;
+  }
 
-.axyra-dark-mode .axyra-security-item,
-.axyra-dark-mode .axyra-company-form,
-.axyra-dark-mode .axyra-system-options {
-    background: #2d3748;
-    color: white;
-}
+  .modulo-subtitle {
+    font-size: 1rem;
+  }
 
-.axyra-dark-mode .axyra-form-input,
-.axyra-dark-mode .axyra-form-select {
-    background: #4a5568;
-    color: white;
-    border-color: #718096;
-}
+  .config-content {
+    padding: 1.5rem;
+  }
 
-.axyra-dark-mode .axyra-form-input::placeholder {
-    color: #a0aec0;
-}
+  .config-form {
+    padding: 1rem;
+  }
 
-.axyra-dark-mode .axyra-option-label {
-    color: #e2e8f0;
-}
-
-.axyra-dark-mode .axyra-security-content h4 {
-    color: #e2e8f0;
-}
-
-.axyra-dark-mode .axyra-security-content p {
-    color: #a0aec0;
-}
-
-.axyra-dark-mode .axyra-2fa-status,
-.axyra-dark-mode .axyra-session-info,
-.axyra-dark-mode .axyra-responsive-info,
-.axyra-dark-mode .axyra-backup-info,
-.axyra-dark-mode .axyra-notifications-info,
-.axyra-dark-mode .axyra-updates-info {
-    background: #4a5568;
-    border-color: #718096;
-}
-
-.axyra-dark-mode .axyra-2fa-label,
-.axyra-dark-mode .axyra-session-label,
-.axyra-dark-mode .axyra-responsive-label,
-.axyra-dark-mode .axyra-backup-label,
-.axyra-dark-mode .axyra-notifications-label,
-.axyra-dark-mode .axyra-updates-label {
-    color: #a0aec0;
-}
-
-.axyra-dark-mode .axyra-btn-secondary {
-    background: #4a5568;
-    color: #e2e8f0;
-    border-color: #718096;
-}
-
-.axyra-dark-mode .axyra-btn-secondary:hover {
-    background: #718096;
+  .empresa-card,
+  .usuario-card,
+  .config-item {
+    padding: 1rem;
+  }
 }
