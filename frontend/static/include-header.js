@@ -100,184 +100,120 @@ class AxyraHeaderIncluder {
           console.error('❌ Body no encontrado');
         }
       } else {
-        console.log('✅ Header ya existe, saltando inserción');
+        console.log('ℹ️ Header ya existe, saltando inserción');
       }
     } catch (error) {
-      console.warn('⚠️ No se pudo cargar header compartido, usando fallback:', error);
-      this.createFallbackHeader();
+      console.error('❌ Error cargando header:', error);
+      throw error;
     }
   }
 
   async includeScript(scriptPath) {
     try {
-      console.log('📥 Cargando script del header desde:', scriptPath);
+      console.log('📥 Cargando script desde:', scriptPath);
 
       // Verificar si el script ya está cargado
-      if (document.querySelector(`script[src="${scriptPath}"]`)) {
-        console.log('✅ Script del header ya está cargado');
+      const existingScript = document.querySelector(`script[src*="${scriptPath.split('/').pop()}"]`);
+      if (existingScript) {
+        console.log('ℹ️ Script ya cargado, saltando...');
         this.scriptLoaded = true;
         return;
       }
 
       const script = document.createElement('script');
       script.src = scriptPath;
-      script.async = false;
-      script.onload = () => {
-        console.log('✅ Script del header cargado y ejecutado');
-        this.scriptLoaded = true;
-        this.initializeHeader();
-      };
-      script.onerror = (error) => {
-        console.error('❌ Error cargando script del header:', error);
-      };
+      script.type = 'text/javascript';
 
-      document.head.appendChild(script);
-    } catch (error) {
-      console.warn('⚠️ No se pudo cargar script del header:', error);
-    }
-  }
+      // Crear promesa para esperar la carga del script
+      const scriptPromise = new Promise((resolve, reject) => {
+        script.onload = () => {
+          console.log('✅ Script del header cargado correctamente');
+          this.scriptLoaded = true;
+          resolve();
+        };
+        script.onerror = () => {
+          console.error('❌ Error cargando script del header');
+          reject(new Error('Error cargando script del header'));
+        };
+      });
 
-  initializeHeader() {
-    try {
-      // Esperar un poco para asegurar que todo esté cargado
-      setTimeout(() => {
-        try {
-          if (window.axyraSharedHeader) {
-            new window.axyraSharedHeader();
-            console.log('✅ Header inicializado correctamente');
-          } else if (typeof AxyraSharedHeader !== 'undefined') {
-            new AxyraSharedHeader();
-            console.log('✅ Header inicializado directamente');
-          } else {
-            console.log('⚠️ Clase del header no disponible, intentando más tarde...');
-            // Intentar de nuevo en 1 segundo
-            setTimeout(() => this.initializeHeader(), 1000);
-          }
-        } catch (error) {
-          console.error('❌ Error inicializando header:', error);
-        }
-      }, 300);
+      // Insertar script en el head
+      const head = document.head || document.getElementsByTagName('head')[0];
+      if (head) {
+        head.appendChild(script);
+        console.log('✅ Script del header insertado en el head');
+      } else {
+        throw new Error('Head no encontrado');
+      }
+
+      // Esperar a que se cargue
+      await scriptPromise;
     } catch (error) {
-      console.error('❌ Error en inicialización:', error);
+      console.error('❌ Error cargando script del header:', error);
+      throw error;
     }
   }
 
   createFallbackHeader() {
-    // Header de respaldo si falla la carga - NO MODIFICA ESTILOS EXISTENTES
-    if (document.querySelector('.axyra-header')) {
-      console.log('✅ Header ya existe, no creando fallback');
-      return;
-    }
+    try {
+      console.log('🔄 Creando header de respaldo...');
 
-    const paths = this.determinePaths();
-    const fallbackHeader = `
-      <header class="axyra-header">
-        <div class="axyra-header-content">
-          <div class="axyra-logo-title">
-            <img src="${paths.headerPath.replace(
-              'shared-header.html',
-              'logo.png'
-            )}" alt="AXYRA Logo" class="axyra-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';">
-            <i class="fas fa-building" style="display: none; font-size: 32px; color: #4299e1; margin-right: 12px;" class="axyra-logo-fallback"></i>
-            <div class="axyra-title-section">
-              <h1 class="axyra-title">AXYRA</h1>
-              <span class="axyra-subtitle" id="pageSubtitle">Dashboard</span>
+      const fallbackHeader = `
+        <header class="axyra-header axyra-header-fallback">
+          <div class="axyra-header-content">
+            <div class="axyra-logo-title">
+              <div class="axyra-logo-fallback">
+                <i class="fas fa-building" style="font-size: 32px; color: #4299e1;"></i>
+              </div>
+              <div class="axyra-title-section">
+                <h1 class="axyra-title">AXYRA</h1>
+                <span class="axyra-subtitle">Sistema de Gestión</span>
+              </div>
+            </div>
+            <nav class="axyra-nav">
+              <a href="../../index.html" class="axyra-nav-link">
+                <i class="fas fa-home"></i>
+                <span>Inicio</span>
+              </a>
+              <a href="../dashboard/dashboard.html" class="axyra-nav-link">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+              </a>
+            </nav>
+            <div class="axyra-user-section">
+              <span class="axyra-user-email">Usuario</span>
+              <button class="axyra-logout-btn" onclick="window.location.href='../../login.html'">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar</span>
+              </button>
             </div>
           </div>
-          <nav class="axyra-nav" id="axyraNav">
-            <a href="${paths.headerPath.replace('static/shared-header.html', 'index.html')}" class="axyra-nav-link">
-              <i class="fas fa-home"></i> Inicio
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/dashboard/dashboard.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-tachometer-alt"></i> Dashboard
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/empleados/empleados.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-users"></i> Empleados
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/horas/gestionar_horas.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-clock"></i> Horas
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/nomina/gestionar_nomina.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-file-invoice-dollar"></i> Nómina
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/cuadre_caja/cuadre_caja.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-calculator"></i> Caja
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/inventario/inventario.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-boxes"></i> Inventario
-            </a>
-            <a href="${paths.headerPath.replace(
-              'static/shared-header.html',
-              'modulos/configuracion/configuracion.html'
-            )}" class="axyra-nav-link">
-              <i class="fas fa-cog"></i> Config
-            </a>
-          </nav>
-          <div class="axyra-user-section">
-            <span class="axyra-user-email" id="userEmail">Usuario</span>
-            <button class="axyra-logout-btn" data-action="logout">
-              <i class="fas fa-sign-out-alt"></i>
-              <span class="axyra-logout-text">Cerrar</span>
-            </button>
-          </div>
-        </div>
-      </header>
-    `;
+        </header>
+      `;
 
-    document.body.insertAdjacentHTML('afterbegin', fallbackHeader);
-    console.log('✅ Header de respaldo creado');
+      const body = document.body;
+      if (body) {
+        body.insertAdjacentHTML('afterbegin', fallbackHeader);
+        console.log('✅ Header de respaldo creado');
+      }
+    } catch (error) {
+      console.error('❌ Error creando header de respaldo:', error);
+    }
+  }
+
+  // Método público para verificar estado
+  getStatus() {
+    return {
+      initialized: this.isInitialized,
+      headerInserted: this.headerInserted,
+      scriptLoaded: this.scriptLoaded,
+    };
   }
 }
 
-// Función global para incluir el header - NO MODIFICA CÓDIGO EXISTENTE
-function incluirHeaderAXYRA() {
-  return new AxyraHeaderIncluder();
-}
+// Inicializar automáticamente
+const headerIncluder = new AxyraHeaderIncluder();
 
-// Función para inicializar el header - NO MODIFICA CÓDIGO EXISTENTE
-function initHeaderAXYRA() {
-  console.log('🚀 Inicializando header compartido AXYRA...');
-  return incluirHeaderAXYRA();
-}
-
-// Incluir automáticamente cuando se carga la página - NO MODIFICA CÓDIGO EXISTENTE
-function initHeader() {
-  // Verificar que no se haya inicializado antes
-  if (window.axyraHeaderIncluder) {
-    console.log('⚠️ Header ya inicializado globalmente');
-    return;
-  }
-
-  window.axyraHeaderIncluder = new AxyraHeaderIncluder();
-}
-
-// Inicialización automática - NO MODIFICA CÓDIGO EXISTENTE
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initHeader);
-} else {
-  // Si el DOM ya está listo, esperar un poco para asegurar que todos los scripts estén cargados
-  setTimeout(initHeader, 100);
-}
-
-// Exportar para uso en otros módulos - NO MODIFICA CÓDIGO EXISTENTE
+// Exportar para uso global
 window.AxyraHeaderIncluder = AxyraHeaderIncluder;
-window.incluirHeaderAXYRA = incluirHeaderAXYRA;
-window.initHeaderAXYRA = initHeaderAXYRA;
+window.axyraHeaderIncluder = headerIncluder;

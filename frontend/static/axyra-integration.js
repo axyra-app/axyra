@@ -1,5 +1,5 @@
 // ========================================
-// INTEGRACIÓN PRINCIPAL AXYRA - FASE 1 + FASE 2
+// INTEGRACIÓN PRINCIPAL AXYRA - VERSIÓN CORREGIDA
 // ========================================
 
 class AxyraIntegration {
@@ -14,7 +14,7 @@ class AxyraIntegration {
     console.log('🚀 Inicializando Integración Principal AXYRA...');
 
     try {
-      // Configurar dependencias entre sistemas
+      // Configurar dependencias entre sistemas (sin dependencias circulares)
       this.setupSystemDependencies();
 
       // Inicializar sistemas en orden correcto
@@ -26,9 +26,6 @@ class AxyraIntegration {
       // Configurar monitoreo de salud del sistema
       this.setupSystemHealthMonitoring();
 
-      // Configurar dashboard de estado
-      this.setupStatusDashboard();
-
       console.log('✅ Integración Principal AXYRA inicializada completamente');
     } catch (error) {
       console.error('❌ Error en integración principal:', error);
@@ -36,7 +33,7 @@ class AxyraIntegration {
   }
 
   // ========================================
-  // CONFIGURACIÓN DE DEPENDENCIAS
+  // CONFIGURACIÓN DE DEPENDENCIAS (CORREGIDA)
   // ========================================
 
   setupSystemDependencies() {
@@ -47,20 +44,22 @@ class AxyraIntegration {
 
       // Sistemas que dependen del manejador de errores
       this.systemDependencies.set('real_time_monitor', ['error_handler']);
-      this.systemDependencies.set('ai_assistant', ['error_handler', 'performance_optimizer']);
+      this.systemDependencies.set('notification_system', ['error_handler']);
 
       // Sistemas que dependen del monitor en tiempo real
-      this.systemDependencies.set('notification_system', ['real_time_monitor']);
       this.systemDependencies.set('audit_system', ['real_time_monitor']);
 
-      console.log('✅ Dependencias entre sistemas configuradas');
+      // AI Assistant sin dependencias críticas
+      this.systemDependencies.set('ai_assistant', []);
+
+      console.log('✅ Dependencias entre sistemas configuradas (sin circulares)');
     } catch (error) {
       console.error('❌ Error configurando dependencias:', error);
     }
   }
 
   // ========================================
-  // INICIALIZACIÓN SECUENCIAL
+  // INICIALIZACIÓN SECUENCIAL (CORREGIDA)
   // ========================================
 
   async initializeSystemsSequentially() {
@@ -99,7 +98,8 @@ class AxyraIntegration {
 
       const visit = (systemName) => {
         if (temp.has(systemName)) {
-          throw new Error(`Dependencia circular detectada: ${systemName}`);
+          console.warn(`⚠️ Dependencia circular detectada en: ${systemName}, saltando...`);
+          return;
         }
 
         if (visited.has(systemName)) {
@@ -127,7 +127,15 @@ class AxyraIntegration {
       return order;
     } catch (error) {
       console.error('❌ Error calculando orden de inicialización:', error);
-      return [];
+      // Retornar orden por defecto si falla
+      return [
+        'error_handler',
+        'performance_optimizer',
+        'real_time_monitor',
+        'notification_system',
+        'audit_system',
+        'ai_assistant',
+      ];
     }
   }
 
@@ -140,14 +148,15 @@ class AxyraIntegration {
           return await this.initializePerformanceOptimizer();
         case 'real_time_monitor':
           return await this.initializeRealTimeMonitor();
-        case 'ai_assistant':
-          return await this.initializeAIAssistant();
         case 'notification_system':
           return await this.initializeNotificationSystem();
         case 'audit_system':
           return await this.initializeAuditSystem();
+        case 'ai_assistant':
+          return await this.initializeAIAssistant();
         default:
-          throw new Error(`Sistema no reconocido: ${systemName}`);
+          console.warn(`⚠️ Sistema no reconocido: ${systemName}`);
+          return null;
       }
     } catch (error) {
       console.error(`❌ Error inicializando sistema ${systemName}:`, error);
@@ -221,28 +230,6 @@ class AxyraIntegration {
     }
   }
 
-  async initializeAIAssistant() {
-    try {
-      // Verificar si ya existe
-      if (window.axyraAIAssistant) {
-        console.log('ℹ️ Asistente de IA ya inicializado');
-        return window.axyraAIAssistant;
-      }
-
-      // Cargar script si no está disponible
-      await this.loadScript('/static/ai-assistant.js');
-
-      // Esperar a que se inicialice
-      await this.waitForSystem('axyraAIAssistant');
-
-      this.systems.set('ai_assistant', window.axyraAIAssistant);
-      return window.axyraAIAssistant;
-    } catch (error) {
-      console.error('❌ Error inicializando asistente de IA:', error);
-      throw error;
-    }
-  }
-
   async initializeNotificationSystem() {
     try {
       // Verificar si ya existe
@@ -287,13 +274,43 @@ class AxyraIntegration {
     }
   }
 
+  async initializeAIAssistant() {
+    try {
+      // Verificar si ya existe
+      if (window.axyraAIAssistant) {
+        console.log('ℹ️ Asistente de IA ya inicializado');
+        return window.axyraAIAssistant;
+      }
+
+      // Cargar script si no está disponible
+      await this.loadScript('/static/ai-assistant.js');
+
+      // Esperar a que se inicialice
+      await this.waitForSystem('axyraAIAssistant');
+
+      this.systems.set('ai_assistant', window.axyraAIAssistant);
+      return window.axyraAIAssistant;
+    } catch (error) {
+      console.error('❌ Error inicializando asistente de IA:', error);
+      throw error;
+    }
+  }
+
   // ========================================
-  // UTILIDADES DE CARGA
+  // UTILIDADES DE CARGA (MEJORADAS)
   // ========================================
 
   async loadScript(src) {
     try {
       return new Promise((resolve, reject) => {
+        // Verificar si el script ya está cargado
+        const existingScript = document.querySelector(`script[src*="${src.split('/').pop()}"]`);
+        if (existingScript) {
+          console.log(`ℹ️ Script ya cargado: ${src}`);
+          resolve();
+          return;
+        }
+
         const script = document.createElement('script');
         script.src = src;
         script.onload = resolve;
@@ -325,7 +342,7 @@ class AxyraIntegration {
   }
 
   // ========================================
-  // RECUPERACIÓN AUTOMÁTICA
+  // RECUPERACIÓN AUTOMÁTICA (MEJORADA)
   // ========================================
 
   async attemptSystemRecovery(systemName) {
@@ -347,19 +364,13 @@ class AxyraIntegration {
   }
 
   // ========================================
-  // COMUNICACIÓN ENTRE SISTEMAS
+  // COMUNICACIÓN ENTRE SISTEMAS (SIMPLIFICADA)
   // ========================================
 
   setupInterSystemCommunication() {
     try {
-      // Configurar eventos globales
+      // Configurar eventos globales básicos
       this.setupGlobalEvents();
-
-      // Configurar mensajería entre sistemas
-      this.setupSystemMessaging();
-
-      // Configurar sincronización de datos
-      this.setupDataSynchronization();
 
       console.log('✅ Comunicación entre sistemas configurada');
     } catch (error) {
@@ -379,161 +390,22 @@ class AxyraIntegration {
         this.handleSystemError(event.detail);
       });
 
-      // Evento de notificación del sistema
-      window.addEventListener('axyra-system-notification', (event) => {
-        this.handleSystemNotification(event.detail);
-      });
-
       console.log('✅ Eventos globales configurados');
     } catch (error) {
       console.error('❌ Error configurando eventos globales:', error);
     }
   }
 
-  setupSystemMessaging() {
-    try {
-      // Sistema de mensajería centralizado
-      window.axyraMessageBus = {
-        send: (target, message) => this.sendSystemMessage(target, message),
-        broadcast: (message) => this.broadcastSystemMessage(message),
-        subscribe: (topic, callback) => this.subscribeToSystemTopic(topic, callback),
-      };
-
-      console.log('✅ Sistema de mensajería configurado');
-    } catch (error) {
-      console.error('❌ Error configurando sistema de mensajería:', error);
-    }
-  }
-
-  sendSystemMessage(target, message) {
-    try {
-      const system = this.systems.get(target);
-      if (system && system.handleMessage) {
-        return system.handleMessage(message);
-      }
-
-      console.warn(`⚠️ Sistema ${target} no tiene método handleMessage`);
-      return null;
-    } catch (error) {
-      console.error(`❌ Error enviando mensaje a ${target}:`, error);
-      return null;
-    }
-  }
-
-  broadcastSystemMessage(message) {
-    try {
-      const results = [];
-
-      for (const [systemName, system] of this.systems) {
-        if (system.handleMessage) {
-          try {
-            const result = system.handleMessage(message);
-            results.push({ system: systemName, result, success: true });
-          } catch (error) {
-            results.push({ system: systemName, error: error.message, success: false });
-          }
-        }
-      }
-
-      return results;
-    } catch (error) {
-      console.error('❌ Error en broadcast de mensaje:', error);
-      return [];
-    }
-  }
-
-  subscribeToSystemTopic(topic, callback) {
-    try {
-      if (!this.messageSubscribers) {
-        this.messageSubscribers = new Map();
-      }
-
-      if (!this.messageSubscribers.has(topic)) {
-        this.messageSubscribers.set(topic, []);
-      }
-
-      this.messageSubscribers.get(topic).push(callback);
-
-      return () => {
-        // Retornar función de unsubscribe
-        const subscribers = this.messageSubscribers.get(topic);
-        const index = subscribers.indexOf(callback);
-        if (index > -1) {
-          subscribers.splice(index, 1);
-        }
-      };
-    } catch (error) {
-      console.error('❌ Error suscribiendo a tópico:', error);
-      return () => {};
-    }
-  }
-
-  setupDataSynchronization() {
-    try {
-      // Sincronizar datos entre sistemas
-      setInterval(() => {
-        this.synchronizeSystemData();
-      }, 30000); // Cada 30 segundos
-
-      console.log('✅ Sincronización de datos configurada');
-    } catch (error) {
-      console.error('❌ Error configurando sincronización de datos:', error);
-    }
-  }
-
-  synchronizeSystemData() {
-    try {
-      // Sincronizar estado de sistemas
-      const systemStatus = {};
-
-      for (const [systemName, system] of this.systems) {
-        try {
-          if (system.getStatus) {
-            systemStatus[systemName] = system.getStatus();
-          } else if (system.getSystemStatus) {
-            systemStatus[systemName] = system.getSystemStatus();
-          } else {
-            systemStatus[systemName] = { status: 'unknown' };
-          }
-        } catch (error) {
-          systemStatus[systemName] = { status: 'error', error: error.message };
-        }
-      }
-
-      // Guardar estado en localStorage
-      localStorage.setItem('axyra_system_status', JSON.stringify(systemStatus));
-
-      // Emitir evento de sincronización
-      window.dispatchEvent(
-        new CustomEvent('axyra-system-sync', {
-          detail: { systemStatus, timestamp: Date.now() },
-        })
-      );
-    } catch (error) {
-      console.error('❌ Error sincronizando datos del sistema:', error);
-    }
-  }
-
   // ========================================
-  // MONITOREO DE SALUD DEL SISTEMA
+  // MONITOREO DE SALUD DEL SISTEMA (SIMPLIFICADO)
   // ========================================
 
   setupSystemHealthMonitoring() {
     try {
-      // Monitorear salud de sistemas cada 10 segundos
+      // Monitorear salud de sistemas cada 30 segundos
       setInterval(() => {
         this.checkSystemHealth();
-      }, 10000);
-
-      // Monitorear uso de memoria
-      setInterval(() => {
-        this.monitorMemoryUsage();
       }, 30000);
-
-      // Monitorear performance
-      setInterval(() => {
-        this.monitorPerformance();
-      }, 60000);
 
       console.log('✅ Monitoreo de salud del sistema configurado');
     } catch (error) {
@@ -588,143 +460,47 @@ class AxyraIntegration {
         })
       );
 
-      // Tomar acciones si es necesario
-      this.handleHealthIssues(healthReport);
+      console.log('📊 Reporte de salud del sistema:', healthReport);
     } catch (error) {
       console.error('❌ Error verificando salud del sistema:', error);
     }
   }
 
-  handleHealthIssues(healthReport) {
+  // ========================================
+  // MANEJADORES DE EVENTOS (SIMPLIFICADOS)
+  // ========================================
+
+  handleSystemStatusChange(detail) {
     try {
-      if (healthReport.overall === 'critical') {
-        console.warn('🚨 Estado crítico del sistema detectado');
-
-        // Activar modo de emergencia
-        if (window.axyraErrorHandler) {
-          window.axyraErrorHandler.activateEmergencyMode();
-        }
-
-        // Notificar al usuario
-        if (window.axyraNotificationSystem) {
-          window.axyraNotificationSystem.showErrorNotification(
-            'Estado crítico del sistema detectado. Se ha activado el modo de emergencia.',
-            15000
-          );
-        }
-      } else if (healthReport.overall === 'warning') {
-        console.warn('⚠️ Estado de advertencia del sistema detectado');
-
-        // Notificar al usuario
-        if (window.axyraNotificationSystem) {
-          window.axyraNotificationSystem.showWarningNotification(
-            'Se han detectado problemas menores en el sistema.',
-            10000
-          );
-        }
-      }
+      console.log('📊 Cambio de estado del sistema:', detail);
     } catch (error) {
-      console.error('❌ Error manejando problemas de salud:', error);
+      console.error('❌ Error manejando cambio de estado:', error);
     }
   }
 
-  monitorMemoryUsage() {
+  handleSystemError(detail) {
     try {
-      if ('memory' in performance) {
-        const memoryInfo = performance.memory;
-        const usagePercent = (memoryInfo.usedJSHeapSize / memoryInfo.jsHeapSizeLimit) * 100;
-
-        if (usagePercent > 80) {
-          console.warn('⚠️ Uso de memoria alto:', usagePercent.toFixed(1) + '%');
-
-          // Limpiar cache si es posible
-          if (window.axyraPerformanceOptimizer) {
-            window.axyraPerformanceOptimizer.clearOldCache();
-          }
-        }
-      }
+      console.error('🚨 Error del sistema:', detail);
     } catch (error) {
-      console.warn('⚠️ No se pudo monitorear uso de memoria:', error);
-    }
-  }
-
-  monitorPerformance() {
-    try {
-      // Obtener métricas de performance
-      const navigation = performance.getEntriesByType('navigation')[0];
-      if (navigation) {
-        const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
-
-        if (loadTime > 5000) {
-          console.warn('⚠️ Tiempo de carga lento:', loadTime.toFixed(0) + 'ms');
-
-          // Sugerir optimizaciones
-          if (window.axyraPerformanceOptimizer) {
-            window.axyraPerformanceOptimizer.suggestOptimization('slow_load', { loadTime });
-          }
-        }
-      }
-    } catch (error) {
-      console.warn('⚠️ No se pudo monitorear performance:', error);
+      console.error('❌ Error manejando error del sistema:', error);
     }
   }
 
   // ========================================
-  // DASHBOARD DE ESTADO
+  // MÉTODOS PÚBLICOS (SIMPLIFICADOS)
   // ========================================
 
-  setupStatusDashboard() {
+  getSystemStatus() {
     try {
-      // Crear dashboard flotante
-      this.createStatusDashboard();
-
-      // Configurar actualizaciones automáticas
-      setInterval(() => {
-        this.updateStatusDashboard();
-      }, 5000);
-
-      console.log('✅ Dashboard de estado configurado');
+      return {
+        totalSystems: this.systems.size,
+        initializationStatus: Object.fromEntries(this.initializationStatus),
+        systemHealth: this.getSystemStatusSummary(),
+        timestamp: Date.now(),
+      };
     } catch (error) {
-      console.error('❌ Error configurando dashboard de estado:', error);
-    }
-  }
-
-  createStatusDashboard() {
-    try {
-      const dashboard = document.createElement('div');
-      dashboard.id = 'axyra-status-dashboard';
-      dashboard.className = 'axyra-status-indicator';
-      dashboard.innerHTML = `
-        <div class="axyra-status-header">
-          <i class="fas fa-chart-line"></i>
-          <span>Estado del Sistema</span>
-        </div>
-        <div class="axyra-status-content" id="axyra-status-content">
-          <div class="axyra-loading-text">
-            <span class="axyra-loading"></span>
-            Cargando estado...
-          </div>
-        </div>
-      `;
-
-      document.body.appendChild(dashboard);
-
-      // Actualizar contenido inicial
-      this.updateStatusDashboard();
-    } catch (error) {
-      console.error('❌ Error creando dashboard de estado:', error);
-    }
-  }
-
-  updateStatusDashboard() {
-    try {
-      const content = document.getElementById('axyra-status-content');
-      if (!content) return;
-
-      const status = this.getSystemStatusSummary();
-      content.innerHTML = this.generateStatusHTML(status);
-    } catch (error) {
-      console.error('❌ Error actualizando dashboard de estado:', error);
+      console.error('❌ Error obteniendo estado del sistema:', error);
+      return null;
     }
   }
 
@@ -783,122 +559,6 @@ class AxyraIntegration {
     }
   }
 
-  generateStatusHTML(summary) {
-    try {
-      let html = '';
-
-      // Estado general
-      const overallStatus = summary.error > 0 ? 'error' : summary.warning > 0 ? 'warning' : 'success';
-      const statusIcon = summary.error > 0 ? '🔴' : summary.warning > 0 ? '🟡' : '🟢';
-
-      html += `
-        <div class="axyra-status-item">
-          <span class="axyra-status-label">Estado General</span>
-          <span class="axyra-status-value ${overallStatus}">${statusIcon} ${summary.healthy}/${summary.total}</span>
-        </div>
-      `;
-
-      // Sistemas individuales
-      for (const [systemName, status] of Object.entries(summary.systems)) {
-        const statusClass =
-          status === 'error' || status === 'failed'
-            ? 'error'
-            : status === 'warning' || status === 'recovered'
-            ? 'warning'
-            : 'success';
-
-        html += `
-          <div class="axyra-status-item">
-            <span class="axyra-status-label">${systemName.replace('_', ' ')}</span>
-            <span class="axyra-status-value ${statusClass}">${status}</span>
-          </div>
-        `;
-      }
-
-      return html;
-    } catch (error) {
-      console.error('❌ Error generando HTML de estado:', error);
-      return '<div class="axyra-status-item">Error generando estado</div>';
-    }
-  }
-
-  // ========================================
-  // MANEJADORES DE EVENTOS
-  // ========================================
-
-  handleSystemStatusChange(detail) {
-    try {
-      console.log('📊 Cambio de estado del sistema:', detail);
-
-      // Actualizar dashboard
-      this.updateStatusDashboard();
-
-      // Notificar si es crítico
-      if (detail.status === 'error' || detail.status === 'critical') {
-        if (window.axyraNotificationSystem) {
-          window.axyraNotificationSystem.showErrorNotification(
-            `Sistema ${detail.system} en estado crítico: ${detail.message}`,
-            10000
-          );
-        }
-      }
-    } catch (error) {
-      console.error('❌ Error manejando cambio de estado:', error);
-    }
-  }
-
-  handleSystemError(detail) {
-    try {
-      console.error('🚨 Error del sistema:', detail);
-
-      // Registrar en sistema de auditoría
-      if (window.axyraAuditSystemUnified) {
-        window.axyraAuditSystemUnified.logSystemEvent('system_error', detail);
-      }
-
-      // Notificar al usuario
-      if (window.axyraNotificationSystem) {
-        window.axyraNotificationSystem.showErrorNotification(
-          `Error en sistema ${detail.system}: ${detail.message}`,
-          8000
-        );
-      }
-    } catch (error) {
-      console.error('❌ Error manejando error del sistema:', error);
-    }
-  }
-
-  handleSystemNotification(detail) {
-    try {
-      console.log('📢 Notificación del sistema:', detail);
-
-      // Reenviar al sistema de notificaciones
-      if (window.axyraNotificationSystem) {
-        window.axyraNotificationSystem.showNotification(detail.message, detail.type || 'info', detail.duration || 5000);
-      }
-    } catch (error) {
-      console.error('❌ Error manejando notificación del sistema:', error);
-    }
-  }
-
-  // ========================================
-  // MÉTODOS PÚBLICOS
-  // ========================================
-
-  getSystemStatus() {
-    try {
-      return {
-        totalSystems: this.systems.size,
-        initializationStatus: Object.fromEntries(this.initializationStatus),
-        systemHealth: this.getSystemStatusSummary(),
-        timestamp: Date.now(),
-      };
-    } catch (error) {
-      console.error('❌ Error obteniendo estado del sistema:', error);
-      return null;
-    }
-  }
-
   getSystem(systemName) {
     try {
       return this.systems.get(systemName);
@@ -949,7 +609,12 @@ class AxyraIntegration {
 
 // Inicializar integración principal
 document.addEventListener('DOMContentLoaded', () => {
-  window.axyraIntegration = new AxyraIntegration();
+  try {
+    window.axyraIntegration = new AxyraIntegration();
+    console.log('✅ AxyraIntegration inicializado globalmente');
+  } catch (error) {
+    console.error('❌ Error inicializando AxyraIntegration:', error);
+  }
 });
 
 // Exportar para uso global

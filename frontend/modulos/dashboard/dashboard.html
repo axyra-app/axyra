@@ -3,402 +3,242 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AXYRA - Dashboard</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="../../nomina.ico" />
+    <title>AXYRA - Dashboard Principal</title>
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- Estilos AXYRA -->
     <link rel="stylesheet" href="../../static/axyra-styles.css" />
+    <link rel="stylesheet" href="../../static/responsive-styles.css" />
     <link rel="stylesheet" href="dashboard-styles.css" />
-    <link rel="stylesheet" href="../../static/modal-fixes.css" />
-
-    <!-- Estilos del Sistema de IA AXYRA -->
-    <link rel="stylesheet" href="../../static/axyra-ai-styles.css" />
-
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <!-- Header Compartido AXYRA -->
     <script src="../../static/include-header.js"></script>
-
-    <!-- Sistema Unificado de Autenticación AXYRA -->
-    <script src="../../static/unified-auth-system.js"></script>
-
-    <!-- Sistema Unificado de Reportes Avanzados AXYRA -->
-    <script src="../../static/advanced-reports-unified.js"></script>
-
-    <!-- Sistema Unificado de Backup AXYRA -->
-    <script src="../../static/backup-system-unified.js"></script>
-
-    <!-- Sistema Unificado de Auditoría AXYRA -->
-    <script src="../../static/audit-system-unified.js"></script>
   </head>
   <body>
     <!-- Header Compartido AXYRA - Se insertará automáticamente -->
 
-    <!-- Main Content -->
-    <main class="axyra-main-content">
-      <div class="axyra-dashboard-container">
-        <!-- Welcome Section -->
-        <div class="axyra-welcome-section">
-          <h1 class="axyra-dashboard-title" id="welcomeTitle">Dashboard</h1>
-          <p class="axyra-dashboard-subtitle" id="welcomeMessage">
-            Resumen general de tu empresa y estadísticas importantes
-          </p>
+    <!-- Sistema de Notificaciones Profesionales -->
+    <div id="notificacionesSistema" class="notificaciones-sistema">
+      <div id="notificacion" class="notificacion">
+        <div class="notificacion-icono">
+          <i id="notificacionIcono" class="fas fa-info-circle"></i>
         </div>
+        <div class="notificacion-contenido">
+          <h4 id="notificacionTitulo">Notificación</h4>
+          <p id="notificacionMensaje">Mensaje de la notificación</p>
+        </div>
+        <button class="notificacion-cerrar" onclick="cerrarNotificacion()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
 
-        <!-- Stats Grid -->
-        <div class="axyra-stats-grid">
-          <div class="axyra-stat-card" data-modal="empleadosModal">
-            <div class="axyra-stat-icon blue">
-              <i class="fas fa-users"></i>
-            </div>
-            <div class="axyra-stat-number" id="empleadosActivos">0</div>
-            <div class="axyra-stat-label">Empleados Activos</div>
+    <!-- Contenido Principal -->
+    <div class="dashboard-container">
+      <!-- Header del Dashboard -->
+      <div class="dashboard-header">
+        <h1 class="dashboard-title">
+          <i class="fas fa-tachometer-alt"></i>
+          Dashboard Principal
+        </h1>
+        <p class="dashboard-subtitle">Vista consolidada de tu empresa en tiempo real</p>
+        <div class="dashboard-actions">
+          <button class="btn btn-primary" onclick="actualizarDashboard()">
+            <i class="fas fa-sync-alt"></i> Actualizar
+          </button>
+          <button class="btn btn-secondary" onclick="exportarDashboard()">
+            <i class="fas fa-download"></i> Exportar
+          </button>
+        </div>
+      </div>
+
+      <!-- Métricas Principales -->
+      <div class="dashboard-metrics">
+        <div class="metric-card primary">
+          <div class="metric-icon">
+            <i class="fas fa-users"></i>
           </div>
-
-          <div class="axyra-stat-card" data-modal="horasModal">
-            <div class="axyra-stat-icon green">
-              <i class="fas fa-clock"></i>
-            </div>
-            <div class="axyra-stat-number" id="horasMes">0</div>
-            <div class="axyra-stat-label">Horas del Mes</div>
-          </div>
-
-          <div class="axyra-stat-card" data-modal="nominasModal">
-            <div class="axyra-stat-icon orange">
-              <i class="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div class="axyra-stat-number" id="nominasGeneradas">0</div>
-            <div class="axyra-stat-label">Nóminas Generadas</div>
-          </div>
-
-          <div class="axyra-stat-card" data-modal="salariosModal">
-            <div class="axyra-stat-icon purple">
-              <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="axyra-stat-number" id="totalSalarios">$0</div>
-            <div class="axyra-stat-label">Total Salarios Netos</div>
-          </div>
-
-          <div class="axyra-stat-card" data-modal="cuadresModal">
-            <div class="axyra-stat-icon blue">
-              <i class="fas fa-calculator"></i>
-            </div>
-            <div class="axyra-stat-number" id="cuadresCaja">0</div>
-            <div class="axyra-stat-label">Cuadres de Caja</div>
-          </div>
-
-          <div class="axyra-stat-card" data-modal="inventarioModal">
-            <div class="axyra-stat-icon green">
-              <i class="fas fa-boxes"></i>
-            </div>
-            <div class="axyra-stat-number" id="totalInventario">0</div>
-            <div class="axyra-stat-label">Items en Inventario</div>
+          <div class="metric-content">
+            <h3 id="totalEmpleados">0</h3>
+            <p>Total Empleados</p>
+            <span class="metric-change positive" id="cambioEmpleados">+0%</span>
           </div>
         </div>
 
-        <!-- Quick Actions -->
-        <div class="axyra-quick-actions">
-          <h2 class="axyra-section-title">
-            <i class="fas fa-bolt"></i>
-            Acciones Rápidas
-          </h2>
-          <div class="axyra-actions-grid">
-            <a href="../empleados/empleados.html" class="axyra-action-btn">
-              <i class="fas fa-user-plus"></i>
-              <span>Registrar Empleado</span>
-            </a>
-            <a href="../horas/gestionar_horas.html" class="axyra-action-btn">
-              <i class="fas fa-clock"></i>
-              <span>Registrar Horas</span>
-            </a>
-            <a href="../nomina/gestionar_nomina.html" class="axyra-action-btn">
-              <i class="fas fa-file-invoice"></i>
-              <span>Generar Nómina</span>
-            </a>
-            <a href="../cuadre_caja/cuadre_caja.html" class="axyra-action-btn">
-              <i class="fas fa-calculator"></i>
-              <span>Cuadre de Caja</span>
-            </a>
-            <a href="../inventario/inventario.html" class="axyra-action-btn">
-              <i class="fas fa-box"></i>
-              <span>Gestionar Inventario</span>
-            </a>
-            <a href="../configuracion/configuracion.html" class="axyra-action-btn">
-              <i class="fas fa-cog"></i>
-              <span>Configuración</span>
-            </a>
+        <div class="metric-card success">
+          <div class="metric-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="horasMes">0.0</h3>
+            <p>Horas del Mes</p>
+            <span class="metric-change positive" id="cambioHoras">+0%</span>
           </div>
         </div>
 
-        <!-- AI Insights Section -->
-        <div class="axyra-ai-insights">
-          <h2 class="axyra-section-title">
-            <i class="fas fa-robot"></i>
-            Insights de IA
-          </h2>
-          <div class="axyra-ai-insights-grid">
-            <div class="axyra-ai-insight-card" id="aiPerformanceInsight">
-              <div class="axyra-ai-insight-icon">
-                <i class="fas fa-chart-line"></i>
-              </div>
-              <div class="axyra-ai-insight-content">
-                <h3>Análisis de Performance</h3>
-                <p id="aiPerformanceText">Analizando rendimiento del sistema...</p>
-                <div class="axyra-ai-insight-actions">
-                  <button class="axyra-btn axyra-btn-primary" onclick="axyraAIAssistant.analyzePerformance()">
-                    <i class="fas fa-magic"></i> Analizar
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="axyra-ai-insight-card" id="aiTrendInsight">
-              <div class="axyra-ai-insight-icon">
-                <i class="fas fa-trending-up"></i>
-              </div>
-              <div class="axyra-ai-insight-content">
-                <h3>Tendencias Predictivas</h3>
-                <p id="aiTrendText">Identificando patrones y tendencias...</p>
-                <div class="axyra-ai-insight-actions">
-                  <button class="axyra-btn axyra-btn-secondary" onclick="axyraAIAssistant.analyzeTrends()">
-                    <i class="fas fa-eye"></i> Ver Tendencias
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="axyra-ai-insight-card" id="aiRecommendationInsight">
-              <div class="axyra-ai-insight-icon">
-                <i class="fas fa-lightbulb"></i>
-              </div>
-              <div class="axyra-ai-insight-content">
-                <h3>Recomendaciones IA</h3>
-                <p id="aiRecommendationText">Generando recomendaciones personalizadas...</p>
-                <div class="axyra-ai-insight-actions">
-                  <button class="axyra-btn axyra-btn-success" onclick="axyraAIAssistant.getRecommendations()">
-                    <i class="fas fa-star"></i> Obtener
-                  </button>
-                </div>
-              </div>
-            </div>
+        <div class="metric-card warning">
+          <div class="metric-icon">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="totalPagos">$0</h3>
+            <p>Total Pagos</p>
+            <span class="metric-change positive" id="cambioPagos">+0%</span>
           </div>
         </div>
 
-        <!-- System Status Section -->
-        <div class="axyra-system-status">
-          <h2 class="axyra-section-title">
-            <i class="fas fa-heartbeat"></i>
-            Estado del Sistema
-          </h2>
-          <div class="axyra-system-status-grid">
-            <div class="axyra-system-status-card" id="errorHandlerStatus">
-              <div class="axyra-system-status-icon">
-                <i class="fas fa-shield-alt"></i>
-              </div>
-              <div class="axyra-system-status-content">
-                <h3>Manejador de Errores</h3>
-                <p id="errorHandlerStatusText">Verificando estado...</p>
-                <div class="axyra-system-status-indicator">
-                  <span class="axyra-status-badge" id="errorHandlerBadge">Verificando</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="axyra-system-status-card" id="performanceOptimizerStatus">
-              <div class="axyra-system-status-icon">
-                <i class="fas fa-tachometer-alt"></i>
-              </div>
-              <div class="axyra-system-status-content">
-                <h3>Optimizador de Performance</h3>
-                <p id="performanceOptimizerStatusText">Verificando estado...</p>
-                <div class="axyra-system-status-indicator">
-                  <span class="axyra-status-badge" id="performanceOptimizerBadge">Verificando</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="axyra-system-status-card" id="aiAssistantStatus">
-              <div class="axyra-system-status-icon">
-                <i class="fas fa-robot"></i>
-              </div>
-              <div class="axyra-system-status-content">
-                <h3>Asistente de IA</h3>
-                <p id="aiAssistantStatusText">Verificando estado...</p>
-                <div class="axyra-system-status-indicator">
-                  <span class="axyra-status-badge" id="aiAssistantBadge">Verificando</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="axyra-system-status-card" id="realTimeMonitorStatus">
-              <div class="axyra-system-status-icon">
-                <i class="fas fa-eye"></i>
-              </div>
-              <div class="axyra-system-status-content">
-                <h3>Monitor en Tiempo Real</h3>
-                <p id="realTimeMonitorStatusText">Verificando estado...</p>
-                <div class="axyra-system-status-indicator">
-                  <span class="axyra-status-badge" id="realTimeMonitorBadge">Verificando</span>
-                </div>
-              </div>
-            </div>
+        <div class="metric-card info">
+          <div class="metric-icon">
+            <i class="fas fa-file-invoice"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="nominasGeneradas">0</h3>
+            <p>Nóminas Generadas</p>
+            <span class="metric-change positive" id="cambioNominas">+0%</span>
           </div>
         </div>
 
-        <!-- Charts Section -->
-        <div class="axyra-charts-section">
-          <h2 class="axyra-section-title">
+        <div class="metric-card secondary">
+          <div class="metric-icon">
             <i class="fas fa-chart-line"></i>
-            Análisis y Estadísticas
-          </h2>
-          <div class="axyra-charts-grid">
-            <div class="axyra-chart-card">
-              <h3 class="axyra-chart-title">Distribución de Empleados por Departamento</h3>
-              <div class="axyra-chart-container">
-                <canvas id="employeeDistributionChart"></canvas>
-              </div>
-            </div>
-            <div class="axyra-chart-card">
-              <h3 class="axyra-chart-title">Tendencia de Horas Trabajadas</h3>
-              <div class="axyra-chart-container">
-                <canvas id="hoursTrendChart"></canvas>
-              </div>
-            </div>
-            <div class="axyra-chart-card">
-              <h3 class="axyra-chart-title">Distribución de Salarios</h3>
-              <div class="axyra-chart-container">
-                <canvas id="salaryDistributionChart"></canvas>
-              </div>
-            </div>
-            <div class="axyra-chart-card">
-              <h3 class="axyra-chart-title">Métricas de Productividad</h3>
-              <div class="axyra-chart-container">
-                <canvas id="productivityChart"></canvas>
-              </div>
-            </div>
+          </div>
+          <div class="metric-content">
+            <h3 id="promedioHoras">0.0</h3>
+            <p>Promedio Horas</p>
+            <span class="metric-change positive" id="cambioPromedio">+0%</span>
           </div>
         </div>
 
-        <!-- Recent Activity -->
-        <div class="axyra-recent-activity">
-          <h2 class="axyra-section-title">
-            <i class="fas fa-history"></i>
-            Actividad Reciente
-          </h2>
-          <div class="axyra-activity-list" id="actividadReciente">
-            <!-- La actividad se cargará dinámicamente -->
+        <div class="metric-card dark">
+          <div class="metric-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <div class="metric-content">
+            <h3 id="totalDepartamentos">0</h3>
+            <p>Departamentos</p>
+            <span class="metric-change positive" id="cambioDepartamentos">+0%</span>
           </div>
         </div>
       </div>
-    </main>
 
-    <!-- Modales para estadísticas -->
-    <div id="empleadosModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Empleados</h3>
-          <button class="axyra-modal-close">&times;</button>
+      <!-- Gráficos y Análisis -->
+      <div class="dashboard-charts">
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-pie"></i> Distribución de Empleados</h3>
+            <div class="chart-actions">
+              <button class="btn btn-sm btn-outline" onclick="toggleChartView('empleados')">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <canvas id="empleadosChart" width="400" height="300"></canvas>
+          </div>
         </div>
-        <div class="axyra-modal-body" id="empleadosModalBody">
-          <!-- Contenido del modal -->
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-line"></i> Tendencia de Horas</h3>
+            <div class="chart-actions">
+              <button class="btn btn-sm btn-outline" onclick="toggleChartView('horas')">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <canvas id="horasChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-bar"></i> Salarios por Departamento</h3>
+            <div class="chart-actions">
+              <button class="btn btn-sm btn-outline" onclick="toggleChartView('salarios')">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <canvas id="salariosChart" width="400" height="300"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-container">
+          <div class="chart-header">
+            <h3><i class="fas fa-chart-doughnut"></i> Productividad General</h3>
+            <div class="chart-actions">
+              <button class="btn btn-sm btn-outline" onclick="toggleChartView('productividad')">
+                <i class="fas fa-exchange-alt"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-content">
+            <canvas id="productividadChart" width="400" height="300"></canvas>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="horasModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Horas del Mes</h3>
-          <button class="axyra-modal-close">&times;</button>
+      <!-- Actividad Reciente -->
+      <div class="dashboard-activity">
+        <div class="activity-section">
+          <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+          <div class="activity-list" id="activityList">
+            <!-- Las actividades se renderizarán aquí -->
+          </div>
         </div>
-        <div class="axyra-modal-body" id="horasModalBody">
-          <!-- Contenido del modal -->
+
+        <div class="activity-section">
+          <h3><i class="fas fa-tasks"></i> Tareas Pendientes</h3>
+          <div class="task-list" id="taskList">
+            <!-- Las tareas se renderizarán aquí -->
+          </div>
         </div>
       </div>
-    </div>
 
-    <div id="nominasModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Nóminas</h3>
-          <button class="axyra-modal-close">&times;</button>
-        </div>
-        <div class="axyra-modal-body" id="nominasModalBody">
-          <!-- Contenido del modal -->
-        </div>
-      </div>
-    </div>
-
-    <div id="salariosModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Salarios Netos</h3>
-          <button class="axyra-modal-close">&times;</button>
-        </div>
-        <div class="axyra-modal-body" id="salariosModalBody">
-          <!-- Contenido del modal -->
-        </div>
-      </div>
-    </div>
-
-    <div id="cuadresModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Cuadres de Caja</h3>
-          <button class="axyra-modal-close">&times;</button>
-        </div>
-        <div class="axyra-modal-body" id="cuadresModalBody">
-          <!-- Contenido del modal -->
-        </div>
-      </div>
-    </div>
-
-    <div id="inventarioModal" class="axyra-modal">
-      <div class="axyra-modal-content">
-        <div class="axyra-modal-header">
-          <h3>Detalle de Inventario</h3>
-          <button class="axyra-modal-close">&times;</button>
-        </div>
-        <div class="axyra-modal-body" id="inventarioModalBody">
-          <!-- Contenido del modal -->
+      <!-- Estado del Sistema -->
+      <div class="dashboard-system-status">
+        <h3><i class="fas fa-server"></i> Estado del Sistema</h3>
+        <div class="system-status-grid" id="systemStatusGrid">
+          <!-- El estado del sistema se renderizará aquí -->
         </div>
       </div>
     </div>
 
     <!-- Scripts -->
-    <script src="../../static/firebase-config.js"></script>
-    <script src="../../static/firebase-sync-manager.js"></script>
-    <script src="../../static/notifications-system.js"></script>
-    <script src="../../static/session-timeout.js"></script>
-    <script src="../../static/advanced-reports.js"></script>
-    <script src="../../static/global-search-system.js"></script>
-    <script src="../../static/custom-reports-system.js"></script>
-    <script src="../../static/auth-manager.js"></script>
+    <!-- Firebase -->
+    <script>
+      // Configuración de Firebase
+      const firebaseConfig = {
+        apiKey: 'AIzaSyBXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+        authDomain: 'axyra-app.firebaseapp.com',
+        projectId: 'axyra-app',
+        storageBucket: 'axyra-app.appspot.com',
+        messagingSenderId: '123456789012',
+        appId: '1:123456789012:web:abcdefghijklmnop',
+      };
 
-    <!-- Sistema de IA AXYRA -->
-    <script src="../../static/error-handler.js"></script>
-    <script src="../../static/performance-optimizer.js"></script>
-    <script src="../../static/real-time-monitor.js"></script>
-    <script src="../../static/ai-assistant.js"></script>
+      // Inicializar Firebase
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp(firebaseConfig);
+        console.log('🔥 Firebase inicializado correctamente');
+      } else {
+        console.warn('⚠️ Firebase no está disponible');
+      }
+    </script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Scripts de la aplicación -->
     <script src="../../static/axyra-integration.js"></script>
-
+    <script src="../../static/unified-auth-system.js"></script>
     <script src="dashboard.js"></script>
-
-    <!-- Script de Verificación de IA -->
-    <script src="../../verify-ai-systems.js"></script>
-
-    <!-- Script de Debug de IA -->
-    <script src="../../debug-ai-systems.js"></script>
   </body>
 </html>
